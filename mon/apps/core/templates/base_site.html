@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{{ title }} | {% trans 'Peoplemeter' %}{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name">{% trans 'Peoplemeter' %}</h1>
+{% endblock %}
+
+{% block content %}
+    <br><h2>{% trans 'Добро пожаловать в проект MO.' %}</h2>
+
+{% endblock %}

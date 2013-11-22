@@ -1,0 +1,198 @@
+/*
+    DJANGO Admin styles
+*/
+
+body {
+    /*margin: 30;*/
+    /*margin-top: 40;*/
+    padding: 30;
+    /*font-size: 12px;*/
+    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    /*color: #333;*/
+    /*background: #f8f8f8;*/
+    background-color: #f8f8f8;
+}
+
+
+/* HEADER */
+
+#header {
+    margin-top: -50px;
+}
+
+#header a {
+    background-color: #fcfcfc;
+}
+
+#header a:hover {
+    background-color: #aaaaaa;
+    color: #ffffff;
+}
+
+.sidebar {
+    padding: 0px;
+    margin-top: 0px;
+    margin-left: -40px;
+    margin-right: -40px;
+    font-size: 18px;
+    left: 0px;
+    background-color: #ffffff;
+}
+.head_menu {
+    padding: 0px;
+    margin-left: 20px;
+    margin-right: 60px;
+    margin-top: -20px;
+    position: absolute;
+    left: 0px;
+    list-style: none;
+}
+.head_menu li {
+    display: inline;
+    margin-right: 40px;
+}
+.head_menu li a {
+    text-decoration: none;
+    color: #716d6a;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.head_menu li a:hover {
+    color: #211e1e;
+}
+
+
+/*.button {*/
+.button, a.button {
+    background:#f9fff9;
+    padding:3px 5px 3px 5px;
+    color: #417690;
+    text-decoration: none;
+    border:1px solid #dff0d8;
+    text-transform:uppercase;
+    font-size:11px; line-height:25px;
+}
+a.button:hover {
+    background:#dff0d8;
+    border-color:#7f7d78;
+}
+
+/* LINKS */
+
+a:link {
+    color: #5b80b2;
+    text-decoration: none;
+}
+
+a img {
+    border: none;
+}
+
+
+/* SIDEBAR */
+
+.profile-main {
+    font-size: 20px;
+    color: #f9fff9;
+    padding: 0px;
+    margin-top: -2px;
+    margin-right: 0px;
+    position: absolute;
+    right: 0px;
+}
+
+#content-related h3 {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+#content-related h4 {
+    font-size: 11px;
+}
+
+
+/* MESSAGES & ERRORS */
+
+ul.messagelist {
+    padding: 0 0 5px 0;
+    margin: 0;
+}
+
+.errornote {
+    font-size: 12px !important;
+    display: block;
+    padding: 4px 5px 4px 25px;
+    margin: 0 0 3px 0;
+    /*border: 1px solid red;*/
+    color: #eed3d7;
+    background: #ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat;
+}
+
+ul.errorlist {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.errorlist li {
+    font-size: 14px !important;
+    display: block;
+    padding: 4px 25px 4px 25px;
+    margin: 2px 0 2px 0;
+    border: 1px solid #802420;
+    color: white;
+    background: #ee5f5b url(../img/admin/icon_alert.gif) 5px .3em no-repeat;
+}
+
+.errorlist li a {
+ 	color: white;
+    text-decoration: underline;
+
+}
+
+td ul.errorlist {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+td ul.errorlist li {
+    margin: 0 !important;
+}
+
+.errors {
+    background: #ffc;
+}
+
+.errors input, .errors select, .errors textarea {
+    border: 1px solid red;
+}
+
+.empty-form {
+    display: none;
+}
+
+select[type="hidden"], .hidden {
+  display: none;
+  visibility: hidden;
+}
+
+input[type="select"]:disabled {
+  background: #ccc;
+}
+
+input[hidden="hidden"], .hidden {
+  display: none;
+  visibility: hidden;
+}
+
+.hide {
+  display: none;
+}
+
+#footer {
+    clear: both;
+    padding: 10px;
+    margin-top: 200px;
+}

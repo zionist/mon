@@ -1,0 +1,36 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h2>{{title}}</h2>
+    {% if user.is_staff %}
+        <a class="btn btn-small" href="{% url 'create-build' %}">
+           {% trans 'Добавить строительный объект' %}</a><br><br>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+
+        {% if objects_list %}
+            <div class="build-table">
+            <h4> {% trans 'Сданные объекты' %}</h4>
+            <table class="table table-condensed">
+                {% for obj in objects_list %}
+                    <tr><td>
+                        {% with obj.address as obj_address %}
+                            {% if obj_address|length > 80 %}
+                                {{obj_address|truncatechars:75}}...
+                            {% else  %}
+                                {{obj_address}}
+                            {% endif %}
+                        {% endwith %}
+                    </td></tr>
+                {% endfor %}
+            </table>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
