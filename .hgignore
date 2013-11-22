@@ -1,0 +1,16 @@
+.hgignore
+.idea
+/env
+
+syntax: glob
+
+*.log
+*.pid
+*.pyc
+.*
+*/mondb
+*/statics/*
+*/migrations/*
+main/collect_static/*
+*settings_local.py
+*~
