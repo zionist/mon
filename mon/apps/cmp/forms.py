@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+
+from django import forms
+from django.forms.formsets import formset_factory
+from django.conf import settings
+from django.utils.translation import ugettext as _
+from django.forms.models import inlineformset_factory, formset_factory, \
+    modelformset_factory, modelform_factory, BaseModelFormSet
+
+from .models import CompareData, Contract, Result, Auction, Person
+
+
+class CompareDataForm(forms.ModelForm):
+    class Meta:
+        model = CompareData
+
+
+class ContractForm(forms.ModelForm):
+    class Meta:
+        model = Contract
+
+
+class ResultForm(forms.ModelForm):
+    class Meta:
+        model = Result
+
+
+class AuctionForm(forms.ModelForm):
+    class Meta:
+        model = Auction
+
+
+class PersonForm(forms.ModelForm):
+    class Meta:
+        model = Person

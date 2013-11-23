@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 
 from apps.build.models import Building
-from apps.build.forms import BuildForm
+from apps.build.forms import BuildingForm
 
 
 def add_build(request):
@@ -23,13 +23,13 @@ def add_build(request):
     context = {'title': _(u'Добавление строительного объекта')}
     prefix = 'build'
     if request.method == "POST":
-        form = BuildForm(request.POST, prefix=prefix)
+        form = BuildingForm(request.POST, prefix=prefix)
         if form.is_valid():
             build = form.save(commit=False)
             build.save()
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
-        form = BuildForm(prefix=prefix)
+        form = BuildingForm(prefix=prefix)
     context.update({'form': form, 'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
 

@@ -107,11 +107,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'apps.imgfile',
     'apps.core',
     'apps.mo',
+    'apps.cmp',
     'apps.build',
     'apps.payment',
-    'apps.imgfile',
     'south',
 )
 

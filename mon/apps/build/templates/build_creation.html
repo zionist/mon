@@ -13,9 +13,9 @@
             <form method="POST" action="{% url 'create-build' %}"> {% csrf_token %}
                 <table border="0">
                 {% for field in form %}
-                    <tr><td width="30%">{{ field.label }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
                 {% endfor %}
-                <table>
+                </table>
                 <br>
                 <button type="submit" name = "build"> {% trans ' Сохранить ' %} </button>
             </form>
