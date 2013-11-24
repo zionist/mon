@@ -21,6 +21,7 @@ GAS_SUPPLY_CHOICES  = ((0, _(u'Центральное')),  (1, _(u'Индиви�
 CREATION_FORM_CHOICES  = ((0, _(u'Приобретение')),  (1, _(u'Долевое строительство')), (2, _(u'Строительство')),)
 SEPARATE_CHOICES  = ((0, _(u'Совместный')),  (1, _(u'Раздельный')),)
 STAGE_CHOICES = ((0, _(u'Подача заявок')),  (1, _(u'Работа комиссии')), (2, _(u'Размещение завершено, аукцион признан несостоявшимся, не допущена ни одна заявка')), (3, _(u'Размещение завершено, аукцион признан несостоявшимся, не подана ни одна заявка')), (4, _(u'Заключен контракт')), (5, _(u'Размещение отменено')))
+PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения денежных средств, выделенных на текущий год. Без дополнительного финансирования')),   (1, _(u'Перспективы освоения ДОПОЛНИТЕЛЬНЫХ денежных средств, в текущем году.')),  (2, _(u'Перспективы освоения денежных средств в планируемом году.')))
 
 #class BaseModel(models.Model):
 #    insert_date = models.DateTimeField(verbose_name=_(u'Created data and time'),
@@ -217,7 +218,7 @@ class BaseDevices(models.Model):
     switches = models.NullBooleanField(blank=True, )
     sockets = models.NullBooleanField(blank=True, )
     lamp = models.NullBooleanField(blank=True, )
-    xeiling_hook = models.NullBooleanField(blank=True, )
+    ceiling_hook = models.NullBooleanField(blank=True, )
     heaters = models.NullBooleanField(blank=True, )
     smoke_filter = models.NullBooleanField(blank=True, )
     not_given = models.NullBooleanField(blank=True, )
@@ -283,7 +284,7 @@ class BaseBuilding(models.Model):
     address = models.CharField(help_text=_(u"Адрес"), null=True, max_length=2048, verbose_name=_(u"Адрес"), blank=True, )
     comment = models.CharField(max_length=2048, null=True, blank=True, )
     readiness = models.IntegerField(blank=True, null=True, choices=READINESS_CHOICES , )
-    payment_perspective = models.IntegerField(null=True, blank=True, )
+    payment_perspective = models.IntegerField(null=True, blank=True, choices=PAYMENT_PERSPECTIVE_CHOICES , )
     complete_date = models.DateField(auto_now=True, null=True, blank=True, )
 
 
