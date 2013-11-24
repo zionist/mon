@@ -20,6 +20,17 @@ lib64
 env
 .idea
 
+# Base
+*db
+
+# Django local setting
+settings_local.py
+
+# Static files
+admin/
+css/
+static/admin/
+
 # Installer logs
 pip-log.txt
 
