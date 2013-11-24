@@ -135,4 +135,6 @@ LOGGING = {
     }
 }
 
+LOGIN_REDIRECT_URL = '/'
+
 from mon.settings_local import DATABASES

@@ -13,8 +13,12 @@ urlpatterns = patterns('',
     url(r'^obj/', include('apps.build.urls')),
     url(r'^obj/', include('apps.payment.urls')),
     url(r'^$', views.main, name='main'),
-    url(r'^login/$', views.login, name='auth-login'),
-    url(r'^logout/$', views.logout, name='logout'),
+    url(r"^login/$", "django.contrib.auth.views.login",
+        {"template_name": "login.html"},
+        name="auth-login"),
+    url(r"^logout/$", "django.contrib.auth.views.logout_then_login",
+        {"login_url": "/login"}, name="logout")
+
 )
 
 if 'django.contrib.admin' in settings.INSTALLED_APPS and settings.DEBUG:

@@ -14,29 +14,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
-
-
-def login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            auth.login(request, form.get_user())
-            request.session.delete_test_cookie()
-            return HttpResponseRedirect(request.GET.get('next', reverse('main')))
-    else:
-        form = AuthenticationForm(request)
-    request.session.set_test_cookie()
-    return render_to_response('login.html', {'form': form}, context_instance=RequestContext(request))
-
-
-def logout(request):
-    auth.logout(request)
-    return HttpResponseRedirect(reverse('main'))
+from django.core.urlresolvers import reverse
 
 
 def main(request):
     if not request.user.is_authenticated():
-        return login(request)
+        return HttpResponseRedirect("/login")
     context = {'title': _(u'Мониторинг')}
     return render(request, 'base_site.html', context)
 
