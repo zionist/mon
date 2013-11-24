@@ -25,3 +25,16 @@ class BuildingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BuildingForm, self).__init__(*args, **kwargs)
         self.fields['address'].widget.attrs['class'] = 'span7'
+
+
+class BuildingShowForm(BuildingForm):
+
+    class Meta:
+        model = Building
+
+    def __init__(self, *args, **kwargs):
+        super(BuildingShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+

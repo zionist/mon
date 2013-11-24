@@ -19,15 +19,18 @@
             <h4> {% trans 'Сданные объекты' %}</h4>
             <table class="table table-condensed">
                 {% for obj in objects_list %}
-                    <tr><td>
+                    {% if obj.id %}
+                        <tr><td>
+                        &nbsp;&nbsp;<a href="{% url 'change-build' obj.id %}">
                         {% with obj.address as obj_address %}
                             {% if obj_address|length > 80 %}
                                 {{obj_address|truncatechars:75}}...
                             {% else  %}
                                 {{obj_address}}
                             {% endif %}
-                        {% endwith %}
-                    </td></tr>
+                        {% endwith %}</a>
+                        </td></tr>
+                    {% endif %}
                 {% endfor %}
             </table>
             </div>

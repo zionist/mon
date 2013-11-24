@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 
 from apps.build.models import Building
-from apps.build.forms import BuildingForm
+from apps.build.forms import BuildingForm, BuildingShowForm
 
 
 def add_build(request):
@@ -57,3 +57,40 @@ def get_builds(request, pk=None, strv=None, numv=None):
             objects = paginator.page(paginator.num_pages)
         context.update({'objects_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
+
+
+def get_build(request, pk, extra=None):
+    context = {'title': _(u'Параметры объекта')}
+    build = Building.objects.get(pk=pk)
+    if request.method == "POST":
+        form = BuildingShowForm(request.POST, instance=build)
+        context.update({'form': form})
+    else:
+        form = BuildingShowForm(instance=build)
+        context.update({'form': form})
+    context.update({'object': build})
+    return render(request, 'build.html', context, context_instance=RequestContext(request))
+
+
+def update_build(request, pk, extra=None):
+    context = {'title': _(u'Параметры объекта')}
+    build = Building.objects.get(pk=pk)
+    if request.method == "POST":
+        form = BuildingForm(request.POST, instance=build)
+        context.update({'form': form})
+        if form.is_valid():
+            form.save()
+            return redirect('builds')
+    else:
+        form = BuildingForm(instance=build)
+        context.update({'form': form})
+    context.update({'object': build})
+    return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
+
+
+def pre_delete_build(request, pk, extra=None):
+    pass
+
+
+def delete_build(request, pk, extra=None):
+    pass
