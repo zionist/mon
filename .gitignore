@@ -20,6 +20,9 @@ lib64
 env
 .idea
 
+# Base
+*db
+
 # Installer logs
 pip-log.txt
 
