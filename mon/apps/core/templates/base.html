@@ -12,57 +12,54 @@
     {% block links %}
         <link media="screen" href="{{ STATIC_URL }}css/bootstrap.min.css" type="text/css" rel="stylesheet" />
         <link media="screen" href="{{ STATIC_URL }}css/style.css" type="text/css" rel="stylesheet" />
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
     {% endblock %}
     {% block scripts %}
     {% endblock %}
 {% endblock %}
 </head>
-<body>
 {% block body %}
-<div id="wrapper">
-{% block header %}
-<div id="header">
-    <div class="logo">
-{#        <a href="{% url 'main' %}"><img src="{{ STATIC_URL }}images/logo.png" alt="Monitoring" /></a>#}
-    </div>
-    {% if user.is_authenticated %}
-        <div class="profile-main">
-            <a class="button" href="{% url 'logout' %}">{% trans 'Выйти' %}</a>
+    <body>
+   {% block navbar %}
+        <div class="navbar navbar-fixed-top">
+          <div class="navbar-inner">
+            <div class="container">
+              <div class="nav-collapse collapse">
+                <ul class="nav">
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <li><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
+                            <li><a href="{% url 'builds' %}">{% trans 'Мониторинг' %}</a></li>
+                            <li><a href="{% url 'main' %}">{% trans 'Аукционы' %}</a></li>
+                            <li><a href="{% url 'main' %}">{% trans 'Контракты' %}</a></li>
+                            <li><a href="{% url 'create-build' %}">{% trans 'Добавить' %}</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="profile">
-        <nav class="navbar" role="navigation" style="font-size: 18; text-transform:uppercase;">
-            <ul class="nav nav-tabs">
-            {% if user.is_staff %}
-                <li><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
-                <li><a href="{% url 'builds' %}">{% trans 'Мониторинг' %}</a></li>
-                <li><a href="{% url 'main' %}">{% trans 'Аукционы' %}</a></li>
-                <li><a href="{% url 'main' %}">{% trans 'Контракты' %}</a></li>
-                <li><a href="{% url 'create-build' %}">{% trans 'Добавить' %}</a></li>
-            {% elif not user.is_staff and user.is_authenticated %}
-                <li><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
-            {% endif %}
-            </ul>
-        </nav><br><br>
-        </div>
-    {% endif %}
-    </div>
+    {% endblock %}
+   <div class="container">
+       {% block wrapper %}{% endblock %}
+   </div>
+   <div class="container">
+       <br />
+       {% block content %}{% endblock %}
+   </div>
 
-{% endblock %}
-{% block wrapper %}{% endblock %}
-</div>
-{% block content %}{% endblock %}
-{% block footer %}
-<div id="footer">
-    <hr />
-    <div class="footer_menu long">
-        <ul class="menu">
-        </ul>
-        <div class="rights"><span class="copy">MO v1.1.0 Copyright &copy; 2013 developers</span> </div>
+   {% block footer %}
+   <div id="footer">
+        <hr />
+        <div class="footer_menu long">
+            <ul class="menu">
+            </ul>
+            <div class="rights"><span class="copy">MO v1.1.0 Copyright &copy; 2013 developers</span> </div>
+        </div>
     </div>
-</div>
+    {% endblock %}
+    </body>
 {% endblock %}
-{% block extra_body %}
-{% endblock %}
-{% endblock %}
-</body>
+{% block extra_body %} {% endblock %}
 </html>
