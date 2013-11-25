@@ -14,11 +14,11 @@
         <div class="error">{{ errorlist }}</div>
     {% else %}
 
-        {% if objects_list %}
+        {% if building_list %}
             <div class="build-table">
             <h4> {% trans 'Сданные объекты' %}</h4>
             <table class="table table-condensed">
-                {% for obj in objects_list %}
+                {% for obj in building_list %}
                     {% if obj.id %}
                         <tr><td>
                         &nbsp;&nbsp;<a href="{% url 'change-build' obj.id %}">

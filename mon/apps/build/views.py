@@ -13,6 +13,8 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnIn
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import permission_required, login_required
 
 from apps.build.models import Building
 from apps.build.forms import BuildingForm, BuildingShowForm
@@ -32,6 +34,33 @@ def add_build(request):
         form = BuildingForm(prefix=prefix)
     context.update({'form': form, 'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+class BuildingListView(ListView):
+    model = Building
+    template_name = "builds.html"
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super(BuildingListView, self).get_context_data(**kwargs)
+        context["title"] = _(u'Строительные материалы')
+        print context
+        return context
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(BuildingListView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self, *args, **kwargs):
+        data = self.request.GET.copy()
+        if data.get("pk"):
+            return Building.objects.get(pk=data.get("pk"))
+        if data.get("strv"):
+            return Building.objects.get(address__icontains=data.get("strv"))
+        if data.get("numv"):
+            return Building.objects.get(state=data.get("numv"))
+        else:
+            return super(BuildingListView, self).get_queryset(*args, **kwargs)
 
 
 def get_builds(request, pk=None, strv=None, numv=None):
