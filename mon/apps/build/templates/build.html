@@ -1,0 +1,35 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form and object %}
+            <h3>{% trans 'Объект' %}</h3>
+            <table>
+                <tr>
+                    <td><a class="btn btn-small" href="{% url 'update-building' object.id %}">
+                        {% trans 'Редактировать' %}</a></td>
+                    <td><a class="btn btn-small" href="{% url 'pre-delete-building' object.id %}">
+                        {% trans 'Удалить' %}</a></td>
+                    <td>{{object.address}}</td>
+                </tr>
+            <table>
+
+            <h3>{% trans 'Параметры' %}</h3>
+            <form method="POST" action="{% url 'update-building' object.id %}"> {% csrf_token %}
+                <table border="0">
+                {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                {% endfor %}
+                </table>
+                <br>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
