@@ -44,7 +44,6 @@ class BuildingListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(BuildingListView, self).get_context_data(**kwargs)
         context["title"] = _(u'Строительные материалы')
-        print context
         return context
 
     @method_decorator(login_required)
