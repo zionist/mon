@@ -17,22 +17,43 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
 from apps.build.models import Building
+from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.forms import BuildingForm, BuildingShowForm
 
 
-def add_build(request):
+def add_building(request):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление строительного объекта')}
-    prefix = 'build'
+    prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
+    RoomInlineFormSet = modelformset_factory(Room, can_delete=False)
+    HallwayInlineFormSet = modelformset_factory(Hallway, can_delete=False)
+    WCInlineFormSet = modelformset_factory(WC, can_delete=False)
+    KitchenInlineFormSet = modelformset_factory(Kitchen, can_delete=False)
     if request.method == "POST":
         form = BuildingForm(request.POST, prefix=prefix)
-        if form.is_valid():
-            build = form.save(commit=False)
-            build.save()
+        room_f = RoomInlineFormSet(request.POST, request.FILES, prefix=room_p)
+        hallway_f = HallwayInlineFormSet(request.POST, request.FILES, prefix=hallway_p)
+        wc_f = WCInlineFormSet(request.POST, request.FILES, prefix=wc_p)
+        kitchen_f = KitchenInlineFormSet(request.POST, request.FILES, prefix=kitchen_p)
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            building = form.save(commit=False)
+            room_f.save()
+            hallway_f.save()
+            wc_f.save()
+            kitchen_f.save()
+            building.save()
+            return redirect('buildings')
+        else:
+            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         form = BuildingForm(prefix=prefix)
-    context.update({'form': form, 'prefix': prefix})
+        room_f = RoomInlineFormSet(prefix=room_p)
+        hallway_f = HallwayInlineFormSet(prefix=hallway_p)
+        wc_f = WCInlineFormSet(prefix=wc_p)
+        kitchen_f = KitchenInlineFormSet(prefix=kitchen_p)
+    context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
@@ -44,7 +65,6 @@ class BuildingListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(BuildingListView, self).get_context_data(**kwargs)
         context["title"] = _(u'Строительные материалы')
-        print context
         return context
 
     @method_decorator(login_required)
@@ -63,7 +83,8 @@ class BuildingListView(ListView):
             return super(BuildingListView, self).get_queryset(*args, **kwargs)
 
 
-def get_builds(request, pk=None, strv=None, numv=None):
+@login_required
+def get_buildings(request, pk=None, strv=None, numv=None):
     template = 'builds.html'
     context = {'title': _(u'Строительные объекты')}
     if Building.objects.all().exists():
@@ -88,7 +109,7 @@ def get_builds(request, pk=None, strv=None, numv=None):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
-def get_build(request, pk, extra=None):
+def get_building(request, pk, extra=None):
     context = {'title': _(u'Параметры объекта')}
     build = Building.objects.get(pk=pk)
     if request.method == "POST":
@@ -101,7 +122,7 @@ def get_build(request, pk, extra=None):
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
 
-def update_build(request, pk, extra=None):
+def update_building(request, pk, extra=None):
     context = {'title': _(u'Параметры объекта')}
     build = Building.objects.get(pk=pk)
     if request.method == "POST":
@@ -109,7 +130,7 @@ def update_build(request, pk, extra=None):
         context.update({'form': form})
         if form.is_valid():
             form.save()
-            return redirect('builds')
+            return redirect('buildings')
     else:
         form = BuildingForm(instance=build)
         context.update({'form': form})
@@ -117,9 +138,9 @@ def update_build(request, pk, extra=None):
     return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
 
 
-def pre_delete_build(request, pk, extra=None):
+def pre_delete_building(request, pk, extra=None):
     pass
 
 
-def delete_build(request, pk, extra=None):
+def delete_building(request, pk, extra=None):
     pass

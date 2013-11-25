@@ -9,13 +9,37 @@
             {{ errorlist }}
         </div>
     {% else %}
-        {% if form %}
-            <form method="POST" action="{% url 'create-build' %}"> {% csrf_token %}
-                <table border="0">
-                {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+        {% if form or formsets %}
+            <form method="POST" action="{% url 'create-building' %}"> {% csrf_token %}
+                {% cycle ' ' 0 1 2 3 as title %}
+                {% cycle ' ' 'Room' 'Hallway' 'WC' 'Kitchen' as str_title %}
+                {% for formset in formsets %}
+
+                    {% if formset.total_form_count > 0 %}
+                        {{ formset.management_form }}
+                        <br><br><h4>{% cycle str_title %}{{titles.title}}{{titles.0}}</h4>
+                        {% for form in formset %}
+                            <table border="0">
+                            {% for field in form %}
+                                {% if field.is_hidden %}
+                                    {{ field }}
+                                {% else %}
+                                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                                {% endif %}
+                            {% endfor %}
+                            </table>
+                        {% endfor %}
+                    {% endif %}
+                    <!--{% cycle title %}-->
                 {% endfor %}
+                {% if form %}
+                <br><h4>{% trans ' Общие параметры' %}</h4>
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
                 </table>
+                {% endif %}
                 <br>
                 <button type="submit" name = "build"> {% trans ' Сохранить ' %} </button>
             </form>

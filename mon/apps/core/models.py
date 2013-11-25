@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from apps.imgfile.models import File, Image
 
 
-STATE_CHOICES  = ((0, _(u'Сданный объект')),  (1, _(u'Строящмйся объект')), (2, _(u'Участок под строительство')))
+STATE_CHOICES  = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
 READINESS_CHOICES  = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
 FLOOR_CHOICES  = ((0, _(u'Ламинат')),  (1, _(u'Паркет')),  (2, _(u'Линолеум')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
 WALL_CHOICES  = ((0, _(u'Обои')),  (1, _(u'Водоэмульсионная краска')),  (2, _(u'Штукатурка')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
@@ -280,35 +280,7 @@ class Developer(BaseDeveloper, ):
     image = models.ForeignKey(Image, null=True, blank=True, )
 
 
-class Developer_Contract(models.Model):
-
-    class Meta:
-
-        verbose_name = "Developer_Contract"
-    def __unicode__(self):
-        return '%s' % self.id
-
-
-class Developer_Building(models.Model):
-
-    class Meta:
-
-        verbose_name = "Developer_Building"
-    def __unicode__(self):
-        return '%s' % self.id
-
-
-class Developer_Ground(models.Model):
-
-    class Meta:
-
-        verbose_name = "Developer_Ground"
-    def __unicode__(self):
-        return '%s' % self.id
-
-
-
-class BaseCompareData(Hallway, WC, Kitchen, Room, BaseCommonChars, ):
+class BaseCompareData(BaseCommonChars, ):
 
     class Meta:
         abstract = True
@@ -317,3 +289,7 @@ class BaseCompareData(Hallway, WC, Kitchen, Room, BaseCommonChars, ):
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
     flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
     area = models.IntegerField(help_text=_(u"Общая площадь"), null=True, verbose_name=_(u"Общая площадь"), blank=True, )
+    room = models.ForeignKey(Room, null=True, blank=True, )
+    wc = models.ForeignKey(WC, null=True, blank=True, )
+    hallway = models.ForeignKey(Hallway, null=True, blank=True, )
+    kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )

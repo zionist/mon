@@ -6,10 +6,10 @@ urlpatterns = patterns(
     'apps.build.views',
 
     # url(r'^builds/$', views.get_builds, name='builds'),
-    url(r'^builds/$', views.BuildingListView.as_view(), name='builds'),
-    url(r'^builds/add/$', views.add_build, name='create-build'),
-    url(r'^builds/build/(?P<pk>[0-9]+)/$', views.get_build, name='change-build'),
-    url(r'^builds/upd/(?P<pk>[0-9]+)/$', views.update_build, name='update-build'),
-    url(r'^builds/pre/(?P<pk>[0-9]+)/$', views.pre_delete_build, name='pre-delete-object'),
-    url(r'^builds/del/(?P<pk>[0-9]+)/$', views.delete_build, name='delete-object'),
+    url(r'^building/$', views.BuildingListView.as_view(), name='buildings'),
+    url(r'^building/add/$', views.add_building, name='create-building'),
+    url(r'^building/building/(?P<pk>[0-9]+)/$', views.get_building, name='change-building'),
+    url(r'^building/update/(?P<pk>[0-9]+)/$', views.update_building, name='update-building'),
+    url(r'^building/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_building, name='pre-delete-building'),
+    url(r'^building/delete/(?P<pk>[0-9]+)/$', views.delete_building, name='delete-building'),
 )

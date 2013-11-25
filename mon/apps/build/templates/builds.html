@@ -4,7 +4,7 @@
 {% block content %}
     <h2>{{title}}</h2>
     {% if user.is_staff %}
-        <a class="btn btn-small" href="{% url 'create-build' %}">
+        <a class="btn btn-small" href="{% url 'create-building' %}">
            {% trans 'Добавить строительный объект' %}</a><br><br>
     {% endif %}
     {% if error %}
@@ -21,7 +21,7 @@
                 {% for obj in building_list %}
                     {% if obj.id %}
                         <tr><td>
-                        &nbsp;&nbsp;<a href="{% url 'change-build' obj.id %}">
+                        &nbsp;&nbsp;<a href="{% url 'change-building' obj.id %}">
                         {% with obj.address as obj_address %}
                             {% if obj_address|length > 80 %}
                                 {{obj_address|truncatechars:75}}...
