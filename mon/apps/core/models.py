@@ -120,7 +120,7 @@ class Developer(BaseDeveloper, ):
         app_label = "build"
         verbose_name = "Developer"
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.name
 
     doc = models.ForeignKey(File, )
     image = models.ForeignKey(Image, )

@@ -25,11 +25,13 @@ env
 
 # Django local setting
 settings_local.py
+settings_local_pg.py
 
 # Static files
 admin/
 css/
 static/admin/
+media
 
 # Installer logs
 pip-log.txt

@@ -11,6 +11,8 @@ class BaseImage(models.Model):
     def __unicode__(self):
         return '%s' % self.id
 
+    image = models.FileField(max_length=2048, null=True, blank=True,
+                             upload_to='img_files')
 
 class BaseFile(models.Model):
 
@@ -18,6 +20,9 @@ class BaseFile(models.Model):
         abstract = True
     def __unicode__(self):
         return '%s' % self.id
+
+    file = models.FileField(max_length=2048, null=True, blank=True,
+                            upload_to='files')
 
 
 class Image(BaseImage, ):
