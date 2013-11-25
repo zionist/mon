@@ -5,6 +5,8 @@ from django.utils.translation import ugettext as _
 from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
 from apps.imgfile.models import File, Image
+# from apps.cmp.models import Result
+
 from apps.build.models import Building, Ground
 
 
@@ -46,7 +48,7 @@ class CompareData(BaseCompareData, ):
     def __unicode__(self):
         return '%s' % self.id
 
-    result = models.ForeignKey(Result, help_text=_(u"Результат осмотра"), null=True, verbose_name=_(u"Результат осмотра"), blank=True, )
+    # result = models.ForeignKey(Result, help_text=_(u"Результат осмотра"), null=True, verbose_name=_(u"Результат осмотра"), blank=True, )
     cmp_date = models.DateTimeField(help_text=_(u"Дата последнего сравнения"), auto_now=True, null=True, verbose_name=_(u"Дата последнего сравнения"), blank=True, )
 
 
@@ -63,8 +65,8 @@ class Result(BaseResult, ):
     building = models.ForeignKey(Building, null=True, blank=True, )
     ground = models.ForeignKey(Ground, null=True, blank=True, )
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
-    mo_pers = models.ForeignKey(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, )
-    establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, )
+    mo_pers = models.ForeignKey(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
+    establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
 
 
 

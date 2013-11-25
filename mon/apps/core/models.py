@@ -26,7 +26,7 @@ PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения �
 class BaseName(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     name = models.CharField(help_text=_(u"Наименование"), null=True, max_length=2048, verbose_name=_(u"Наименование"), blank=True, )
 
@@ -34,7 +34,7 @@ class BaseName(models.Model):
 class BaseModel(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     creation_date = models.DateTimeField(auto_now=True, null=True, blank=True, )
 
@@ -42,7 +42,7 @@ class BaseModel(models.Model):
 class BaseBudget(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     sub_sum = models.IntegerField(help_text=_(u"Размер предоставляемой в текущем году субвенции"), null=True, verbose_name=_(u"Размер предоставляемой в текущем году субвенции"), blank=True, )
     sub_orph_home = models.IntegerField(help_text=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"), null=True, verbose_name=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"), blank=True, )
@@ -52,7 +52,7 @@ class BaseBudget(models.Model):
 class BaseSubvention(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     date = models.DateField(null=True, blank=True, )
     amount = models.IntegerField(help_text=_(u"Общая сумма субвенции"), null=True, verbose_name=_(u"Общая сумма субвенции"), blank=True, )
@@ -61,7 +61,7 @@ class BaseSubvention(models.Model):
 class BaseDepartamentAgreement(BaseModel, ):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     date = models.DateField(help_text=_(u"Дата"), null=True, verbose_name=_(u"Дата"), blank=True, )
     num = models.IntegerField(help_text=_(u"Номер"), null=True, verbose_name=_(u"Номер"), blank=True, )
@@ -71,7 +71,7 @@ class BaseDepartamentAgreement(BaseModel, ):
 class BaseOrphan(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     age = models.IntegerField(blank=True, null=True, choices=STAGE_CHOICES , )
     have_home = models.NullBooleanField(blank=True, )
@@ -81,10 +81,10 @@ class BaseOrphan(models.Model):
 class BaseBuilding(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
-    offer = models.ForeignKey(File, help_text=_(u"Коммерческое предложение"), null=True, verbose_name=_(u"Коммерческое предложение"), blank=True, )
-    permission = models.ForeignKey(File, help_text=_(u"Разрешение"), null=True, verbose_name=_(u"Разрешение"), blank=True, )
+#    offer = models.ForeignKey(File, help_text=_(u"Коммерческое предложение"), null=True, verbose_name=_(u"Коммерческое предложение"), blank=True, related_name='offer')
+#    permission = models.ForeignKey(File, help_text=_(u"Разрешение"), null=True, verbose_name=_(u"Разрешение"), blank=True, related_name='permission')
     state = models.IntegerField(help_text=_(u"Состояние"), null=True, blank=True, verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
     address = models.CharField(help_text=_(u"Адрес"), null=True, max_length=2048, verbose_name=_(u"Адрес"), blank=True, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
@@ -93,21 +93,10 @@ class BaseBuilding(models.Model):
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива осноения"), null=True, blank=True, verbose_name=_(u"Перспектива осноения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
-class BaseCompareData(Hallway, WC, Kitchen, Room, BaseCommonChars, ):
-
-    class Meta:
-        abstruct = True
-
-    floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
-    driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
-    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
-    area = models.IntegerField(help_text=_(u"Общая площадь"), null=True, verbose_name=_(u"Общая площадь"), blank=True, )
-
-
 class BaseContract(BaseName, ):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     num = models.CharField(help_text=_(u"Номер"), null=True, max_length=2048, verbose_name=_(u"Номер"), blank=True, )
 
@@ -115,7 +104,7 @@ class BaseContract(BaseName, ):
 class BaseResult(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     doc_files = models.ForeignKey(File, help_text=_(u"Предоставленные документы"), null=True, verbose_name=_(u"Предоставленные документы"), blank=True, )
     check_date = models.DateField(help_text=_(u"Дата проверки"), null=True, verbose_name=_(u"Дата проверки"), blank=True, )
@@ -126,7 +115,7 @@ class BaseResult(models.Model):
 class BaseImage(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     image = models.FileField(max_length=2048, null=True, blank=True, )
 
@@ -134,7 +123,7 @@ class BaseImage(models.Model):
 class BaseFile(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     file = models.FileField(max_length=2048, null=True, blank=True, )
 
@@ -142,7 +131,7 @@ class BaseFile(models.Model):
 class BaseDeveloper(BaseName, ):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     face_list = models.IntegerField(help_text=_(u"Юридическое лицо/Физическое лицо"), null=True, verbose_name=_(u"Юридическое лицо/Физическое лицо"), blank=True, )
     address = models.CharField(help_text=_(u"Фактический адрес"), null=True, max_length=2048, verbose_name=_(u"Фактический адрес"), blank=True, )
@@ -153,7 +142,7 @@ class BaseDeveloper(BaseName, ):
 class BasePayment(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     date = models.DateField(null=True, blank=True, )
     amount = models.CharField(max_length=2048, null=True, blank=True, )
@@ -161,16 +150,53 @@ class BasePayment(models.Model):
 class BaseMaterials(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     floor = models.IntegerField(help_text=_(u"Материал отделки пола"), null=True, blank=True, verbose_name=_(u"Материал отделки пола"), choices=FLOOR_CHOICES , )
     wall = models.IntegerField(help_text=_(u"Материал отделки стен"), null=True, blank=True, verbose_name=_(u"Материал отделки стен"), choices=WALL_CHOICES , )
     ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка"), null=True, blank=True, verbose_name=_(u"Материал отделки потолка"), choices=CEILING_CHOICES , )
 
+
+class BaseEngineerNetworks(models.Model):
+
+    class Meta:
+        abstract = True
+
+    water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
+    hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
+    water_removal = models.IntegerField(help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), choices=WATER_REMOVAL_CHOICES , )
+    electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
+    gas_supply = models.NullBooleanField(help_text=_(u"Газоснабжение"), blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
+
+
+class BaseSocialObjects(models.Model):
+
+    class Meta:
+        abstract = True
+
+    public_transport = models.IntegerField(help_text=_(u"Ближайшая остановка общественного транспорта"), null=True, verbose_name=_(u"Ближайшая остановка общественного транспорта"), blank=True, )
+    market = models.IntegerField(help_text=_(u"Магазин"), null=True, verbose_name=_(u"Магазин"), blank=True, )
+    kindergarden = models.IntegerField(help_text=_(u"Детский сад"), null=True, verbose_name=_(u"Детский сад"), blank=True, )
+    school = models.IntegerField(help_text=_(u"Школа"), null=True, verbose_name=_(u"Школа"), blank=True, )
+    clinic = models.IntegerField(null=True, blank=True, )
+
+
+class BaseTerritoryImprovement(models.Model):
+
+    class Meta:
+        abstract = True
+
+    is_routes = models.NullBooleanField(help_text=_(u"Подъездные"), verbose_name=_(u"Подъездные"), blank=True, )
+    is_playground = models.NullBooleanField(help_text=_(u"Детская площадка"), verbose_name=_(u"Детская площадка"), blank=True, )
+    is_clother_drying = models.NullBooleanField(help_text=_(u"Площадка для сушки белья"), verbose_name=_(u"Площадка для сушки белья"), blank=True, )
+    is_parking = models.NullBooleanField(help_text=_(u"Парковка"), verbose_name=_(u"Парковка"), blank=True, )
+    is_dustbin_area = models.NullBooleanField(help_text=_(u"Площадка для мусорных контейнеров"), verbose_name=_(u"Площадка для мусорных контейнеров"), blank=True, )
+
+
 class BaseCommonChars(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImprovement, ):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     is_water_boiler = models.NullBooleanField(help_text=_(u"Водонагревательный прибор (бойлер)"), verbose_name=_(u"Водонагревательный прибор (бойлер)"), blank=True, )
     is_heat_boiler = models.NullBooleanField(help_text=_(u"Отопительный котел"), verbose_name=_(u"Отопительный котел"), blank=True, )
@@ -181,32 +207,11 @@ class BaseCommonChars(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImpr
     entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
     window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
 
-class BaseEngineerNetworks(models.Model):
-
-    class Meta:
-        abstruct = True
-
-    water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
-    hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
-    water_removal = models.IntegerField(help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), choices=WATER_REMOVAL_CHOICES , )
-    electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
-    gas_supply = models.NullBooleanField(help_text=_(u"Газоснабжение"), blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
-
-class BaseSocialObjects(models.Model):
-
-    class Meta:
-        abstruct = True
-
-    public_transport = models.IntegerField(help_text=_(u"Ближайшая остановка общественного транспорта"), null=True, verbose_name=_(u"Ближайшая остановка общественного транспорта"), blank=True, )
-    market = models.IntegerField(help_text=_(u"Магазин"), null=True, verbose_name=_(u"Магазин"), blank=True, )
-    kindergarden = models.IntegerField(help_text=_(u"Детский сад"), null=True, verbose_name=_(u"Детский сад"), blank=True, )
-    school = models.IntegerField(help_text=_(u"Школа"), null=True, verbose_name=_(u"Школа"), blank=True, )
-    clinic = models.IntegerField(null=True, blank=True, )
 
 class BaseDevices(models.Model):
 
     class Meta:
-        abstruct = True
+        abstract = True
 
     switches = models.NullBooleanField(help_text=_(u"Выключатели"), verbose_name=_(u"Выключатели"), blank=True, )
     sockets = models.NullBooleanField(help_text=_(u"Розетки"), verbose_name=_(u"Розетки"), blank=True, )
@@ -215,17 +220,6 @@ class BaseDevices(models.Model):
     heaters = models.NullBooleanField(help_text=_(u"Отопительные приборы"), verbose_name=_(u"Отопительные приборы"), blank=True, )
     smoke_filter = models.NullBooleanField(help_text=_(u"Дымоулавливатель"), verbose_name=_(u"Дымоулавливатель"), blank=True, )
     not_given = models.NullBooleanField(help_text=_(u"Не указано"), verbose_name=_(u"Не указано"), blank=True, )
-
-class BaseTerritoryImprovement(models.Model):
-
-    class Meta:
-        abstruct = True
-
-    is_routes = models.NullBooleanField(help_text=_(u"Подъездные"), verbose_name=_(u"Подъездные"), blank=True, )
-    is_playground = models.NullBooleanField(help_text=_(u"Детская площадка"), verbose_name=_(u"Детская площадка"), blank=True, )
-    is_clother_drying = models.NullBooleanField(help_text=_(u"Площадка для сушки белья"), verbose_name=_(u"Площадка для сушки белья"), blank=True, )
-    is_parking = models.NullBooleanField(help_text=_(u"Парковка"), verbose_name=_(u"Парковка"), blank=True, )
-    is_dustbin_area = models.NullBooleanField(help_text=_(u"Площадка для мусорных контейнеров"), verbose_name=_(u"Площадка для мусорных контейнеров"), blank=True, )
 
 # common classes
 class Room(BaseMaterials, BaseDevices):
@@ -272,3 +266,54 @@ class Hallway(BaseMaterials, BaseDevices, ):
         verbose_name = "Hallway"
     def __unicode__(self):
         return '%s' % self.id
+
+
+class Developer(BaseDeveloper, ):
+
+    class Meta:
+        app_label = "core"
+        verbose_name = "Developer"
+    def __unicode__(self):
+        return '%s' % self.id
+
+    doc = models.ForeignKey(File, null=True, blank=True, )
+    image = models.ForeignKey(Image, null=True, blank=True, )
+
+
+class Developer_Contract(models.Model):
+
+    class Meta:
+
+        verbose_name = "Developer_Contract"
+    def __unicode__(self):
+        return '%s' % self.id
+
+
+class Developer_Building(models.Model):
+
+    class Meta:
+
+        verbose_name = "Developer_Building"
+    def __unicode__(self):
+        return '%s' % self.id
+
+
+class Developer_Ground(models.Model):
+
+    class Meta:
+
+        verbose_name = "Developer_Ground"
+    def __unicode__(self):
+        return '%s' % self.id
+
+
+
+class BaseCompareData(Hallway, WC, Kitchen, Room, BaseCommonChars, ):
+
+    class Meta:
+        abstract = True
+
+    floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
+    driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
+    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
+    area = models.IntegerField(help_text=_(u"Общая площадь"), null=True, verbose_name=_(u"Общая площадь"), blank=True, )
