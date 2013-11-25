@@ -20,27 +20,25 @@
 </head>
 {% block body %}
     <body>
+   {% if user.is_authenticated %}
    {% block navbar %}
         <div class="navbar navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
               <div class="nav-collapse collapse">
                 <ul class="nav">
-                    {% if user.is_authenticated %}
-                        {% if user.is_staff %}
-                            <li><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
-                            <li><a href="{% url 'builds' %}">{% trans 'Мониторинг' %}</a></li>
-                            <li><a href="{% url 'main' %}">{% trans 'Аукционы' %}</a></li>
-                            <li><a href="{% url 'main' %}">{% trans 'Контракты' %}</a></li>
-                            <li><a href="{% url 'create-build' %}">{% trans 'Добавить' %}</a></li>
-                        {% endif %}
-                    {% endif %}
+                    <li><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
+                    <li><a href="{% url 'builds' %}">{% trans 'Мониторинг' %}</a></li>
+                    <li><a href="{% url 'main' %}">{% trans 'Аукционы' %}</a></li>
+                    <li><a href="{% url 'main' %}">{% trans 'Контракты' %}</a></li>
+                    <li><a href="{% url 'create-build' %}">{% trans 'Добавить' %}</a></li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-    {% endblock %}
+   {% endblock %}
+   {% endif %}
    <div class="container">
        {% block wrapper %}{% endblock %}
    </div>
