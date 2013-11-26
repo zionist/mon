@@ -11,6 +11,7 @@ if 'django.contrib.admin' in settings.INSTALLED_APPS:
 urlpatterns = patterns('',
     url(r'^mo/', include('apps.mo.urls')),
     url(r'^obj/', include('apps.build.urls')),
+    url(r'^cmp/', include('apps.cmp.urls')),
     url(r'^obj/', include('apps.payment.urls')),
     url(r'^$', views.main, name='main'),
     url(r"^login/$", "django.contrib.auth.views.login",

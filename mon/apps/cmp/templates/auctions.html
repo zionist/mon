@@ -4,8 +4,8 @@
 {% block content %}
     <h2>{{title}}</h2>
     {% if user.is_staff %}
-        <a class="btn btn-small" href="{% url 'create-building' %}">
-           {% trans 'Добавить строительный объект' %}</a>
+        <a class="btn btn-small" href="{% url 'create-auction' %}">
+            {% trans 'Добавить заказ' %}</a><br><br>
     {% endif %}
     {% if error %}
         <div class="error">{{ error }}</div><br>
@@ -14,19 +14,19 @@
         <div class="error">{{ errorlist }}</div>
     {% else %}
 
-        {% if building_list %}
-            <div class="build-table">
-            <h4> {% trans 'Сданные объекты' %}</h4>
+        {% if auction_list %}
+            <div class="auction-table">
+            <h4> {% trans 'Аукционы на этапе подачи заявки' %}</h4>
             <table class="table table-condensed">
-                {% for obj in building_list %}
+                {% for obj in auction_list %}
                     {% if obj.id %}
                         <tr><td>
-                        &nbsp;&nbsp;<a href="{% url 'change-building' obj.id %}">
-                        {% with obj.address as obj_address %}
-                            {% if obj_address|length > 80 %}
-                                {{obj_address|truncatechars:75}}...
+                        &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
+                        {% with obj.num as obj_num %}
+                            {% if obj_num|length > 80 %}
+                                {{obj_num|truncatechars:75}}...
                             {% else  %}
-                                {{obj_address}}
+                                {{obj_num}}
                             {% endif %}
                         {% endwith %}</a>
                         </td></tr>

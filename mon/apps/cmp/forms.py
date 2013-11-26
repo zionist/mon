@@ -28,8 +28,23 @@ class ResultForm(forms.ModelForm):
 class AuctionForm(forms.ModelForm):
     class Meta:
         model = Auction
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
 
 
 class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
+
+
+class AuctionShowForm(forms.ModelForm):
+    class Meta:
+        model = Auction
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
+
+    def __init__(self, *args, **kwargs):
+        super(AuctionShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+

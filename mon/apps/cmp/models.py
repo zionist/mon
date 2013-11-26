@@ -5,8 +5,8 @@ from django.utils.translation import ugettext as _
 from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
 from apps.imgfile.models import File, Image
-# from apps.cmp.models import Result
 
+from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground
 
 
@@ -23,6 +23,7 @@ class Contract(BaseContract, ):
     ground = models.ForeignKey(Ground, help_text=_(u"Земельный участок"), null=True, verbose_name=_(u"Земельный участок"), blank=True, )
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
+    room = models.ForeignKey(Room, null=True, blank=True, )
 
 
 
