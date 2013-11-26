@@ -1,0 +1,33 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles%}
+
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    {% if errorlist or error %}
+        {% if errorlist %}
+            <div class="error">
+                {{ errorlist }}
+                 {% for error in errorlist%}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            <br>
+        {% endif %}
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+            <br>
+        {% endif %}
+    {% else %}
+        <h3>{% trans ' Вы действительно хотите удалить строение по адресу ' %} {{ object.address }}? </h3>
+
+        <form method="POST" action="{% url 'delete-building' object.id %}"> {% csrf_token %}
+            <br>
+            <button type="submit" name="delete"> {% trans ' Удалить ' %} </button>
+            &nbsp;<button type="cancel" name="cancel"> {% trans ' Отменить ' %} </button>
+        </form>
+            <br>
+    {% endif %}
+{% endblock %}

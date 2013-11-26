@@ -9,13 +9,31 @@
             {{ errorlist }}
         </div>
     {% else %}
-        {% if form %}
+        {% if form or formsets %}
             <form method="POST" action="{% url 'update-building' object.id %}"> {% csrf_token %}
-                <table border="0">
-                {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                {% cycle ' ' 0 1 2 3 as title %}
+                {% cycle ' ' 'Room' 'Hallway' 'WC' 'Kitchen' as str_title %}
+                {% for obj_form in formsets %}
+                    <br><br><h4>{% cycle str_title %}{{titles.title}}{{titles.0}}</h4>
+                        <table border="0">
+                        {% for field in obj_form %}
+                            {% if field.is_hidden %}
+                                {{ field }}
+                            {% else %}
+                                <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                            {% endif %}
+                        {% endfor %}
+                        </table>
+                    <!--{% cycle title %}-->
                 {% endfor %}
+                {% if form %}
+                <br><h4>{% trans ' Общие параметры' %}</h4>
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
                 </table>
+                {% endif %}
                 <br>
                 <button type="submit" name = "build"> {% trans ' Сохранить ' %} </button>
             </form>

@@ -8,7 +8,6 @@ from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 
 from .models import Building, Ground
-from apps.core.models import Room, WC, Hallway, Kitchen
 
 
 class GroundForm(forms.ModelForm):
@@ -40,27 +39,3 @@ class BuildingShowForm(BuildingForm):
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
-
-
-class RoomForm(BuildingForm):
-
-    class Meta:
-        model = Room
-
-
-class WCForm(BuildingForm):
-
-    class Meta:
-        model = WC
-
-
-class HallwayForm(BuildingForm):
-
-    class Meta:
-        model = Hallway
-
-
-class KitchenForm(BuildingForm):
-
-    class Meta:
-        model = Kitchen
