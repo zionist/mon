@@ -51,7 +51,6 @@ def add_building(request):
                 if isinstance(v, CharField) and isinstance(v.widget, Textarea):
                     text_area_fields.fields.update({k: form.fields.pop(k)})
                     k = "%s-%s" % (form.prefix, k)
-                    print "# %s" % k
                     if data.get(k):
                         text_area_fields.data.update({k: data.get(k)})
                         del data[k]
