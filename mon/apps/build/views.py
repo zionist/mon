@@ -15,6 +15,10 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
+from django.forms.fields import CharField
+from django.forms.widgets import Textarea
+from django.forms import Form as CustomForm
+from django.http.request import QueryDict
 
 from apps.build.models import Building
 from apps.build.forms import BuildingForm, BuildingShowForm
@@ -37,12 +41,32 @@ def add_building(request):
             building.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('buildings')
         else:
-            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            # move text_area fields to another form
+            text_area_fields = CustomForm()
+            text_area_fields.is_bound = True
+            text_area_fields.prefix = form.prefix
+            text_area_fields.data = QueryDict({}).copy()
+            data = form.data.copy()
+            for k, v in form.fields.iteritems():
+                if isinstance(v, CharField) and isinstance(v.widget, Textarea):
+                    text_area_fields.fields.update({k: form.fields.pop(k)})
+                    k = "%s-%s" % (form.prefix, k)
+                    if data.get(k):
+                        text_area_fields.data.update({k: data.get(k)})
+                        del data[k]
+            form.data = data
+            context.update({'form': form, 'text_area_fields': text_area_fields, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         form = BuildingForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-    context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        # move text_area fields to another form
+        text_area_fields = CustomForm()
+        for k, v in form.fields.iteritems():
+            if isinstance(v, CharField) and isinstance(v.widget, Textarea):
+                text_area_fields.fields.update({k: form.fields.pop(k)})
+        text_area_fields.prefix = form.prefix
+    context.update({'form': form, 'text_area_fields': text_area_fields, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
     return render_to_response(template, context, context_instance=RequestContext(request))
 

@@ -32,6 +32,9 @@
                     {% for field in form %}
                     <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
                     {% endfor %}
+                    {% for field in text_area_fields %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
                 </table>
                 {% endif %}
                 <br>
