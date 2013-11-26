@@ -86,9 +86,9 @@ class BaseBuilding(models.Model):
 #    offer = models.ForeignKey(File, help_text=_(u"Коммерческое предложение"), null=True, verbose_name=_(u"Коммерческое предложение"), blank=True, related_name='offer')
 #    permission = models.ForeignKey(File, help_text=_(u"Разрешение"), null=True, verbose_name=_(u"Разрешение"), blank=True, related_name='permission')
     state = models.IntegerField(help_text=_(u"Состояние"), null=True, blank=True, verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
-    address = models.CharField(help_text=_(u"Адрес"), null=True, max_length=2048, verbose_name=_(u"Адрес"), blank=True, )
+    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=True, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
-    comment = models.CharField(help_text=_(u"Комментарий"), null=True, max_length=2048, verbose_name=_(u"Комментарий"), blank=True, )
+    comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива осноения"), null=True, blank=True, verbose_name=_(u"Перспектива осноения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
