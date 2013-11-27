@@ -52,7 +52,7 @@ def get_auctions(request, pk=None):
     template = 'auctions.html'
     context = {'title': _(u'Аукционы')}
     if Auction.objects.all().exists():
-        objects = Auction.objects.all()
+        objects = Auction.objects.all().order_by('stage')
         if pk:
             auction_object = Auction.objects.get(pk=pk)
             context.update({'object': auction_object})

@@ -41,7 +41,6 @@ class Person(models.Model):
     position = models.CharField(help_text=_(u"Должность"), null=True, max_length=2048, verbose_name=_(u"Должность"), blank=True, )
 
 
-
 class CompareData(BaseCompareData, ):
 
     class Meta:
@@ -52,7 +51,6 @@ class CompareData(BaseCompareData, ):
 
     # result = models.ForeignKey(Result, help_text=_(u"Результат осмотра"), null=True, verbose_name=_(u"Результат осмотра"), blank=True, )
     cmp_date = models.DateTimeField(help_text=_(u"Дата последнего сравнения"), auto_now=True, null=True, verbose_name=_(u"Дата последнего сравнения"), blank=True, )
-
 
 
 class Result(BaseResult, ):
@@ -69,7 +67,6 @@ class Result(BaseResult, ):
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
     mo_pers = models.ForeignKey(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
     establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
-
 
 
 class Auction(BaseContract, BaseCompareData,):

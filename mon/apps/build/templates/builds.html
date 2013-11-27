@@ -15,24 +15,80 @@
     {% else %}
 
         {% if building_list %}
-            <div class="build-table">
-            <h4> {% trans 'Сданные объекты' %}</h4>
-            <table class="table table-condensed">
+            <div class="build-table"><br>
+                {% regroup building_list by state as objects_list %}
+                    <ul>
+                    {% for state in objects_list %}
+                        <li>{% if state.grouper == 0 %}
+                            <h4> {% trans 'Сданные объекты' %}</h4>
+                            {% elif state.grouper == 1 %}
+                            <h4> {% trans 'Строящиеся объекты' %}</h4>
+                            {% elif state.grouper == 2 %}
+                            <h4> {% trans 'Участки под строительство' %}</h4>
+                            {% endif %}
+                        <ul>
+                            {% for item in state.list %}
+                            {% with item.address as obj_address %}
+                              <li><a href="{% url 'change-building' item.id %}">
+                                {% if obj_address|length > 80 %}
+                                    {{obj_address|truncatechars:75}}...
+                                {% else  %}
+                                    {{obj_address}}
+                                {% endif %}</a>
+                              </li>
+                            {% endwith %}
+                            {% endfor %}
+                        </ul>
+                        </li>
+                    {% endfor %}
+                    </ul>
+
                 {% for obj in building_list %}
-                    {% if obj.id %}
+                {% with obj.id as obj_id %}
+                {% with obj.state as obj_state %}
+                {% with obj.address as obj_address %}
+                    {% if obj_id and obj_state == 0 %}
+                    <h4> {% trans 'Сданный объект' %}</h4>
+                    <table class="table table-condensed">
                         <tr><td>
                         &nbsp;&nbsp;<a href="{% url 'change-building' obj.id %}">
-                        {% with obj.address as obj_address %}
                             {% if obj_address|length > 80 %}
                                 {{obj_address|truncatechars:75}}...
                             {% else  %}
                                 {{obj_address}}
-                            {% endif %}
-                        {% endwith %}</a>
+                            {% endif %}</a>
                         </td></tr>
+                    </table>
+                    {% elif obj_id and obj_state == 1 %}
+                    <h4> {% trans 'Строящийся объект' %}</h4>
+                    <table class="table table-condensed">
+                        <tr><td>
+                        &nbsp;&nbsp;<a href="{% url 'change-building' obj.id %}">
+                            {% if obj_address|length > 80 %}
+                                {{obj_address|truncatechars:75}}...
+                            {% else  %}
+                                {{obj_address}}
+                            {% endif %}</a>
+                        </td></tr>
+                    </table>
+                    {% elif obj_id and obj_state == 2 %}
+                    <h4> {% trans 'Участок под строительство' %}</h4>
+                    <table class="table table-condensed">
+                        <tr><td>
+                        &nbsp;&nbsp;<a href="{% url 'change-building' obj.id %}">
+                            {% if obj_address|length > 80 %}
+                                {{obj_address|truncatechars:75}}...
+                            {% else  %}
+                                {{obj_address}}
+                            {% endif %}</a>
+                        </td></tr>
+                    </table>
                     {% endif %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
                 {% endfor %}
-            </table>
+
             </div>
         {% endif %}
     {% endif %}
