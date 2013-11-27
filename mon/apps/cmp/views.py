@@ -129,3 +129,113 @@ def delete_auction(request, pk):
     else:
         context.update({'error': _(u'Возникла ошибка при удалении заказа!')})
     return render_to_response("auction_deleting.html", context, context_instance=RequestContext(request))
+
+
+def add_contract(request):
+    template = 'contract_creation.html'
+    context = {'title': _(u'Добавление контракта')}
+    prefix = 'contract'
+    if request.method == "POST":
+        form = ContractForm(request.POST, prefix=prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            contract = form.save()
+            contract.room = room_f.save()
+            contract.hallway = hallway_f.save()
+            contract.wc = wc_f.save()
+            contract.kitchen = kitchen_f.save()
+            contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
+            return redirect('contracts')
+        else:
+            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            return render_to_response(template, context, context_instance=RequestContext(request))
+    else:
+        form = ContractForm(prefix=prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
+    context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def get_contracts(request, pk=None):
+    template = 'contracts.html'
+    context = {'title': _(u'Контракты')}
+    if Contract.objects.all().exists():
+        objects = Contract.objects.all()
+        if pk:
+            contract_object = Contract.objects.get(pk=pk)
+            context.update({'object': contract_object})
+        page = request.GET.get('page', '1')
+        paginator = Paginator(objects, 50)
+        try:
+            objects = paginator.page(page)
+        except PageNotAnInteger:
+            objects = paginator.page(1)
+        except EmptyPage:
+            objects = paginator.page(paginator.num_pages)
+        context.update({'contract_list': objects})
+    return render(request, template, context, context_instance=RequestContext(request))
+
+
+def get_contract(request, pk, extra=None):
+    context = {'title': _(u'Параметры контракта')}
+    contract = Сontract.objects.get(pk=pk)
+    if request.method == "POST":
+        form = СontractShowForm(request.POST, instance=contract)
+        context.update({'form': form})
+    else:
+        form = СontractShowForm(instance=contract)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
+        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+    context.update({'object': contract})
+    return render(request, 'contract.html', context, context_instance=RequestContext(request))
+
+
+def update_contract(request, pk, extra=None):
+    context = {'title': _(u'Параметры контракта')}
+    contract = Сontract.objects.get(pk=pk)
+    prefix = 'contract'
+    if request.method == "POST":
+        form = СontractForm(request.POST, prefix=prefix, instance=contract)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract, request=request)
+        context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            form.save()
+            for obj in [room_f, hallway_f, wc_f, kitchen_f]:
+                obj.save()
+            return redirect('contracts')
+        else:
+            context.update({'object': contract, 'form': form, 'prefix': prefix,
+                            'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                            'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+            return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
+    else:
+        form = ContractForm(instance=contract, prefix=prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
+        context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+    return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
+
+
+def pre_delete_contract(request, pk):
+    context = {'title': _(u'Удаление контракта')}
+    contract = Contract.objects.get(pk=pk)
+    context.update({'object': contract})
+    return render_to_response("contract_deleting.html", context, context_instance=RequestContext(request))
+
+
+def delete_contract(request, pk):
+    context = {'title': _(u'Удаление контракта')}
+    contract = Auction.objects.get(pk=pk)
+    if contract and 'delete' in request.POST:
+        contract.room.delete()
+        contract.hallway.delete()
+        contract.wc.delete()
+        contract.kitchen.delete()
+        return redirect('contracts')
+    elif 'cancel' in request.POST:
+        return redirect('contracts')
+    else:
+        context.update({'error': _(u'Возникла ошибка при удалении контракта!')})
+    return render_to_response("contract_deleting.html", context, context_instance=RequestContext(request))

@@ -1,0 +1,39 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h2>{{title}}</h2>
+    {% if user.is_staff %}
+        <a class="btn btn-small" href="{% url 'create-contract' %}">
+            {% trans 'Добавить контракт' %}</a><br><br>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+
+        {% if contract_list %}
+            <div class="auction-table">
+            <h4> {% trans 'Контракты' %}</h4>
+            <table class="table table-condensed">
+                {% for obj in contract_list %}
+                    {% if obj.id %}
+                        <tr><td>
+                        &nbsp;&nbsp;<a href="{% url 'change-contract' obj.id %}">
+                        {% with obj.num as obj_num %}
+                            {% if obj_num|length > 80 %}
+                                {{obj_num|truncatechars:75}}...
+                            {% else  %}
+                                {{obj_num}}
+                            {% endif %}
+                        {% endwith %}</a>
+                        </td></tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}

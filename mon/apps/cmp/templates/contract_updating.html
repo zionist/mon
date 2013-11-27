@@ -10,7 +10,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'create-auction' %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'update-contract' object.id %}"> {% csrf_token %}
                 {% cycle ' ' 0 1 2 3 as title %}
                 {% cycle ' ' 'Room' 'Hallway' 'WC' 'Kitchen' as str_title %}
                 {% for obj_form in formsets %}
@@ -35,7 +35,7 @@
                 </table>
                 {% endif %}
                 <br>
-                <button type="submit" name = "auction"> {% trans ' Сохранить ' %} </button>
+                <button type="submit" name = "contract"> {% trans ' Сохранить ' %} </button>
             </form>
         {% endif %}
     {% endif %}

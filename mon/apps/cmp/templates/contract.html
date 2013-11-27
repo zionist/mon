@@ -13,9 +13,9 @@
             <h3>{% trans 'Объект' %}</h3>
             <table>
                 <tr>
-                    <td><a class="btn btn-small" href="{% url 'update-auction' object.id %}">
+                    <td><a class="btn btn-small" href="{% url 'update-contract' object.id %}">
                         {% trans 'Редактировать' %}</a></td>
-                    <td><a class="btn btn-small" href="{% url 'pre-delete-auction' object.id %}">
+                    <td><a class="btn btn-small" href="{% url 'pre-delete-contract' object.id %}">
                         {% trans 'Удалить' %}</a></td>
                     <td>{{object.num}}</td>
                 </tr>

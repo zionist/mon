@@ -45,6 +45,8 @@ class MO(BaseName, ):
         return '%s' % self.id
 
     creation_form = models.IntegerField(blank=True, null=True, choices=CREATION_FORM_CHOICES , )
+    has_trouble = models.NullBooleanField(blank=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
+    home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
 
 
 class DepartamentAgreement(BaseDepartamentAgreement, ):
