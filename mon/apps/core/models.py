@@ -85,12 +85,12 @@ class BaseBuilding(models.Model):
 
 #    offer = models.ForeignKey(File, help_text=_(u"Коммерческое предложение"), null=True, verbose_name=_(u"Коммерческое предложение"), blank=True, related_name='offer')
 #    permission = models.ForeignKey(File, help_text=_(u"Разрешение"), null=True, verbose_name=_(u"Разрешение"), blank=True, related_name='permission')
-    state = models.IntegerField(help_text=_(u"Состояние"), null=True, blank=True, verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
+    state = models.IntegerField(help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
     address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=True, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
-    payment_perspective = models.IntegerField(help_text=_(u"Перспектива осноения"), null=True, blank=True, verbose_name=_(u"Перспектива осноения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
+    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива осноения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
 class BaseContract(BaseName, ):
@@ -146,6 +146,7 @@ class BasePayment(models.Model):
 
     date = models.DateField(null=True, blank=True, )
     amount = models.CharField(max_length=2048, null=True, blank=True, )
+
 
 class BaseMaterials(models.Model):
 
@@ -219,7 +220,8 @@ class BaseDevices(models.Model):
     ceiling_hook = models.NullBooleanField(help_text=_(u"Потолочный крюк"), verbose_name=_(u"Потолочный крюк"), blank=True, )
     heaters = models.NullBooleanField(help_text=_(u"Отопительные приборы"), verbose_name=_(u"Отопительные приборы"), blank=True, )
     smoke_filter = models.NullBooleanField(help_text=_(u"Дымоулавливатель"), verbose_name=_(u"Дымоулавливатель"), blank=True, )
-    not_given = models.NullBooleanField(help_text=_(u"Не указано"), verbose_name=_(u"Не указано"), blank=True, )
+    #not_given = models.NullBooleanField(help_text=_(u"Не указано"), verbose_name=_(u"Не указано"), blank=True, )
+
 
 # common classes
 class Room(BaseMaterials, BaseDevices):

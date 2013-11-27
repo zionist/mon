@@ -78,7 +78,7 @@ class BuildingListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(BuildingListView, self).get_context_data(**kwargs)
-        context["title"] = _(u'Строительные материалы')
+        context["title"] = _(u'Строительные объекты')
         return context
 
     @method_decorator(login_required)
@@ -102,7 +102,7 @@ def get_buildings(request, pk=None, strv=None, numv=None):
     template = 'builds.html'
     context = {'title': _(u'Строительные объекты')}
     if Building.objects.all().exists():
-        objects = Building.objects.all()
+        objects = Building.objects.all().order_by('state')
         if pk or strv or numv:
             if pk:
                 build_object = Building.objects.get(pk=pk)
@@ -119,7 +119,7 @@ def get_buildings(request, pk=None, strv=None, numv=None):
             objects = paginator.page(1)
         except EmptyPage:
             objects = paginator.page(paginator.num_pages)
-        context.update({'objects_list': objects})
+        context.update({'building_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
 
 

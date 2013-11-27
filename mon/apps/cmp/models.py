@@ -26,7 +26,6 @@ class Contract(BaseContract, ):
     room = models.ForeignKey(Room, null=True, blank=True, )
 
 
-
 class Person(models.Model):
 
     class Meta:
@@ -40,7 +39,6 @@ class Person(models.Model):
     position = models.CharField(help_text=_(u"Должность"), null=True, max_length=2048, verbose_name=_(u"Должность"), blank=True, )
 
 
-
 class CompareData(BaseCompareData, ):
 
     class Meta:
@@ -51,7 +49,6 @@ class CompareData(BaseCompareData, ):
 
     # result = models.ForeignKey(Result, help_text=_(u"Результат осмотра"), null=True, verbose_name=_(u"Результат осмотра"), blank=True, )
     cmp_date = models.DateTimeField(help_text=_(u"Дата последнего сравнения"), auto_now=True, null=True, verbose_name=_(u"Дата последнего сравнения"), blank=True, )
-
 
 
 class Result(BaseResult, ):
@@ -70,7 +67,6 @@ class Result(BaseResult, ):
     establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
 
 
-
 class Auction(BaseContract, BaseCompareData,):
 
     class Meta:
@@ -85,5 +81,4 @@ class Auction(BaseContract, BaseCompareData,):
     start_price = models.FloatField(help_text=_(u"Начальная (максимальная) цена руб."), null=True, verbose_name=_(u"Начальная (максимальная) цена руб."), blank=True, )
     public_date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"), null=True, verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"), blank=True, )
     open_date = models.DateTimeField(help_text=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"), auto_now=True, null=True, verbose_name=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"), blank=True, )
-    stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), null=True, blank=True, verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
-
+    stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
