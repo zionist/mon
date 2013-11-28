@@ -180,12 +180,12 @@ def get_contracts(request, pk=None):
 
 def get_contract(request, pk, extra=None):
     context = {'title': _(u'Параметры контракта')}
-    contract = Сontract.objects.get(pk=pk)
+    contract = Contract.objects.get(pk=pk)
     if request.method == "POST":
-        form = СontractShowForm(request.POST, instance=contract)
+        form = ContractShowForm(request.POST, instance=contract)
         context.update({'form': form})
     else:
-        form = СontractShowForm(instance=contract)
+        form = ContractShowForm(instance=contract)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
         context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': contract})
@@ -194,10 +194,10 @@ def get_contract(request, pk, extra=None):
 
 def update_contract(request, pk, extra=None):
     context = {'title': _(u'Параметры контракта')}
-    contract = Сontract.objects.get(pk=pk)
+    contract = Contract.objects.get(pk=pk)
     prefix = 'contract'
     if request.method == "POST":
-        form = СontractForm(request.POST, prefix=prefix, instance=contract)
+        form = ContractForm(request.POST, prefix=prefix, instance=contract)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract, request=request)
         context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
