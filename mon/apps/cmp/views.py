@@ -16,8 +16,9 @@ from django.forms.models import inlineformset_factory, formset_factory, modelfor
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
-from .models import Contract, Result, Auction, Person
-from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm
+from .models import Contract, Result, Auction, Person, CompareData
+from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
+    ResultShowForm, CompareDataShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms
 
 
@@ -123,6 +124,7 @@ def delete_auction(request, pk):
         auction.hallway.delete()
         auction.wc.delete()
         auction.kitchen.delete()
+        auction.delete()
         return redirect('auctions')
     elif 'cancel' in request.POST:
         return redirect('auctions')
@@ -227,15 +229,138 @@ def pre_delete_contract(request, pk):
 
 def delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
-    contract = Auction.objects.get(pk=pk)
+    contract = Contract.objects.get(pk=pk)
     if contract and 'delete' in request.POST:
         contract.room.delete()
         contract.hallway.delete()
         contract.wc.delete()
         contract.kitchen.delete()
+        contract.delete()
         return redirect('contracts')
     elif 'cancel' in request.POST:
         return redirect('contracts')
     else:
         context.update({'error': _(u'Возникла ошибка при удалении контракта!')})
     return render_to_response("contract_deleting.html", context, context_instance=RequestContext(request))
+
+
+def add_result(request):
+    template = 'result_creation.html'
+    context = {'title': _(u'Добавление результатов осмотра')}
+    prefix, cmp_prefix = 'result', 'cmp_result'
+    if request.method == "POST":
+        form = ResultForm(request.POST, prefix=prefix)
+        cmp_form = CompareDataForm(request.POST, prefix=cmp_prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
+        if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            result = form.save()
+            result.cmp_data = cmp_form.save()
+            result.cmp_data.room = room_f.save()
+            result.cmp_data.hallway = hallway_f.save()
+            result.cmp_data.wc = wc_f.save()
+            result.cmp_data.kitchen = kitchen_f.save()
+            result.cmp_data.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
+            result.save(update_fields=['cmp_data'])
+            return redirect('results')
+        else:
+            context.update({'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            return render_to_response(template, context, context_instance=RequestContext(request))
+    else:
+        form = ResultForm(prefix=prefix)
+        cmp_form = CompareDataForm(prefix=cmp_prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
+    context.update({'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def get_results(request, pk=None):
+    template = 'results.html'
+    context = {'title': _(u'Осмотры')}
+    if Result.objects.all().exists():
+        objects = Result.objects.all()
+        if pk:
+            result_object = Result.objects.get(pk=pk)
+            context.update({'object': result_object})
+        page = request.GET.get('page', '1')
+        paginator = Paginator(objects, 50)
+        try:
+            objects = paginator.page(page)
+        except PageNotAnInteger:
+            objects = paginator.page(1)
+        except EmptyPage:
+            objects = paginator.page(paginator.num_pages)
+        context.update({'result_list': objects})
+    return render(request, template, context, context_instance=RequestContext(request))
+
+
+def get_result(request, pk, extra=None):
+    context = {'title': _(u'Параметры осмотра')}
+    result = Result.objects.get(pk=pk)
+    prefix, cmp_prefix = 'result', 'cmp_result'
+    if request.method == "POST":
+        form = ResultShowForm(request.POST, instance=result, prefix=prefix)
+        cmp_form = CompareDataShowForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
+        context.update({'form': form, 'cmp_form': cmp_form})
+    else:
+        form = ResultShowForm(instance=result, prefix=prefix)
+        cmp_form = CompareDataShowForm(instance=result.cmp_data, prefix=cmp_prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result.cmp_data)
+        context.update({'form': form, 'cmp_form': cmp_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+    context.update({'object': result})
+    return render(request, 'result.html', context, context_instance=RequestContext(request))
+
+
+def update_result(request, pk, extra=None):
+    context = {'title': _(u'Параметры осмотра')}
+    result = Result.objects.get(pk=pk)
+    prefix, cmp_prefix = 'result', 'cmp_result'
+    if request.method == "POST":
+        form = ResultForm(request.POST, instance=result, prefix=prefix)
+        cmp_form = CompareDataForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data, request=request)
+        context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+        if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            form.save()
+            cmp_form.save()
+            for obj in [room_f, hallway_f, wc_f, kitchen_f]:
+                obj.save()
+            return redirect('results')
+        else:
+            context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix,
+                            'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                            'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+            return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
+    else:
+        form = ResultForm(instance=result, prefix=prefix)
+        cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data)
+        context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+    return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
+
+
+def pre_delete_result(request, pk):
+    context = {'title': _(u'Удаление осмотра')}
+    result = Result.objects.get(pk=pk)
+    context.update({'object': result})
+    return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))
+
+
+def delete_result(request, pk):
+    context = {'title': _(u'Удаление осмотра')}
+    result = Result.objects.get(pk=pk)
+    if result and 'delete' in request.POST:
+        result.cmp_data.delete()
+        result.cmp_data.room.delete()
+        result.cmp_data.hallway.delete()
+        result.cmp_data.wc.delete()
+        result.cmp_data.kitchen.delete()
+        result.delete()
+        return redirect('results')
+    elif 'cancel' in request.POST:
+        return redirect('results')
+    else:
+        context.update({'error': _(u'Возникла ошибка при удалении результатов осмотра!')})
+    return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))

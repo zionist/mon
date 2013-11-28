@@ -179,7 +179,7 @@ class BaseSocialObjects(models.Model):
     market = models.IntegerField(help_text=_(u"Магазин"), null=True, verbose_name=_(u"Магазин"), blank=True, )
     kindergarden = models.IntegerField(help_text=_(u"Детский сад"), null=True, verbose_name=_(u"Детский сад"), blank=True, )
     school = models.IntegerField(help_text=_(u"Школа"), null=True, verbose_name=_(u"Школа"), blank=True, )
-    clinic = models.IntegerField(null=True, blank=True, )
+    clinic = models.IntegerField(help_text=_(u"Поликлиника"), null=True, verbose_name=_(u"Поликлиника"), blank=True, )
 
 
 class BaseTerritoryImprovement(models.Model):

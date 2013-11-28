@@ -21,9 +21,9 @@
             <br>
         {% endif %}
     {% else %}
-        <h3>{% trans ' Вы действительно хотите удалить контракт под номером ' %}&nbsp; {{ object.num }}? </h3>
+        <h3>{% trans ' Вы действительно хотите удалить результаты осмотра от ' %}&nbsp; {{ object.check_date }}? </h3>
 
-        <form method="POST" action="{% url 'delete-contract' object.id %}"> {% csrf_token %}
+        <form method="POST" action="{% url 'delete-result' object.id %}"> {% csrf_token %}
             <br>
             <button type="submit" name="delete"> {% trans ' Удалить ' %} </button>
             &nbsp;<button type="cancel" name="cancel"> {% trans ' Отменить ' %} </button>

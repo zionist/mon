@@ -11,7 +11,7 @@ from apps.build.models import Building, Ground
 from apps.mo.models import MO
 
 
-class Contract(BaseContract, ):
+class Contract(BaseContract, BaseCompareData):
 
     class Meta:
         app_label = "cmp"
@@ -24,7 +24,6 @@ class Contract(BaseContract, ):
     ground = models.ForeignKey(Ground, help_text=_(u"Земельный участок"), null=True, verbose_name=_(u"Земельный участок"), blank=True, )
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
-    room = models.ForeignKey(Room, null=True, blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
 
 
@@ -39,6 +38,8 @@ class Person(models.Model):
     birth_date = models.DateField(help_text=_(u"Дата рождения"), null=True, verbose_name=_(u"Дата рождения"), blank=True, )
     name = models.CharField(help_text=_(u"ФИО"), null=True, max_length=2048, verbose_name=_(u"ФИО"), blank=True, )
     position = models.CharField(help_text=_(u"Должность"), null=True, max_length=2048, verbose_name=_(u"Должность"), blank=True, )
+    email = models.EmailField(help_text=_(u"Адрес электронной почты"), null=True, max_length=100, verbose_name=_(u"Адрес электронной почты"), blank=True, )
+    contact_phone = models.CharField(help_text=_(u"Номер телефона"), null=True, max_length=100, verbose_name=_(u"Номер телефона"), blank=True, )
 
 
 class CompareData(BaseCompareData, ):
@@ -62,8 +63,8 @@ class Result(BaseResult, ):
         return '%s' % self.id
 
     contract = models.ForeignKey(Contract, help_text=_(u"Реквизиты контракта"), null=True, verbose_name=_(u"Реквизиты контракта"), blank=True, )
-    building = models.ForeignKey(Building, null=True, blank=True, )
-    ground = models.ForeignKey(Ground, null=True, blank=True, )
+    building = models.ForeignKey(Building, null=True, blank=True, help_text=_(u"Осмотренное строение"), verbose_name=_(u"Осмотренное строение"))
+    ground = models.ForeignKey(Ground, null=True, blank=True, help_text=_(u"Осмотренный земельный участок"), verbose_name=_(u"Осмотренный земельный участок"))
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
     mo_pers = models.ForeignKey(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
     establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')

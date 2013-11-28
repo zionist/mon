@@ -13,16 +13,19 @@ from .models import CompareData, Contract, Result, Auction, Person
 class CompareDataForm(forms.ModelForm):
     class Meta:
         model = CompareData
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
 
 
 class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
 
 
 class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
+        exclude = ('cmp_data',)
 
 
 class AuctionForm(forms.ModelForm):
@@ -46,5 +49,42 @@ class AuctionShowForm(forms.ModelForm):
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class ContractShowForm(forms.ModelForm):
+    class Meta:
+        model = Contract
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
+
+    def __init__(self, *args, **kwargs):
+        super(ContractShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class CompareDataShowForm(forms.ModelForm):
+    class Meta:
+        model = CompareData
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
+
+    def __init__(self, *args, **kwargs):
+        super(CompareDataShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class ResultShowForm(forms.ModelForm):
+    class Meta:
+        model = Result
+        exclude = ('cmp_data',)
+
+    def __init__(self, *args, **kwargs):
+        super(ResultShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
 
 

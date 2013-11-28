@@ -1,0 +1,33 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h2>{{title}}</h2>
+    {% if user.is_staff %}
+        <a class="btn btn-small" href="{% url 'create-result' %}">
+            {% trans 'Добавить результаты осмотра' %}</a><br><br>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+
+        {% if result_list %}
+            <div class="auction-table">
+            <h4> {% trans 'Осмотры' %}</h4>
+            <table class="table table-condensed">
+                {% for obj in result_list %}
+                    {% if obj.id %}
+                        <tr><td>
+                        &nbsp;&nbsp;<a href="{% url 'change-result' obj.id %}">
+                        {{obj.check_date}}</a>
+                        </td></tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
