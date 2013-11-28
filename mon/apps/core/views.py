@@ -14,6 +14,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.core.urlresolvers import reverse
+from django.forms import Form as CustomForm
+from django.forms.fields import CharField
+from django.forms.widgets import Textarea
+from django.http.request import QueryDict
 
 from .forms import RoomForm, HallwayForm, WCForm, KitchenForm, \
     RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm
@@ -60,3 +64,35 @@ def get_fk_show_forms(parent=None):
     wc_f = WCShowForm(prefix=wc_p, instance=parent.wc)
     kitchen_f = KitchenShowForm(prefix=kitchen_p, instance=parent.kitchen)
     return [room_f, hallway_f, wc_f, kitchen_f]
+
+
+def split_form(form, is_bound):
+    """
+    :param form: forms.Form object
+    :param is_bound: Form is bound or unbound to data
+    :return: two forms. First form without fields with Textarea widget
+        and second form which contains fields with Textarea widget
+    """
+    # move text_area fields to another form
+    if is_bound:
+        text_area_form = CustomForm()
+        text_area_form.is_bound = True
+        text_area_form.prefix = form.prefix
+        text_area_form.data = QueryDict({}).copy()
+        data = form.data.copy()
+        for k, v in form.fields.iteritems():
+            if isinstance(v, CharField) and isinstance(v.widget, Textarea):
+                text_area_form.fields.update({k: form.fields.pop(k)})
+                k = "%s-%s" % (form.prefix, k)
+                if data.get(k):
+                    text_area_form.data.update({k: data.get(k)})
+                    del data[k]
+        form.data = data
+        return (form, text_area_form)
+    else:
+        text_area_form = CustomForm()
+        for k, v in form.fields.iteritems():
+            if isinstance(v, CharField) and isinstance(v.widget, Textarea):
+                text_area_form.fields.update({k: form.fields.pop(k)})
+        text_area_form.prefix = form.prefix
+        return (form, text_area_form)
