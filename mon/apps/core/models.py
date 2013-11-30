@@ -228,7 +228,7 @@ class Room(BaseMaterials, BaseDevices):
 
     class Meta:
         app_label = "core"
-        verbose_name = "Room"
+        verbose_name = "Комната"
     def __unicode__(self):
         return '%s' % self.id
 
@@ -237,7 +237,7 @@ class Kitchen(BaseMaterials, BaseDevices):
 
     class Meta:
         app_label = "core"
-        verbose_name = "Kitchen"
+        verbose_name = "Кухня"
     def __unicode__(self):
         return '%s' % self.id
 
@@ -250,7 +250,7 @@ class WC(BaseMaterials, BaseDevices, ):
 
     class Meta:
         app_label = "core"
-        verbose_name = "WC"
+        verbose_name = "Туалет"
     def __unicode__(self):
         return '%s' % self.id
 
@@ -265,7 +265,7 @@ class Hallway(BaseMaterials, BaseDevices, ):
 
     class Meta:
         app_label = "core"
-        verbose_name = "Hallway"
+        verbose_name = "Прихожая"
     def __unicode__(self):
         return '%s' % self.id
 

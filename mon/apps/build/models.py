@@ -9,7 +9,7 @@ class Ground(BaseBuilding, BaseCompareData):
 
     class Meta:
         app_label = "build"
-        verbose_name = "Ground"
+        verbose_name = _(u"Земальный участок")
     def __unicode__(self):
         return '%s' % self.id
 
