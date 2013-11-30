@@ -58,32 +58,6 @@ def add_building(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
-class BuildingListView(ListView):
-    model = Building
-    template_name = "builds.html"
-    paginate_by = 20
-
-    def get_context_data(self, **kwargs):
-        context = super(BuildingListView, self).get_context_data(**kwargs)
-        context["title"] = _(u'Строительные объекты')
-        return context
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(BuildingListView, self).dispatch(*args, **kwargs)
-
-    def get_queryset(self, *args, **kwargs):
-        data = self.request.GET.copy()
-        if data.get("pk"):
-            return Building.objects.get(pk=data.get("pk"))
-        if data.get("strv"):
-            return Building.objects.get(address__icontains=data.get("strv"))
-        if data.get("numv"):
-            return Building.objects.get(state=data.get("numv"))
-        else:
-            return super(BuildingListView, self).get_queryset(*args, **kwargs)
-
-
 @login_required
 def get_buildings(request, pk=None, strv=None, numv=None):
     template = 'builds.html'
