@@ -10,7 +10,7 @@
     {% endblock %}
     <title>{% block head_title %}{{ title }}{% endblock %}</title>
     {% block links %}
-        <link media="screen" href="{{ STATIC_URL }}css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+        <link media="screen" href="{{ STATIC_URL }}css/bootstrap.css" type="text/css" rel="stylesheet" />
         <link media="screen" href="{{ STATIC_URL }}css/style.css" type="text/css" rel="stylesheet" />
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
     {% endblock %}
@@ -23,9 +23,6 @@
         <div class="navbar navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
-              <div class="profile-main">
-                <a style="font-size:12px;" href="{% url 'logout' %}">{% trans 'Выйти' %}</a>
-              </div>
               <div class="nav-collapse collapse">
                 <ul class="nav">
                     <li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
@@ -57,7 +54,13 @@
                             <li><a href="{% url 'create-result' %}">{% trans 'Добавить' %}</a></li>
                         </ul>
                     </li>
-                    <!-- <li class="divider-vertical"></li> -->
+                    <li class="divider-vertical"></li>
+                    <li id="control" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <ul class="nav pull-right">
                     <li id="filters" class="dropdown">
