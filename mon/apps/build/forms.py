@@ -16,8 +16,8 @@ class GroundForm(forms.ModelForm):
 
 
 class BuildingForm(forms.ModelForm):
-    address = forms.CharField(help_text=_(u"Адрес"), label=_(u'Адрес'), widget=forms.Textarea(attrs={'rows': 4, 'class': 'span6'}))
-    comment = forms.CharField(help_text=_(u"Комментарий"), label=_(u'Комментарий'), widget=forms.Textarea(attrs={'rows': 4, 'class': 'span6'}))
+    address = forms.CharField(help_text=_(u"Адрес"), label=_(u'Адрес'), widget=forms.Textarea(attrs={'rows': 4 }))
+    comment = forms.CharField(help_text=_(u"Комментарий"), label=_(u'Комментарий'), widget=forms.Textarea(attrs={'rows': 4 }))
 
     class Meta:
         model = Building
@@ -25,7 +25,6 @@ class BuildingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingForm, self).__init__(*args, **kwargs)
-        self.fields['address'].widget.attrs['class'] = 'span7'
 
 
 class BuildingShowForm(BuildingForm):

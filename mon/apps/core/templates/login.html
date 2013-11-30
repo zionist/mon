@@ -1,30 +1,18 @@
 {% extends "base_site.html" %}
 {% load i18n %}
 
-
 {% block content %}
-    <h2>{% trans 'Войти' %}</h2>
-    {% if errorlist %}
-        <div class="error">
-            {{ errorlist }}
-        </div>
+    {{ title }}
+    {% if user.is_authenticated %}
+        <br />
+        <p> Вы уже вошли как {{ user }}.
+        <a href="{% url 'django.contrib.auth.views.logout_then_login' %}">Выйти</a></p>
     {% else %}
-        {% if form %}
-            {% csrf_token %}
-            <form method="post" action="" enctype="multipart/form-data">
-                {% csrf_token %}
-                    <table>
-                    {{ form }}
-                    </table>
-                <br>
-                <button type="submit" name = "action"> {% trans ' Войти ' %}</button>
-            </form>
-            <br>
-        {% else %}
-            <br>
-            Sorry, you can't login right now, try again later.
-        {% endif %}
+        <h3>Вход в систему</h3>
+        <form method="post" action="{% url 'django.contrib.auth.views.login' %}"> {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-info" value="Вход" />
+        <input type="hidden" name="next" value="{% url 'main' %}" />
+        </form>
     {% endif %}
-
-
 {% endblock %}

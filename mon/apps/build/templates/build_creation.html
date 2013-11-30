@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 {% load i18n %}
-
+{% load extras %}
 
 {% block content %}
     <h2>{{ title }}</h2>
@@ -11,34 +11,76 @@
     {% else %}
         {% if form or formsets %}
             <form method="POST" action="{% url 'create-building' %}"> {% csrf_token %}
-                {% cycle ' ' 0 1 2 3 as title %}
-                {% cycle ' ' 'Room' 'Hallway' 'WC' 'Kitchen' as str_title %}
                 {% for obj_form in formsets %}
-                    <br><br><h4>{% cycle str_title %}{{titles.title}}{{titles.0}}</h4>
-                        <table border="0">
-                        {% for field in obj_form %}
-                            {% if field.is_hidden %}
-                                {{ field }}
-                            {% else %}
-                                <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                   <br />
+                   <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>
+                   {% for field in obj_form %}
+                        {% if forloop.counter0|check_divison:"4" == "0" %}
+                        <div class="row">
+                        {% endif %}
+                            <div class="span3">
+                                {% if field.is_hidden %}
+                                    {{ field }}
+                                {% else %}
+                                    {{ field.label_tag }} {{ field.errors }} {{ field }}
+                                {% endif %}
+                             </div>
+                        {% if forloop.counter0|check_divison:"4" == "3" %}
+                            </div>
+                        {% endif %}
+                        {% if forloop.last and forloop.counter0|check_divison:"4" != "3" %}
+                            {% if forloop.counter0|check_divison:"4" %}
+                                </div>
                             {% endif %}
-                        {% endfor %}
-                        </table>
-                    <!--{% cycle title %}-->
+                        {% endif %}
                 {% endfor %}
-                {% if form %}
-                <br><h4>{% trans ' Общие параметры' %}</h4>
-                <table border="0">
+            {% endfor %}
+            {% if form %}
+                    <br />
+                    <h4>{% trans ' Общие параметры' %}</h4>
                     {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                        {% if forloop.counter0|check_divison:"4" == "0" %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="span3">
+                                {% if field.is_hidden %}
+                                {{ field }}
+                                {% else %}
+                                {{ field.label_tag }} {{ field.errors }} {{ field }}
+                                {% endif %}
+                            </div>
+                            {% if forloop.counter0|check_divison:"4" == "3" %}
+                        </div>
+                        {% endif %}
+                        {% if forloop.last and forloop.counter0|check_divison:"4" != "3" %}
+                        {% if forloop.counter0|check_divison:"4" %}
+                        </div>
+                        {% endif %}
+                        {% endif %}
                     {% endfor %}
                     {% for field in text_area_fields %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                            {% if forloop.counter0|check_divison:"2" == "0" %}
+                            <div class="row">
+                                {% endif %}
+                                <div class="span6">
+                                    {% if field.is_hidden %}
+                                    {{ field }}
+                                    {% else %}
+                                    {{ field.label_tag }} {{ field.errors }} {{ field }}
+                                    {% endif %}
+                                </div>
+                                {% if forloop.counter0|check_divison:"4" == "2" %}
+                            </div>
+                            {% endif %}
+                            {% if forloop.last and forloop.counter0|check_divison:"4" != "2" %}
+                            {% if forloop.counter0|check_divison:"2" %}
+                            </div>
+                            {% endif %}
+                            {% endif %}
                     {% endfor %}
-                </table>
                 {% endif %}
                 <br>
-                <button type="submit" name = "build"> {% trans ' Сохранить ' %} </button>
+                <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
             </form>
         {% endif %}
     {% endif %}

@@ -28,9 +28,11 @@ settings_local_pg.py
 
 # Static files
 admin/
-css/
+mon/css/
 static/admin/
 media
+mon/js
+mon/coffee
 
 # Installer logs
 pip-log.txt
