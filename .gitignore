@@ -31,6 +31,8 @@ admin/
 css/
 static/admin/
 media
+mon/js
+mon/coffee
 
 # Installer logs
 pip-log.txt

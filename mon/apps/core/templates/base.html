@@ -14,8 +14,6 @@
         <link media="screen" href="{{ STATIC_URL }}css/style.css" type="text/css" rel="stylesheet" />
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
     {% endblock %}
-    {% block scripts %}
-    {% endblock %}
 {% endblock %}
 </head>
 {% block body %}
@@ -30,12 +28,35 @@
               </div>
               <div class="nav-collapse collapse">
                 <ul class="nav">
-                    <li><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
-                    <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
-                    <li><a href="{% url 'auctions' %}">{% trans 'Аукционы' %}</a></li>
-                    <li><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
-                    <li><a href="{% url 'results' %}">{% trans 'Осмотры' %}</a></li>
-                    <li><a href="{% url 'create-building' %}">{% trans 'Добавить' %}</a></li>
+                    <li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
+                    <li id="buildings" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Объекты<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'buildings' %}">{% trans 'Просмотреть' %}</a></li>
+                            <li><a href="{% url 'create-building' %}">{% trans 'Добавить' %}</a></li>
+                        </ul>
+                    </li>
+                    <li id="auctions" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Аукционы<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'auctions' %}">{% trans 'Просмотреть' %}</a></li>
+                            <li><a href="{% url 'create-auction' %}">{% trans 'Добавить' %}</a></li>
+                        </ul>
+                    </li>
+                    <li id="contracts" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Контракты<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'contracts' %}">{% trans 'Просмотреть' %}</a></li>
+                            <li><a href="{% url 'create-contract' %}">{% trans 'Добавить' %}</a></li>
+                        </ul
+                    </li>
+                    <li id="results" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Осмотры<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'results' %}">{% trans 'Просмотреть' %}</a></li>
+                            <li><a href="{% url 'create-result' %}">{% trans 'Добавить' %}</a></li>
+                        </ul>
+                    </li>
                 </ul>
               </div>
             </div>
@@ -60,6 +81,11 @@
             <div class="rights"><span class="copy">MO v1.1.0 Copyright &copy; 2013 developers</span> </div>
         </div>
     </div>
+    {% endblock %}
+    {% block scripts %}
+        <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+        <script src="{{ STATIC_URL }}js/tabs.js"></script>
     {% endblock %}
     </body>
 {% endblock %}
