@@ -35,13 +35,48 @@
                         {% endif %}
                 {% endfor %}
             {% endfor %}
-                {% if form %}
-                <br /><h4>{% trans ' Общие параметры' %}</h4>
+            {% if form %}
+                    <br />
+                    <h4>{% trans ' Общие параметры' %}</h4>
                     {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                        {% if forloop.counter0|check_divison:"4" == "0" %}
+                        <div class="row">
+                            {% endif %}
+                            <div class="span3">
+                                {% if field.is_hidden %}
+                                {{ field }}
+                                {% else %}
+                                {{ field.label_tag }} {{ field.errors }} {{ field }}
+                                {% endif %}
+                            </div>
+                            {% if forloop.counter0|check_divison:"4" == "3" %}
+                        </div>
+                        {% endif %}
+                        {% if forloop.last and forloop.counter0|check_divison:"4" != "3" %}
+                        {% if forloop.counter0|check_divison:"4" %}
+                        </div>
+                        {% endif %}
+                        {% endif %}
                     {% endfor %}
                     {% for field in text_area_fields %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                            {% if forloop.counter0|check_divison:"2" == "0" %}
+                            <div class="row">
+                                {% endif %}
+                                <div class="span6">
+                                    {% if field.is_hidden %}
+                                    {{ field }}
+                                    {% else %}
+                                    {{ field.label_tag }} {{ field.errors }} {{ field }}
+                                    {% endif %}
+                                </div>
+                                {% if forloop.counter0|check_divison:"4" == "2" %}
+                            </div>
+                            {% endif %}
+                            {% if forloop.last and forloop.counter0|check_divison:"4" != "2" %}
+                            {% if forloop.counter0|check_divison:"2" %}
+                            </div>
+                            {% endif %}
+                            {% endif %}
                     {% endfor %}
                 {% endif %}
                 <br>
