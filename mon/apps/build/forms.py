@@ -26,6 +26,8 @@ class BuildingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BuildingForm, self).__init__(*args, **kwargs)
 
+    def to_table(self):
+        return "<td> %s </td> <td> %s </td> <td> %s </td>" % (self.address, self.mo.name, self.developer)
 
 class BuildingShowForm(BuildingForm):
 
