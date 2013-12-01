@@ -25,3 +25,8 @@ textarea{
 input {
     width: inherit;
 }
+
+.table th {
+    color: steelblue;
+    border-top-style: None;
+}
