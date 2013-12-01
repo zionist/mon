@@ -26,7 +26,7 @@ from apps.core.models import WC, Room, Hallway, Kitchen
 
 def add_auction(request):
     template = 'auction_creation.html'
-    context = {'title': _(u'Добавление заказа')}
+    context = {'title': _(u'Добавление аукциона')}
     prefix = 'auction'
     if request.method == "POST":
         form = AuctionForm(request.POST, prefix=prefix)
@@ -46,14 +46,16 @@ def add_auction(request):
     else:
         form = AuctionForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-    form, text_area_form = split_form(form)
-    context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': [
-                        Room._meta.verbose_name,
-                        Hallway._meta.verbose_name,
-                        WC._meta.verbose_name,
-                        Kitchen._meta.verbose_name,
-                        ]})
+        # move text_area fields to another form
+        form, text_area_form = split_form(form)
+        print text_area_form
+        context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [
+                            Room._meta.verbose_name,
+                            Hallway._meta.verbose_name,
+                            WC._meta.verbose_name,
+                            Kitchen._meta.verbose_name,
+                            ]})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 

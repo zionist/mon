@@ -21,7 +21,7 @@
             <br>
         {% endif %}
     {% else %}
-        <h3>{% trans ' Вы действительно хотите удалить строение по адресу ' %} {{ object.address }}? </h3>
+        <h3>{% trans ' Вы действительно хотите удалить объект по адресу ' %} {{ object.address }}? </h3>
 
         <form method="POST" action="{% url 'delete-building' object.id %}"> {% csrf_token %}
             <br>

@@ -86,13 +86,6 @@ def get_buildings(request, pk=None, strv=None, numv=None):
 def get_building(request, pk, extra=None):
     context = {'title': _(u'Параметры объекта')}
     build = Building.objects.get(pk=pk)
-    if request.method == "POST":
-        form = BuildingShowForm(request.POST, instance=build)
-        context.update({'form': form})
-    else:
-        form = BuildingShowForm(instance=build)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
-        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': build})
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 

@@ -98,7 +98,7 @@ class BaseContract(BaseName, ):
     class Meta:
         abstract = True
 
-    num = models.CharField(help_text=_(u"Номер"), null=True, max_length=2048, verbose_name=_(u"Номер"), blank=True, )
+    num = models.CharField(help_text=_(u"Номер"), max_length=2048, verbose_name=_(u"Номер"), )
 
 
 class BaseResult(models.Model):

@@ -29,6 +29,7 @@ class ResultForm(forms.ModelForm):
 
 
 class AuctionForm(forms.ModelForm):
+
     class Meta:
         model = Auction
         exclude = ('room', 'hallway', 'wc', 'kitchen')
