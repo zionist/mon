@@ -28,12 +28,13 @@ class FederalBudgetForm(forms.ModelForm):
 class SubventionForm(forms.ModelForm):
     class Meta:
         model = Subvention
+        exclude = ('date', 'reg_budget', 'fed_budget')
 
 
 class DepartamentAgreementForm(forms.ModelForm):
     class Meta:
         model = DepartamentAgreement
-        exclude = ('mo', )
+        exclude = ('mo', 'subvention')
 
 
 class PeopleAmountForm(forms.ModelForm):
@@ -56,7 +57,7 @@ class MOShowForm(forms.ModelForm):
 class DepartamentAgreementShowForm(forms.ModelForm):
     class Meta:
         model = DepartamentAgreement
-        exclude = ('mo', )
+        exclude = ('mo', 'subvention')
 
     def __init__(self, *args, **kwargs):
         super(DepartamentAgreementShowForm, self).__init__(*args, **kwargs)
@@ -64,3 +65,36 @@ class DepartamentAgreementShowForm(forms.ModelForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
+
+class SubventionShowForm(forms.ModelForm):
+    class Meta:
+        model = Subvention
+        exclude = ('date', 'reg_budget', 'fed_budget')
+
+    def __init__(self, *args, **kwargs):
+        super(SubventionShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class FederalBudgetShowForm(forms.ModelForm):
+    class Meta:
+        model = FederalBudget
+
+    def __init__(self, *args, **kwargs):
+        super(FederalBudgetShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class RegionalBudgetShowForm(forms.ModelForm):
+    class Meta:
+        model = RegionalBudget
+
+    def __init__(self, *args, **kwargs):
+        super(RegionalBudgetShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'

@@ -11,6 +11,7 @@
     {% else %}
         {% if form or formsets %}
             <form method="POST" action="{% url 'create-mo' %}"> {% csrf_token %}
+
                 {% if form %}
                 <br><h4>{% trans ' Общие параметры' %}</h4>
                 <table border="0">
@@ -21,10 +22,22 @@
                     {% for field in dep_form %}
                     <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
                     {% endfor %}
+
+                    {% for field in sub_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
                 </table>
                 {% endif %}
+                {% for form in formsets %}
+                <table>
+                    <h4>{% cycle titles.0 titles.1%}</h4>
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% endfor %}
                 <br>
-                <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
+                <button type="submit" name = "mo"> {% trans ' Сохранить ' %} </button>
             </form>
         {% endif %}
     {% endif %}
