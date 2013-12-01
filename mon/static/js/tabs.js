@@ -14,7 +14,7 @@
       "/cmp/result/": "results",
       "/cmp/results/$": "results",
       "/mo/mos/$": "mos",
-      "/mo/mo/": "results"
+      "/filter/\\d+/": "filters"
     };
     _results = [];
     for (url_regex in urls) {
