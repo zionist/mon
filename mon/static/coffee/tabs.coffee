@@ -1,14 +1,16 @@
 set_active_tab = () ->
   urls = {
       "/main/$": "main"
-      "/obj/building/\\D+/$": "buildings",
+      "/obj/building/": "buildings",
       "/obj/buildings/$": "buildings"
-      "/cmp/auction/\\D+/$": "auctions",
+      "/cmp/auction/": "auctions",
       "/cmp/auctions/$": "auctions"
-      "/cmp/contract/\\D+/$": "contracts",
+      "/cmp/contract/": "contracts",
       "/cmp/contracts/$": "contracts"
-      "/cmp/result/\\D+/$": "results",
+      "/cmp/result/": "results",
       "/cmp/results/$": "results"
+      "/mo/mos/$": "mos"
+      "/mo/mo/": "results",
   }
   for url_regex, div_id of urls
     m = RegExp(url_regex)

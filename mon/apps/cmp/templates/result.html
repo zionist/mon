@@ -10,7 +10,6 @@
         </div>
     {% else %}
         {% if form and object %}
-            <h3>{% trans 'Объект' %}</h3>
             <table>
                 <tr>
                     <td><a class="btn btn-small" href="{% url 'update-result' object.id %}">
