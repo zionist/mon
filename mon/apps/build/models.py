@@ -11,7 +11,7 @@ class Ground(BaseBuilding, BaseCompareData):
         app_label = "build"
         verbose_name = _(u"Земальный участок")
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.address
 
     cad_passport = models.ForeignKey(File, help_text=_(u"Выписка из кадастрового паспорта"), null=True, verbose_name=_(u"Выписка из кадастрового паспорта"), blank=True, related_name='cad_passport')
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
@@ -29,7 +29,7 @@ class Building(BaseBuilding, BaseCompareData):
         app_label = "build"
         verbose_name = "Building"
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.address
 
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"),
         verbose_name=_(u"Застройщик (владелец) объекта"), )

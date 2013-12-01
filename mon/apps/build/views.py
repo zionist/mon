@@ -45,7 +45,6 @@ def add_building(request):
     else:
         form = BuildingForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-        # move text_area fields to another form
         form, text_area_form = split_form(form)
         context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [

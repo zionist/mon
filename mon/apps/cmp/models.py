@@ -58,7 +58,7 @@ class Result(BaseResult, ):
 
     class Meta:
         app_label = "cmp"
-        verbose_name = "Result"
+        verbose_name = "Осмотр"
     def __unicode__(self):
         return '%s' % self.id
 

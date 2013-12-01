@@ -26,6 +26,7 @@ class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
         exclude = ('cmp_data',)
+    recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), widget=forms.Textarea(attrs={'rows': 4 }))
 
 
 class AuctionForm(forms.ModelForm):

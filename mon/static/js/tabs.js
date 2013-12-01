@@ -5,14 +5,16 @@
     var div_id, m, url_regex, urls, _results;
     urls = {
       "/main/$": "main",
-      "/obj/building/\\D+/$": "buildings",
+      "/obj/building/": "buildings",
       "/obj/buildings/$": "buildings",
-      "/cmp/auction/\\D+/$": "auctions",
+      "/cmp/auction/": "auctions",
       "/cmp/auctions/$": "auctions",
-      "/cmp/contract/\\D+/$": "contracts",
+      "/cmp/contract/": "contracts",
       "/cmp/contracts/$": "contracts",
-      "/cmp/result/\\D+/$": "results",
-      "/cmp/results/$": "results"
+      "/cmp/result/": "results",
+      "/cmp/results/$": "results",
+      "/mo/mos/$": "mos",
+      "/mo/mo/": "results"
     };
     _results = [];
     for (url_regex in urls) {
