@@ -39,22 +39,21 @@ def add_building(request):
             building.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('buildings')
         else:
-            form, text_area_form = split_form(form, is_bound=True)
-            print text_area_form
+            form, text_area_form = split_form(form)
             context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         form = BuildingForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         # move text_area fields to another form
-    form, text_area_form = split_form(form, is_bound=False)
-    context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': [
-                        Room._meta.verbose_name,
-                        Hallway._meta.verbose_name,
-                        WC._meta.verbose_name,
-                        Kitchen._meta.verbose_name,
-                    ]})
+        form, text_area_form = split_form(form)
+        context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [
+                            Room._meta.verbose_name,
+                            Hallway._meta.verbose_name,
+                            WC._meta.verbose_name,
+                            Kitchen._meta.verbose_name,
+                        ]})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
@@ -105,23 +104,34 @@ def update_building(request, pk, extra=None):
     if request.method == "POST":
         form = BuildingForm(request.POST, prefix=prefix, instance=build)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
-        context.update({'object': build, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('buildings')
         else:
-            context.update({'object': build, 'form': form, 'prefix': prefix,
+            form, text_area_form = split_form(form)
+            context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                            'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+                            'titles': [
+                                Room._meta.verbose_name,
+                                Hallway._meta.verbose_name,
+                                WC._meta.verbose_name,
+                                Kitchen._meta.verbose_name,
+                                ]})
             return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
     else:
         form = BuildingForm(instance=build, prefix=prefix)
+        form, text_area_form = split_form(form)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build)
-        context.update({'object': build, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
-    return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
+        context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [
+                            Room._meta.verbose_name,
+                            Hallway._meta.verbose_name,
+                            WC._meta.verbose_name,
+                            Kitchen._meta.verbose_name,
+                            ]})
+        return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
 
 
 def pre_delete_building(request, pk):

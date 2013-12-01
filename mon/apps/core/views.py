@@ -66,15 +66,28 @@ def get_fk_show_forms(parent=None):
     return [room_f, hallway_f, wc_f, kitchen_f]
 
 
-def split_form(form, is_bound):
+def split_form(form):
     """
+    move text_area fields to another form
     :param form: forms.Form object
-    :param is_bound: Form is bound or unbound to data
     :return: two forms. First form without fields with Textarea widget
         and second form which contains fields with Textarea widget
     """
-    # move text_area fields to another form
-    if is_bound:
+    if form.instance.id and not form.is_bound:
+        text_area_form = CustomForm()
+        text_area_form.is_bound = False
+        text_area_form.prefix = form.prefix
+        text_area_form.initial = QueryDict({}).copy()
+        data = form.initial.copy()
+        for k, v in form.fields.iteritems():
+            if isinstance(v, CharField) and isinstance(v.widget, Textarea):
+                text_area_form.fields.update({k: form.fields.pop(k)})
+                if data.get(k):
+                    text_area_form.initial.update({k: data.get(k)})
+                    del data[k]
+        form.data = data
+        return (form, text_area_form)
+    if form.is_bound:
         text_area_form = CustomForm()
         text_area_form.is_bound = True
         text_area_form.prefix = form.prefix
@@ -90,6 +103,7 @@ def split_form(form, is_bound):
         form.data = data
         return (form, text_area_form)
     else:
+        text_area_form = CustomForm()
         text_area_form = CustomForm()
         for k, v in form.fields.iteritems():
             if isinstance(v, CharField) and isinstance(v.widget, Textarea):

@@ -20,6 +20,8 @@ from .models import Contract, Result, Auction, Person, CompareData
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms
+from apps.core.views import split_form
+from apps.core.models import WC, Room, Hallway, Kitchen
 
 
 def add_auction(request):
@@ -38,13 +40,20 @@ def add_auction(request):
             auction.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('auctions')
         else:
-            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            form, text_area_form = split_form(form, is_bound=True)
+            context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         form = AuctionForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-    context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': ['Room', 'Hallway', 'WC', 'Kitchen']})
+    form, text_area_form = split_form(form, is_bound=False)
+    context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': [
+                        Room._meta.verbose_name,
+                        Hallway._meta.verbose_name,
+                        WC._meta.verbose_name,
+                        Kitchen._meta.verbose_name,
+                        ]})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 

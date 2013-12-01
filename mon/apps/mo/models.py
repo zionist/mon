@@ -42,7 +42,7 @@ class MO(BaseName, ):
         app_label = "mo"
         verbose_name = "MO"
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.name
 
     creation_form = models.IntegerField(help_text=_(u"Форма образования"), verbose_name=_(u"Форма образования"), blank=True, null=True, choices=CREATION_FORM_CHOICES , )
     has_trouble = models.NullBooleanField(blank=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))

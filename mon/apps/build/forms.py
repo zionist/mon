@@ -17,7 +17,7 @@ class GroundForm(forms.ModelForm):
 
 class BuildingForm(forms.ModelForm):
     address = forms.CharField(help_text=_(u"Адрес"), label=_(u'Адрес'), widget=forms.Textarea(attrs={'rows': 4 }))
-    comment = forms.CharField(help_text=_(u"Комментарий"), label=_(u'Комментарий'), widget=forms.Textarea(attrs={'rows': 4 }))
+    comment = forms.CharField(help_text=_(u"Комментарий"), label=_(u'Комментарий'), required=False, widget=forms.Textarea(attrs={'rows': 4 }))
 
     class Meta:
         model = Building
