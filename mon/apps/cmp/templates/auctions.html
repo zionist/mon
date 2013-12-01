@@ -38,7 +38,7 @@
                     <td> {{ item.open_date }} </td>
                     {% if item.stage == 4 %}
                         {% if item.contract %}
-                            <td> <a class="btn btn-small" href="{% url 'change-contract' item.contract.id %}"> {% trans 'Контракт' %}</a> </td>
+                            <td> <a class="btn btn-small" href="{% url 'change-contract' item.contract.id %}"> {% trans 'Контракт ' %}{{ item.contract.num }}</a> </td>
                             <td> {{ item.contract.building.address|truncatechars:50 }} </td>
                             <td> {{ item.contract.building.developer|truncatechars:50 }} </td>
                         {% else %}

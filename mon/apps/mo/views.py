@@ -57,7 +57,7 @@ def add_mo(request):
 @login_required
 def get_mos(request, pk=None):
     template = 'mos.html'
-    context = {'title': _(u'Муниципальные образовнаиия')}
+    context = {'title': _(u'Муниципальные образования')}
     if MO.objects.all().exists():
         objects = MO.objects.all()
         if pk:
