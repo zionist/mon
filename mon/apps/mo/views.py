@@ -19,6 +19,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
     RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm
+from apps.build.models import Building
 
 
 def add_mo(request):
@@ -122,3 +123,30 @@ def delete_mo(request, pk):
         context.update({'error': _(u'Возникла ошибка при удалении муниципального образования!')})
     return render_to_response("mo_deleting.html", context, context_instance=RequestContext(request))
 
+
+def get_filter(request, num, extra=None):
+    context = {'title': _(u'Результат выборки')}
+    template = 'filter.html'
+    num = int(num) if num else 0
+    objects = None
+    if num == 0:
+        template = '/main/'
+        context.update({'title': _(u'По запросу соответствий не найдено, попробуйте изменить фильтр')})
+    elif num == 1:
+        # Фильтр готовых объектов по всем муниципальным образованиям
+        objects = Building.objects.filter(state=0)
+        template = '../../build/templates/builds.html'
+        context.update({'building_list': objects})
+    elif num == 2:
+        # Фильтр строящихся объектов по всем муниципальным образованиям (3.2)
+        objects = Building.objects.filter(state=1)
+        template = '../../build/templates/builds.html'
+        context.update({'building_list': objects})
+    elif num == 3:
+        # Фильтр земельных участков по всем муниципальным образованиям (3.3)
+        objects = Building.objects.filter(state=2)
+        template = '../../build/templates/builds.html'
+        context.update({'building_list': objects})
+    if not objects:
+        context.update({'errorlist': _(u'Объекты, соответствующие запросу,  не найдены')})
+    return render_to_response(template, context, context_instance=RequestContext(request))

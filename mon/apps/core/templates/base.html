@@ -76,8 +76,9 @@
                     <li id="filters" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Фильтры<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href=""> "Фильтр 1"</a></li>
-                            <li><a href=""> "Фильтр 2"</a></li>
+                            <li><a href="{% url 'filter' 1 %}"> "Фильтр 1"</a></li>
+                            <li><a href="{% url 'filter' 2 %}"> "Фильтр 2"</a></li>
+                            <li><a href="{% url 'filter' 3 %}"> "Фильтр 3"</a></li>
                         </ul>
                     </li>
                 </ul>
