@@ -16,8 +16,8 @@
 
         {% if mo_list %}
             <div class="auction-table">
-            <h4> {% trans 'Муниципальные образования' %}</h4>
             <table class="table table-condensed">
+                <tr><th> {% trans 'Муниципальные образования' %}</th></tr>
                 {% for obj in mo_list %}
                     {% if obj.id %}
                         <tr><td>

@@ -16,8 +16,8 @@
 
         {% if result_list %}
             <div class="auction-table">
-            <h4> {% trans 'Осмотры' %}</h4>
             <table class="table table-condensed">
+                <tr><th> {% trans 'Осмотры' %}</th></tr>
                 {% for obj in result_list %}
                     {% if obj.id %}
                         <tr><td>

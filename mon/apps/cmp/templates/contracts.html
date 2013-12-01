@@ -16,8 +16,8 @@
 
         {% if contract_list %}
             <div class="auction-table">
-            <h4> {% trans 'Контракты' %}</h4>
             <table class="table table-condensed">
+                <tr><th> {% trans 'Контракты' %}</th></tr>
                 {% for obj in contract_list %}
                     {% if obj.id %}
                         <tr><td>

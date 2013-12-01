@@ -15,130 +15,42 @@
     {% else %}
 
         {% if auction_list %}
-            <div class="auction-table">
-
-            {% regroup auction_list by stage as objects_list %}
-            <ul>
-            {% for stage in objects_list %}
-                <li>{% if stage.grouper == 0 %}
-                    <h4> {% trans 'Аукционы на этапе подачи заявки' %}</h4>
-                    {% elif stage.grouper == 1 %}
-                    <h4> {% trans 'Аукционы на этапе работы комиссии' %}</h4>
-                    {% elif stage.grouper == 2 %}
-                    <h4> {% trans 'Аукционы на этапе завершения работы (не допущена ни одна заявка)' %}</h4>
-                    {% elif stage.grouper == 3 %}
-                    <h4> {% trans 'Аукционы на этапе завершения работы (не подана ни одна заявка)' %}</h4>
-                    {% elif stage.grouper == 4 %}
-                    <h4> {% trans 'Аукционы на этапе заключения контракта' %}</h4>
-                    {% elif stage.grouper == 5 %}
-                    <h4> {% trans 'Аукционы на этапе отмены размещения' %}</h4>
-                    {% endif %} </li>
-                    <ul>
-                    {% for item in stage.list %}
-                    {% with item.num as obj_num %}
-                        <li><a href="{% url 'change-auction' item.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                        {% if item.stage == 4 %}
-                            &nbsp;<a class="btn btn-small" href="{% url 'create-auction' %}">
-                                {% trans 'Заполнить данные контракта' %}</a>
-                            {% endif %}
-                        <hr></li>
-                    {% endwith %}
-                    {% endfor %}
-                    </ul>
-                    </li>
-            {% endfor %}
-            </ul><br>
-
-            {% for obj in auction_list %}
-            {% with obj.id as obj_id %}
-            {% with obj.stage as obj_stage %}
-            {% with obj.num as obj_num %}
-                {% if obj_id and obj_stage == 0 %}
-                    <table class="table table-condensed">
-                    <tr><h4> {% trans 'Аукцион на этапе подачи заявки' %}</h4></tr>
-                    <tr><td>
-                    &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                    </td></tr>
-                    </table>
-                {% elif obj_id and obj_stage == 1 %}
-                    <table class="table table-condensed">
-                    <tr><h4> {% trans 'Аукцион на этапе работы комиссии' %}</h4></tr>
-                    <tr><td>
-                    &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                    </td></tr>
-                    </table>
-                {% elif obj_id and obj_stage == 2 %}
-                    <table class="table table-condensed">
-                    <tr><h4> {% trans 'Аукцион на этапе завершения работы (не допущена ни одна заявка)' %}</h4></tr>
-                    <tr><td>
-                    &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                    </td></tr>
-                    </table>
-                {% elif obj_id and obj_stage == 3 %}
-                    <table class="table table-condensed">
-                    <tr><h4> {% trans 'Аукцион на этапе завершения работы (не подана ни одна заявка)' %}</h4></tr>
-                    <tr><td>
-                    &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                    </td></tr>
-                    </table>
-                {% elif obj_id and obj_stage == 4 %}
-                    <table class="table table-condensed">
-                    <tr><h4> {% trans 'Аукцион на этапе заключения контракта' %}</h4></tr>
-                    <tr><td>
-                    &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                    </td>
-                    <td>&nbsp;<a class="btn btn-small" href="{% url 'create-auction' %}">
-                            {% trans 'Заполнить данные контракта' %}</a>
-                    </td></tr>
-                    </table>
-                {% elif obj_id and obj_stage == 5 %}
-                    <table class="table table-condensed">
-                    <tr><h4> {% trans 'Аукцион на этапе отмены размещения' %}</h4></tr>
-                    <tr><td>
-                    &nbsp;&nbsp;<a href="{% url 'change-auction' obj.id %}">
-                        {% if obj_num|length > 80 %}
-                            {{obj_num|truncatechars:75}}...
-                        {% else  %}
-                            {{obj_num}}
-                        {% endif %}</a>
-                    </td></tr>
-                    </table>
+            <table class="table table-striped table-condensed table-hover">
+                {% regroup auction_list by stage as objects_list %}
+                {% for stage in objects_list %}
+                {% if stage.grouper == 0 %}
+                <tr><th> {% trans 'Аукционы на этапе подачи заявки' %}</th></tr>
+                {% elif stage.grouper == 1 %}
+                <tr><th> {% trans 'Аукционы на этапе работы комиссии' %}</th></tr>
+                {% elif stage.grouper == 2 %}
+                <tr><th> {% trans 'Аукционы на этапе завершения работы (не допущена ни одна заявка)' %}</th></tr>
+                {% elif stage.grouper == 3 %}
+                <tr><th> {% trans 'Аукционы на этапе завершения работы (не подана ни одна заявка)' %}</th></tr>
+                {% elif stage.grouper == 4 %}
+                <tr><th> {% trans 'Аукционы на этапе заключения контракта' %}</th></tr>
+                {% elif stage.grouper == 5 %}
+                <tr><th> {% trans 'Аукционы на этапе отмены размещения' %}</th></tr>
                 {% endif %}
-            {% endwith %}
-            {% endwith %}
-            {% endwith %}
-            {% endfor %}
-            </div>
+                {% for item in stage.list %}
+                <tr onclick="location.href = '{% url 'change-auction' item.id %}'">
+                    <td> <a href="{% url 'change-auction' item.id %}"> {{ item.num }} </a> </td>
+                    <td> {{ item.mo.name }} </td>
+                    <td> {{ item.open_date }} </td>
+                    {% if item.stage == 4 %}
+                        {% if item.contract %}
+                            <td> <a class="btn btn-small" href="{% url 'change-contract' item.contract.id %}"> {% trans 'Контракт' %}</a> </td>
+                            <td> {{ item.contract.building.address|truncatechars:50 }} </td>
+                            <td> {{ item.contract.building.developer|truncatechars:50 }} </td>
+                        {% else %}
+                            <td> <a class="btn btn-small" href="{% url 'create-contract' %}"> {% trans 'Составить контракт' %}</a> </td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+                {% for obj in building_list %}
+                {% endfor %}
+            </table>
         {% endif %}
     {% endif %}
 {% endblock %}
