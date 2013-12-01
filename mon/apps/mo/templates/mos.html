@@ -18,12 +18,16 @@
             <div class="auction-table">
             <table class="table table-condensed">
                 <tr><th> {% trans 'Муниципальные образования' %}</th></tr>
+                <tr><th> {% trans 'Наименование' %}</th><th> {% trans 'Форма создания' %}</th>
+                    <th> {% trans 'Сирот' %}</th><th> {% trans 'Требуется жилья' %}</th></tr>
                 {% for obj in mo_list %}
                     {% if obj.id %}
-                        <tr><td>
-                        &nbsp;&nbsp;<a href="{% url 'change-mo' obj.id %}">
-                        {{obj.name}}</a>
-                        </td></tr>
+                        <tr>
+                            <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a></td>
+                            <td>{% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС{% elif obj.creation_form == 2%}С{% endif %}</td>
+                            <td>{{obj.peopleamount_set.all.0.privilege_people}}</td>
+                            <td>{{obj.peopleamount_set.all.0.unhome_orphan}}</td>
+                        </tr>
                     {% endif %}
                 {% endfor %}
             </table>
