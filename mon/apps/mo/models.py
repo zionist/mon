@@ -10,7 +10,7 @@ class RegionalBudget(BaseBudget, ):
 
     class Meta:
         app_label = "mo"
-        verbose_name = "RegionalBudget"
+        verbose_name = _(u"Региональный бюджет")
     def __unicode__(self):
         return '%s' % self.id
 
@@ -19,7 +19,7 @@ class FederalBudget(BaseBudget, ):
 
     class Meta:
         app_label = "mo"
-        verbose_name = "FederalBudget"
+        verbose_name = _(u"Федеральный бюджет")
     def __unicode__(self):
         return '%s' % self.id
 
@@ -32,8 +32,8 @@ class Subvention(BaseSubvention, ):
     def __unicode__(self):
         return '%s' % self.id
 
-    fed_budget = models.ForeignKey(FederalBudget, help_text=_(u"Федеральный бюджет"), verbose_name=_(u"Федеральный бюджет"), )
-    reg_budget = models.ForeignKey(RegionalBudget, help_text=_(u"Краевой бюджет"), verbose_name=_(u"Краевой бюджет"), )
+    fed_budget = models.ForeignKey(FederalBudget, help_text=_(u"Федеральный бюджет"), verbose_name=_(u"Федеральный бюджет"), blank=True, null=True, )
+    reg_budget = models.ForeignKey(RegionalBudget, help_text=_(u"Краевой бюджет"), verbose_name=_(u"Краевой бюджет"), blank=True, null=True, )
 
 
 class MO(BaseName, ):
