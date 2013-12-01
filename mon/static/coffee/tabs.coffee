@@ -10,6 +10,7 @@ set_active_tab = () ->
       "/cmp/result/": "results",
       "/cmp/results/$": "results"
       "/mo/mos/$": "mos"
+      "/mo/mo/": "mos"
       "/filter/\\d+/": "filters",
   }
   for url_regex, div_id of urls

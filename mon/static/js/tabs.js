@@ -14,6 +14,7 @@
       "/cmp/result/": "results",
       "/cmp/results/$": "results",
       "/mo/mos/$": "mos",
+      "/mo/mo/": "mos",
       "/filter/\\d+/": "filters"
     };
     _results = [];
