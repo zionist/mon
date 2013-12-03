@@ -11,6 +11,7 @@ class RegionalBudget(BaseBudget, ):
     class Meta:
         app_label = "mo"
         verbose_name = _(u"Региональный бюджет")
+
     def __unicode__(self):
         return '%s' % self.id
 
@@ -20,6 +21,7 @@ class FederalBudget(BaseBudget, ):
     class Meta:
         app_label = "mo"
         verbose_name = _(u"Федеральный бюджет")
+
     def __unicode__(self):
         return '%s' % self.id
 
@@ -29,6 +31,7 @@ class Subvention(BaseSubvention, ):
     class Meta:
         app_label = "mo"
         verbose_name = "Subvention"
+
     def __unicode__(self):
         return '%s' % self.id
 
@@ -40,11 +43,14 @@ class MO(BaseName, ):
 
     class Meta:
         app_label = "mo"
-        verbose_name = "MO"
+        verbose_name = _(u"Муниципальное образование")
+
     def __unicode__(self):
         return '%s' % self.name
 
-    creation_form = models.IntegerField(help_text=_(u"Форма образования"), verbose_name=_(u"Форма образования"), blank=True, null=True, choices=CREATION_FORM_CHOICES , )
+    creation_form = models.IntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+                                        verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+                                        blank=True, null=True, choices=CREATION_FORM_CHOICES , )
     has_trouble = models.NullBooleanField(blank=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
     home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
 
@@ -53,7 +59,8 @@ class DepartamentAgreement(BaseDepartamentAgreement, ):
 
     class Meta:
         app_label = "mo"
-        verbose_name = "DepartamentAgreement"
+        verbose_name = _(u"Реквизиты соглашения с министерством социального развития и семейной политики")
+
     def __unicode__(self):
         return '%s' % self.id
 
@@ -61,12 +68,12 @@ class DepartamentAgreement(BaseDepartamentAgreement, ):
     subvention = models.ForeignKey(Subvention, blank=True, null=True, help_text=_(u"Субвенция"), verbose_name=_(u"Субвенция"), )
 
 
-
 class Orphan(BaseOrphan, ):
 
     class Meta:
         app_label = "mo"
         verbose_name = "Orphan"
+
     def __unicode__(self):
         return '%s' % self.id
 
@@ -76,6 +83,7 @@ class PeopleAmount(models.Model):
     class Meta:
         app_label = "mo"
         verbose_name = "PeopleAmount"
+
     def __unicode__(self):
         return '%s' % self.id
 

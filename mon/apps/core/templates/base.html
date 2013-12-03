@@ -23,9 +23,7 @@
         <div class="navbar navbar-fixed-top">
           <div class="navbar-inner">
             <div class="container">
-              <!--<div class="profile-main">-->
-                <!--<a style="font-size:12px;" href="{% url 'logout' %}">{% trans 'Выйти' %}</a>-->
-              <!--</div>-->
+
               <div class="nav-collapse collapse">
                 <ul class="nav">
                     <li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
@@ -39,54 +37,14 @@
                         <ul class="dropdown-menu" role="menu" >
                             <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
                             <li><a href="{% url 'create-building' %}">{% trans 'Добавить строительный объект' %}</a></li>
+                            <li><a href="{% url 'manage-developer' %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
                             <li><a href="{% url 'create-auction' %}">{% trans 'Добавить заказ' %}</a></li>
                             <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li>
                             <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат осмотра' %}</a></li>
+                            <li><a href="{% url 'manage-person' %}">{% trans 'Добавить участника осмотров' %}</a></li>
                         </ul>
                     </li>
-                    <!--<li id="mos" class="dropdown">-->
-                        <!--<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">МО<b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu" role="menu" >-->
-                            <!--<li><a href="{% url 'mos' %}">{% trans 'Просмотреть' %}</a></li>-->
-                            <!--<li><a href="{% url 'create-mo' %}">{% trans 'Добавить' %}</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li id="buildings" class="dropdown">-->
-                        <!--<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Объекты<b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu" role="menu" >-->
-                            <!--<li><a href="{% url 'buildings' %}">{% trans 'Просмотреть' %}</a></li>-->
-                            <!--<li><a href="{% url 'create-building' %}">{% trans 'Добавить' %}</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li id="auctions" class="dropdown">-->
-                        <!--<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Аукционы<b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu" role="menu" >-->
-                            <!--<li><a href="{% url 'auctions' %}">{% trans 'Просмотреть' %}</a></li>-->
-                            <!--<li><a href="{% url 'create-auction' %}">{% trans 'Добавить' %}</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li id="contracts" class="dropdown">-->
-                        <!--<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Контракты<b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu" role="menu" >-->
-                            <!--<li><a href="{% url 'contracts' %}">{% trans 'Просмотреть' %}</a></li>-->
-                            <!--<li><a href="{% url 'create-contract' %}">{% trans 'Добавить' %}</a></li>-->
-                        <!--</ul-->
-                    <!--</li>-->
-                    <!--<li id="results" class="dropdown">-->
-                        <!--<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Осмотры<b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu" role="menu" >-->
-                            <!--<li><a href="{% url 'results' %}">{% trans 'Просмотреть' %}</a></li>-->
-                            <!--<li><a href="{% url 'create-result' %}">{% trans 'Добавить' %}</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                    <!--<li class="divider-vertical"></li>-->
-                    <!--<li id="control" class="dropdown">-->
-                        <!--<a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>-->
-                        <!--<ul class="dropdown-menu" role="menu" >-->
-                            <!--<li><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>-->
-                        <!--</ul>-->
-                    <!--</li>-->
-                <!--</ul>-->
+
                 <ul class="nav pull-right">
                     <li id="filters" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Фильтры<b class="caret"></b></a>
@@ -115,7 +73,7 @@
    {% block footer %}
    <div id="footer">
         <hr />
-        <div class="footer_menu long">
+        <div class="footer_menu long navbar-fixed-bottom">
             <ul class="menu">
             </ul>
             <div class="rights"><span class="copy">MO v1.1.0 Copyright &copy; 2013 developers</span> </div>

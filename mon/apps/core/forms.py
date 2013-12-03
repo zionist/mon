@@ -7,7 +7,28 @@ from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 
-from .models import Room, WC, Hallway, Kitchen
+from .models import Room, WC, Hallway, Kitchen, Developer
+
+
+class DeveloperForm(forms.ModelForm):
+    boss_position = forms.CharField(help_text=_(u"Ф.И.О. и должность руководителя"), required=False,
+                                    label=_(u'Ф.И.О. и должность руководителя'), widget=forms.Textarea(attrs={'rows': 4}))
+    address = forms.CharField(help_text=_(u"Фактический адрес"), label=_(u'Фактический адрес'), required=False,
+                              widget=forms.Textarea(attrs={'rows': 4}))
+
+    class Meta:
+        model = Developer
+        exclude = ('doc', 'image')
+
+    def __init__(self, *args, **kwargs):
+        super(DeveloperForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') \
+                and not hasattr(self.fields[field].widget.attrs, 'hidden') \
+                and not isinstance(self.fields[field].widget, forms.Textarea):
+                self.fields[field].widget.attrs['class'] = 'span5'
+                self.fields[field].widget.attrs['style'] = 'height:26px;'
+
 
 
 class RoomForm(forms.ModelForm):

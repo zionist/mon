@@ -28,7 +28,9 @@
                     {% for field in form %}
                     <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
                     {% endfor %}
-
+                </table>
+                <table border="0">
+                    <h4>{% trans ' Реквизиты соглашения с министерством' %}</h4>
                     {% for field in dep_form %}
                     <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
                     {% endfor %}

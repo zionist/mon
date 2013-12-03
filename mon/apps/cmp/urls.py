@@ -25,4 +25,7 @@ urlpatterns = patterns(
     url(r'^result/update/(?P<pk>[0-9]+)/$', views.update_result, name='update-result'),
     url(r'^result/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_result, name='pre-delete-result'),
     url(r'^result/delete/(?P<pk>[0-9]+)/$', views.delete_result, name='delete-result'),
+
+    url(r'^result/person/(?P<pk>[0-9]*)/$', views.manage_person, name='manage-person'),
+    url(r'^result/person/add$', views.manage_person, name='manage-person'),
 )

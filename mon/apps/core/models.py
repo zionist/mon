@@ -4,22 +4,22 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from apps.imgfile.models import File, Image
 
-
-STATE_CHOICES  = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
-READINESS_CHOICES  = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
-FLOOR_CHOICES  = ((0, _(u'Ламинат')),  (1, _(u'Паркет')),  (2, _(u'Линолеум')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
-WALL_CHOICES  = ((0, _(u'Обои')),  (1, _(u'Водоэмульсионная краска')),  (2, _(u'Штукатурка')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
-CEILING_CHOICES  = ((0, _(u'Натяжной')),  (1, _(u'Штукатурка')),  (2, _(u'Не указано')))
-INTERNAL_DOORS_CHOICES  = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые')),  (2, _(u'Не указано')))
-ENTRANCE_DOOR_CHOICES  = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые')),  (2, _(u'Не указано')))
-WINDOW_CONSTRUCTIONS_CHOICES  = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые стеклопакеты')),  (2, _(u'Не указано')))
-WATER_SETTLEMENT_CHOICES  = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-HOT_WATER_SUPPLY_CHOICES  = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-WATER_REMOVAL_CHOICES  = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-ELECTRIC_SUPPLY_CHOICES  = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-GAS_SUPPLY_CHOICES  = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-CREATION_FORM_CHOICES  = ((0, _(u'Приобретение')),  (1, _(u'Долевое строительство')), (2, _(u'Строительство')),)
-SEPARATE_CHOICES  = ((0, _(u'Совместный')),  (1, _(u'Раздельный')),)
+FACE_LIST_CHOICES = ((0, _(u'Юридическое лицо')),  (1, _(u'Физическое лицо')),)
+STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
+READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
+FLOOR_CHOICES = ((0, _(u'Ламинат')),  (1, _(u'Паркет')),  (2, _(u'Линолеум')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
+WALL_CHOICES = ((0, _(u'Обои')),  (1, _(u'Водоэмульсионная краска')),  (2, _(u'Штукатурка')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
+CEILING_CHOICES = ((0, _(u'Натяжной')),  (1, _(u'Штукатурка')),  (2, _(u'Не указано')))
+INTERNAL_DOORS_CHOICES = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые')),  (2, _(u'Не указано')))
+ENTRANCE_DOOR_CHOICES = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые')),  (2, _(u'Не указано')))
+WINDOW_CONSTRUCTIONS_CHOICES = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые стеклопакеты')),  (2, _(u'Не указано')))
+WATER_SETTLEMENT_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+HOT_WATER_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+WATER_REMOVAL_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+ELECTRIC_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+GAS_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+CREATION_FORM_CHOICES = ((0, _(u'Приобретение')),  (1, _(u'Долевое строительство')), (2, _(u'Строительство')),)
+SEPARATE_CHOICES = ((0, _(u'Совместный')),  (1, _(u'Раздельный')),)
 STAGE_CHOICES = ((0, _(u'Подача заявок')),  (1, _(u'Работа комиссии')), (2, _(u'Размещение завершено, аукцион признан несостоявшимся, не допущена ни одна заявка')), (3, _(u'Размещение завершено, аукцион признан несостоявшимся, не подана ни одна заявка')), (4, _(u'Заключен контракт')), (5, _(u'Размещение отменено')))
 PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения денежных средств, выделенных на текущий год. Без дополнительного финансирования')),   (1, _(u'Перспективы освоения ДОПОЛНИТЕЛЬНЫХ денежных средств, в текущем году.')),  (2, _(u'Перспективы освоения денежных средств в планируемом году.')))
 
@@ -45,7 +45,9 @@ class BaseBudget(models.Model):
         abstract = True
 
     sub_sum = models.IntegerField(help_text=_(u"Размер предоставляемой в текущем году субвенции"), null=True, verbose_name=_(u"Размер предоставляемой в текущем году субвенции"), blank=True, )
-    sub_orph_home = models.IntegerField(help_text=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"), null=True, verbose_name=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"), blank=True, )
+    sub_orph_home = models.IntegerField(help_text=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
+                                        verbose_name=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
+                                        blank=True, null=True, )
     adm_coef = models.IntegerField(help_text=_(u"Размер коэффициента на администрирование расходов"), null=True, verbose_name=_(u"Размер коэффициента на администрирование расходов"), blank=True, )
 
 
@@ -54,8 +56,9 @@ class BaseSubvention(models.Model):
     class Meta:
         abstract = True
 
-    date = models.DateField(null=True, blank=True, )
-    amount = models.IntegerField(help_text=_(u"Общая сумма субвенции"), null=True, verbose_name=_(u"Общая сумма субвенции"), blank=True, )
+    date = models.DateField(auto_now=True)
+    amount = models.IntegerField(help_text=_(u"Общая сумма предоставляемой в текущем году субвенции"), null=True,
+                                 verbose_name=_(u"Общая сумма предоставляемой в текущем году субвенции"), blank=True, )
 
 
 class BaseDepartamentAgreement(BaseModel, ):
@@ -63,9 +66,16 @@ class BaseDepartamentAgreement(BaseModel, ):
     class Meta:
         abstract = True
 
-    date = models.DateField(help_text=_(u"Дата"), null=True, verbose_name=_(u"Дата"), blank=True, )
-    num = models.IntegerField(help_text=_(u"Номер"), null=True, verbose_name=_(u"Номер"), blank=True, )
-    subvention_performance = models.IntegerField(help_text=_(u"Показатель результативности предоставления субвенции (количество детей-сирот, подлежащих обеспечению жилыми человек заполнение помещениями в текущем году)"), null=True, verbose_name=_(u"Показатель результативности предоставления субвенции (количество детей-сирот, подлежащих обеспечению жилыми человек заполнение помещениями в текущем году)"), blank=True, )
+    date = models.DateField(help_text=_(u"Дата соглашения с министерством"), null=True,
+                            verbose_name=_(u"Дата соглашения с министерством"), blank=True, )
+    num = models.IntegerField(help_text=_(u"Номер соглашения с министерством"), null=True,
+                              verbose_name=_(u"Номер соглашения с министерством"), blank=True, )
+    subvention_performance = models.IntegerField(help_text=_(u"Показатель результативности предоставления субвенции "
+                                                             u"(количество детей-сирот, подлежащих обеспечению жилыми "
+                                                             u"помещениями в текущем году)"), null=True,
+                                                 verbose_name=_(u"Показатель результативности предоставления субвенции "
+                                                                u"(количество детей-сирот, подлежащих обеспечению "
+                                                                u"жилыми помещениями в текущем году)"), blank=True, )
 
 
 class BaseOrphan(models.Model):
@@ -133,9 +143,10 @@ class BaseDeveloper(BaseName, ):
     class Meta:
         abstract = True
 
-    face_list = models.IntegerField(help_text=_(u"Юридическое лицо/Физическое лицо"), null=True, verbose_name=_(u"Юридическое лицо/Физическое лицо"), blank=True, )
-    address = models.CharField(help_text=_(u"Фактический адрес"), null=True, max_length=2048, verbose_name=_(u"Фактический адрес"), blank=True, )
     phone = models.CharField(help_text=_(u"Контактный телефон"), null=True, max_length=2048, verbose_name=_(u"Контактный телефон"), blank=True, )
+    face_list = models.IntegerField(help_text=_(u"Юридическое/Физическое лицо"), null=True, blank=True,
+                                    verbose_name=_(u"Юридическое/Физическое лицо"), choices=FACE_LIST_CHOICES,)
+    address = models.CharField(help_text=_(u"Фактический адрес"), null=True, max_length=2048, verbose_name=_(u"Фактический адрес"), blank=True, )
     boss_position = models.CharField(help_text=_(u"Ф.И.О. и должность руководителя"), null=True, max_length=2048, verbose_name=_(u"Ф.И.О. и должность руководителя"), blank=True, )
 
 

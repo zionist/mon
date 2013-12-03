@@ -29,6 +29,7 @@ class BuildingForm(forms.ModelForm):
     def to_table(self):
         return "<td> %s </td> <td> %s </td> <td> %s </td>" % (self.address, self.mo.name, self.developer)
 
+
 class BuildingShowForm(BuildingForm):
 
     class Meta:

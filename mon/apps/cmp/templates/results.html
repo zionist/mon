@@ -5,7 +5,10 @@
     <h2>{{title}}</h2>
     {% if user.is_staff %}
         <a class="btn btn-small" href="{% url 'create-result' %}">
-            {% trans 'Добавить результаты осмотра' %}</a><br><br>
+            {% trans 'Добавить результаты осмотра' %}</a>
+        &nbsp; <a class="btn btn-small" href="{% url 'manage-person' %}">
+           {% trans 'Добавить участника осмотров' %}</a>
+        <br><br>
     {% endif %}
     {% if error %}
         <div class="error">{{ error }}</div><br>

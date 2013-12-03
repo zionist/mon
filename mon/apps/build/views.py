@@ -18,9 +18,9 @@ from django.contrib.auth.decorators import permission_required, login_required
 
 from apps.build.models import Building
 from apps.build.forms import BuildingForm, BuildingShowForm
-from apps.core.views import get_fk_forms, get_fk_show_forms
-from apps.core.views import split_form
-from apps.core.models import WC, Room, Hallway, Kitchen
+from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
+from apps.core.models import WC, Room, Hallway, Kitchen, Developer
+from apps.core.forms import DeveloperForm
 
 
 def add_building(request):
@@ -53,6 +53,29 @@ def add_building(request):
                             WC._meta.verbose_name,
                             Kitchen._meta.verbose_name,
                         ]})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+def manage_developer(request, pk=None):
+    template = 'developer_creation.html'
+    context = {'title': _(u'Добавление застройщика(владельца) объекта')}
+    if not pk:
+        form = DeveloperForm(request.POST or {})
+        if form.is_valid() and 'dev' in request.POST:
+            form.save()
+            return redirect('buildings')
+    else:
+        developer = Developer.objects.get(pk=pk)
+        context.update({'object': developer})
+        form = DeveloperForm(instance=developer)
+        if request.method == "POST":
+            form = DeveloperForm(request.POST, instance=developer)
+            if form.is_valid() and 'dev' in request.POST:
+                form.save()
+                return redirect('buildings')
+            else:
+                form = DeveloperForm(request.POST, instance=developer)
+    context.update({'form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 

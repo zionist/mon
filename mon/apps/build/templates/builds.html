@@ -6,6 +6,8 @@
     {% if user.is_staff %}
         <a class="btn btn-small" href="{% url 'create-building' %}">
            {% trans 'Добавить строительный объект' %}</a>
+        &nbsp; <a class="btn btn-small" href="{% url 'manage-developer' %}">
+           {% trans 'Добавить застройщика(владельца) объекта' %}</a>
            <br /> <br />
     {% endif %}
     {% if error %}

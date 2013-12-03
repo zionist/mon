@@ -16,12 +16,13 @@ from django.forms.models import inlineformset_factory, formset_factory, modelfor
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
-from .models import Contract, Result, Auction, Person, CompareData
+from .models import Result, Auction, Person, CompareData
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms
 from apps.core.views import split_form
 from apps.core.models import WC, Room, Hallway, Kitchen
+from apps.build.models import Contract
 
 
 def add_auction(request):
@@ -416,3 +417,26 @@ def delete_result(request, pk):
     else:
         context.update({'error': _(u'Возникла ошибка при удалении результатов осмотра!')})
     return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))
+
+
+def manage_person(request, pk=None):
+    template = 'person_creation.html'
+    context = {'title': _(u'Добавление участника осмотров')}
+    if not pk:
+        form = PersonForm(request.POST or {})
+        if form.is_valid() and 'pers' in request.POST:
+            form.save()
+            return redirect('results')
+    else:
+        person = Person.objects.get(pk=pk)
+        context.update({'object': person})
+        form = PersonForm(instance=person)
+        if request.method == "POST":
+            form = PersonForm(request.POST, instance=person)
+            if form.is_valid() and 'pers' in request.POST:
+                form.save()
+                return redirect('results')
+            else:
+                form = PersonForm(request.POST, instance=person)
+    context.update({'form': form})
+    return render_to_response(template, context, context_instance=RequestContext(request))

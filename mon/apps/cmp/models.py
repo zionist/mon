@@ -7,24 +7,8 @@ from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContr
 from apps.imgfile.models import File, Image
 
 from apps.core.models import Room, Hallway, WC, Kitchen
-from apps.build.models import Building, Ground
+from apps.build.models import Building, Ground, Contract
 from apps.mo.models import MO
-
-
-class Contract(BaseContract, BaseCompareData):
-
-    class Meta:
-        app_label = "cmp"
-        verbose_name = "Contract"
-    def __unicode__(self):
-        return '%s' % self.id
-
-    developer = models.ForeignKey(Developer, help_text=_(u"ФИО и должность руководителя"), null=True, verbose_name=_(u"ФИО и должность руководителя"), blank=True, )
-    building = models.ForeignKey(Building, help_text=_(u"Строение"), null=True, verbose_name=_(u"Строение"), blank=True, )
-    ground = models.ForeignKey(Ground, help_text=_(u"Земельный участок"), null=True, verbose_name=_(u"Земельный участок"), blank=True, )
-    summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
-    sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
-    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
 
 
 class Person(models.Model):
@@ -33,13 +17,13 @@ class Person(models.Model):
         app_label = "cmp"
         verbose_name = "Person"
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s, %s' % (self.name, self.position)
 
     birth_date = models.DateField(help_text=_(u"Дата рождения"), null=True, verbose_name=_(u"Дата рождения"), blank=True, )
     name = models.CharField(help_text=_(u"ФИО"), null=True, max_length=2048, verbose_name=_(u"ФИО"), blank=True, )
-    position = models.CharField(help_text=_(u"Должность"), null=True, max_length=2048, verbose_name=_(u"Должность"), blank=True, )
     email = models.EmailField(help_text=_(u"Адрес электронной почты"), null=True, max_length=100, verbose_name=_(u"Адрес электронной почты"), blank=True, )
     contact_phone = models.CharField(help_text=_(u"Номер телефона"), null=True, max_length=100, verbose_name=_(u"Номер телефона"), blank=True, )
+    position = models.CharField(help_text=_(u"Должность"), null=True, max_length=2048, verbose_name=_(u"Должность"), blank=True, )
 
 
 class CompareData(BaseCompareData, ):

@@ -37,6 +37,9 @@ class AuctionForm(forms.ModelForm):
 
 
 class PersonForm(forms.ModelForm):
+    position = forms.CharField(help_text=_(u"Должность"), label=_(u'Должность'), required=False,
+                               widget=forms.Textarea(attrs={'rows': 2}))
+
     class Meta:
         model = Person
 
