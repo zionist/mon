@@ -17,5 +17,3 @@ def get_choice_or_value(form, field_name):
             return choices.get(form.initial[field_name])
     else:
         return form.initial[field_name]
-    #return dict(form.fields[field_name].choices)[form.data[field_name]]
-
