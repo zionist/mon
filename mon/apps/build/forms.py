@@ -9,7 +9,6 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 
 from .models import Building, Ground
 
-
 class GroundForm(forms.ModelForm):
     class Meta:
         model = Ground
@@ -25,9 +24,6 @@ class BuildingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingForm, self).__init__(*args, **kwargs)
-
-    def to_table(self):
-        return "<td> %s </td> <td> %s </td> <td> %s </td>" % (self.address, self.mo.name, self.developer)
 
 
 class BuildingShowForm(BuildingForm):

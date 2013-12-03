@@ -30,3 +30,23 @@ input {
     color: steelblue;
     border-top-style: None;
 }
+
+.blue {
+    color: steelblue;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.left_padding_fix {
+    padding-left: 20px;
+}
+
+.border-left {
+    border-left: 1px #dddddd solid;
+}

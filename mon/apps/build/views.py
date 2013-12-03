@@ -108,7 +108,8 @@ def get_buildings(request, pk=None, strv=None, numv=None):
 def get_building(request, pk, extra=None):
     context = {'title': _(u'Параметры объекта')}
     build = Building.objects.get(pk=pk)
-    context.update({'object': build})
+    form = BuildingForm(instance=build)
+    context.update({'object': build, 'form': form})
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
 

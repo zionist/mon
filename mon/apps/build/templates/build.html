@@ -1,17 +1,25 @@
 {% extends "base_site.html" %}
 {% load i18n %}
+{% load extras %}
 
 
 {% block content %}
     <h2>{{ title }}</h2>
-   <p> Вывод таблицы объекта c адресом {{object.address}} для просмотра </p>
-    <table>
+   <p class="blue"> Объект по адресу: {{object.address}} </p>
+    <table class="table table-hover table-striped table-condensed">
+        <tbody>
+        {% for field in form %}
+            <tr> <td> {{ field.label }} </td><td class="border-left"> {{ form|get_choice_or_value:field.name|default_if_none:"Не указано"  }} </td> </tr>
+        {% endfor %}
         <tr>
-            <td><a class="btn btn-small" href="{% url 'update-building' object.id %}">
-                {% trans 'Редактировать' %}</a></td>
-            <td><a class="btn btn-small" href="{% url 'pre-delete-building' object.id %}">
-                {% trans 'Удалить' %}</a></td>
         </tr>
+        </tbody>
     <table>
+    <div class="row">
+        <div class="left left_padding_fix"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
+            {% trans 'Редактировать' %}</a></div>
+        <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
+            {% trans 'Удалить' %}</a></div>
+    </div>
 
 {% endblock %}

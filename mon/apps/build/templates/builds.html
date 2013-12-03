@@ -27,6 +27,7 @@
                             {% elif state.grouper == 2 %}
                                 <tr><th> {% trans 'Участки под строительство' %}</th></tr>
                             {% endif %}
+                            <tr><th> {% trans 'Адрес' %}</th> <th> {% trans 'Муниципальное образование' %}</th> <th>{% trans 'Застройщик' %}</th> </tr>
                             {% for item in state.list %}
                               <tr onclick="location.href = '{% url 'change-building' item.id %}'">
                                     <td> <a href="{% url 'change-building' item.id %}"> {{ item.address|truncatechars:50 }} </a> </td> <td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
