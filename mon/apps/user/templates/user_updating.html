@@ -1,0 +1,25 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+        <a class="btn btn-small" href="{% url 'pre-delete-user' object.id %}">
+            {% trans 'Удалить' %}</a>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form %}
+            <form method="POST" action="{% url 'update-user' object.id %}"> {% csrf_token %}
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                <br />
+                <button type="submit" name = "result" class="btn-info"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}

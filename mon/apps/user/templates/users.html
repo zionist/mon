@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h4>{{title}}</h4>
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+        {% if user_list %}
+            <table class="table table-condensed table-striped table-hover">
+                <tr><th> {% trans 'Пользователь' %}</th><th> {% trans 'Является администратором' %}</th>
+                    <th> {% trans 'Является персоналом' %}</th></tr>
+                {% for obj in user_list %}
+                        <tr>
+                            <td><a href="{% url 'update-user' obj.id %}">{{obj.username}}</a></td>
+                            <td>{{ obj.is_superuser }}</td>
+                            <td>{{ obj.is_staff }}</td>
+                        </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endif %}
+{% endblock %}

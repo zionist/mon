@@ -1,0 +1,24 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<h4>{{ title }}</h4>
+{% if errorlist %}
+<div class="error">
+    {{ errorlist }}
+</div>
+{% else %}
+{% if form %}
+<form method="POST" action="{% url 'create-user' %}"> {% csrf_token %}
+    <br>
+    <table border="0">
+        {% for field in form %}
+        <tr><td width="30%">{{ field.label_tag }}</td><td><span class="text-error">{{ field.errors }}</span>{{ field }}</td></tr>
+        {% endfor %}
+    </table>
+    <br>
+    <button type="submit" name = "user"> {% trans ' Сохранить ' %} </button>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

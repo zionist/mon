@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'apps.cmp',
     'apps.build',
     'apps.payment',
+    'apps.user',
     'south',
 )
 
