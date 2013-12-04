@@ -62,10 +62,20 @@ class ContractShowForm(forms.ModelForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen')
 
     def __init__(self, *args, **kwargs):
+
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
+        print('initial', cmp_initial)
         super(ContractShowForm, self).__init__(*args, **kwargs)
+
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+        if cmp_initial:
+            for field in self.fields:
+                if self.instance.field and cmp_initial.field:
+                    if getattr(self.instance, field) != getattr(cmp_initial, field):
+                        self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class CompareDataShowForm(forms.ModelForm):

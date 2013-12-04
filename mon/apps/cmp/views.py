@@ -19,10 +19,11 @@ from django.contrib.auth.decorators import permission_required, login_required
 from .models import Result, Auction, Person, CompareData
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm
-from apps.core.views import get_fk_forms, get_fk_show_forms
+from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form
 from apps.core.models import WC, Room, Hallway, Kitchen
 from apps.build.models import Contract
+from apps.build.forms import BuildingShowForm
 
 
 def add_auction(request):
@@ -440,3 +441,28 @@ def manage_person(request, pk=None):
                 form = PersonForm(request.POST, instance=person)
     context.update({'form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+def cmp_contract(request, pk):
+    context = {'title': _(u'Сравнение параметров')}
+    contract = Contract.objects.get(pk=pk)
+
+    form = ContractShowForm(instance=contract)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
+    context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+
+    if contract.building_set.all().exists():
+        cmp_obj = contract.building_set.all()[0]
+    elif contract.ground_set.all().exists():
+        cmp_obj = contract.ground_set.all()[0]
+    else:
+        context.update({'errorlist': _('No one matched object')})
+        return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+    cmp_form = BuildingShowForm(instance=cmp_obj, cmp_initial=contract)
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract)
+    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+
+    context.update({'object': contract, 'cmp_object': cmp_obj,
+                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
+                    WC._meta.verbose_name, Kitchen._meta.verbose_name]})
+    return render(request, 'cmp.html', context, context_instance=RequestContext(request))

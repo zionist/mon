@@ -18,6 +18,8 @@
                     <td><a class="btn btn-small" href="{% url 'pre-delete-contract' object.id %}">
                         {% trans 'Удалить' %}</a></td>
                     <td>{{object.num}}</td>
+                    <td><a class="btn btn-small" href="{% url 'cmp-contract' object.id %}">
+                        {% trans 'Сравнить с объектом' %}</a></td>
                 </tr>
             <table>
 

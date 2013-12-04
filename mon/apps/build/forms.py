@@ -30,10 +30,16 @@ class BuildingShowForm(BuildingForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract')
 
     def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(BuildingShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if hasattr(self.instance, field) and hasattr(cmp_initial, field):
+                    if getattr(self.instance, field) != getattr(cmp_initial, field):
+                        self.fields[field].widget.attrs['style'] = 'background-color: red;'

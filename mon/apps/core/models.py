@@ -23,6 +23,7 @@ SEPARATE_CHOICES = ((0, _(u'Совместный')),  (1, _(u'Раздельны
 STAGE_CHOICES = ((0, _(u'Подача заявок')),  (1, _(u'Работа комиссии')), (2, _(u'Размещение завершено, аукцион признан несостоявшимся, не допущена ни одна заявка')), (3, _(u'Размещение завершено, аукцион признан несостоявшимся, не подана ни одна заявка')), (4, _(u'Заключен контракт')), (5, _(u'Размещение отменено')))
 PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения денежных средств, выделенных на текущий год. Без дополнительного финансирования')),   (1, _(u'Перспективы освоения ДОПОЛНИТЕЛЬНЫХ денежных средств, в текущем году.')),  (2, _(u'Перспективы освоения денежных средств в планируемом году.')))
 
+
 class BaseName(models.Model):
 
     class Meta:
@@ -100,7 +101,7 @@ class BaseBuilding(models.Model):
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
-    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива осноения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
+    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
 class BaseContract(BaseName, ):
@@ -261,7 +262,7 @@ class WC(BaseMaterials, BaseDevices, ):
 
     class Meta:
         app_label = "core"
-        verbose_name = "Туалет"
+        verbose_name = "Санузел"
     def __unicode__(self):
         return '%s' % self.id
 

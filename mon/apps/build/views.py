@@ -109,7 +109,9 @@ def get_building(request, pk, extra=None):
     context = {'title': _(u'Параметры объекта')}
     build = Building.objects.get(pk=pk)
     form = BuildingForm(instance=build)
-    context.update({'object': build, 'form': form})
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
+    context.update({'object': build, 'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name, WC._meta.verbose_name, Kitchen._meta.verbose_name]})
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
 

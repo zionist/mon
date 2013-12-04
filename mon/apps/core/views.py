@@ -66,6 +66,15 @@ def get_fk_show_forms(parent=None):
     return [room_f, hallway_f, wc_f, kitchen_f]
 
 
+def get_fk_cmp_forms(parent=None, cmp=None):
+    room_p, hallway_p, wc_p, kitchen_p = 'room_cmp', 'hallway_cmp', 'wc_cmp', 'kitchen_cmp'
+    room_f = RoomShowForm(prefix=room_p, instance=parent.room, cmp_initial=cmp.room)
+    hallway_f = HallwayShowForm(prefix=hallway_p, instance=parent.hallway, cmp_initial=cmp.hallway)
+    wc_f = WCShowForm(prefix=wc_p, instance=parent.wc, cmp_initial=cmp.wc)
+    kitchen_f = KitchenShowForm(prefix=kitchen_p, instance=parent.kitchen, cmp_initial=cmp.kitchen)
+    return [room_f, hallway_f, wc_f, kitchen_f]
+
+
 def split_form(form):
     """
     move text_area fields to another form

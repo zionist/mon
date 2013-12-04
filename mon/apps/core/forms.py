@@ -30,7 +30,6 @@ class DeveloperForm(forms.ModelForm):
                 self.fields[field].widget.attrs['style'] = 'height:26px;'
 
 
-
 class RoomForm(forms.ModelForm):
 
     class Meta:
@@ -61,7 +60,15 @@ class RoomShowForm(forms.ModelForm):
         model = Room
 
     def __init__(self, *args, **kwargs):
+
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(RoomShowForm, self).__init__(*args, **kwargs)
+
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
@@ -73,10 +80,15 @@ class HallwayShowForm(forms.ModelForm):
         model = Hallway
 
     def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(HallwayShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class WCShowForm(forms.ModelForm):
@@ -85,10 +97,15 @@ class WCShowForm(forms.ModelForm):
         model = WC
 
     def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(WCShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class KitchenShowForm(forms.ModelForm):
@@ -97,7 +114,12 @@ class KitchenShowForm(forms.ModelForm):
         model = Kitchen
 
     def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(KitchenShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'

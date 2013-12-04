@@ -28,4 +28,6 @@ urlpatterns = patterns(
 
     url(r'^result/person/(?P<pk>[0-9]*)/$', views.manage_person, name='manage-person'),
     url(r'^result/person/add$', views.manage_person, name='manage-person'),
+
+    url(r'^cmp/(?P<pk>[0-9]+)/$', views.cmp_contract, name='cmp-contract'),
 )
