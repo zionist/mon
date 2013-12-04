@@ -59,3 +59,7 @@ input {
     position: absolute;
     right: 0px;
 }
+
+.width_20_perc {
+    width: 20%;
+}

@@ -4,7 +4,7 @@
 
 
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h4>{{ title }}</h4>
     {% if object and user.is_staff%}
         <div class="row">
         <div class="left left_padding_fix"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
@@ -14,24 +14,17 @@
     </div><br>
     {% endif %}
     {% if form or formsets %}
-        <p class="blue"> Объект по адресу: {{object.address}} </p>
-        <table class="table table-hover table-striped table-condensed">
-            <tbody>
-            {% for field in form %}
-                <tr> <td> {{ field.label }} </td><td class="border-left"> {{ form|get_choice_or_value:field.name|default_if_none:"Не указано"  }} </td> </tr>
-            {% endfor %}
-            <tr>
-            </tr>
-            </tbody>
-        <table>
+        {% if form %}
+            <h3 class="blue"> Объект по адресу: {{object.address}} </h3>
+            {% include "view_table.html" %}
+        {% endif %}
 
-        {% for form in formsets %}
-           <br />
-           <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>
-            <table class="table table-hover table-striped table-condensed">
-            {% include "4_col_form.html" %}
-            <table>
-        {% endfor %}
+        {% if formsets %}
+            {% for form in formsets %}
+               <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
+                {% include "view_table.html" %}
+            {% endfor %}
+        {% endif %}
     {% endif %}
 
 
