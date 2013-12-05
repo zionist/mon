@@ -12,3 +12,9 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 class UserCustomCreationForm(UserCreationForm):
     is_staff = forms.NullBooleanField(required=False, label=_(u'Назначить права админа'))
+
+
+class UserCustomChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        exclude = ('user_permissions', 'is_superuser')

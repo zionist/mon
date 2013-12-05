@@ -20,6 +20,7 @@ from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalB
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
     RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, RegionalBudgetShowForm
 from apps.build.models import Building
+from apps.cmp.models import Auction
 
 
 def add_mo(request):
@@ -184,6 +185,53 @@ def get_filter(request, num, extra=None):
         objects = Building.objects.filter(state=2)
         template = '../../build/templates/builds.html'
         context.update({'building_list': objects})
+    elif num == 4:
+        # 4 Фильтр муниципальных образований, которым выделены средства из федерального бюджета (1.2.4.2)
+        subs = Subvention.objects.filter(federal_budget__sub_sum>0).values('id')
+        objects = MO.objects.filter(subvention__in=[sub.get('id') for sub in subs])
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
+    elif num == 5:
+        # 5 Фильтр муниципальных образований, которым выделены средства из краевого бюджета (1.2.4.1)
+        subs = Subvention.objects.filter(regional_budget__sub_sum>0).values('id')
+        objects = MO.objects.filter(subvention__in=[sub.get('id') for sub in subs])
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
+    elif num == 6:
+        # 6 Фильтр всех муниципальных образований, которые заключили контракты с возможностью просмотра подробных сведений по каждому контракту (4.7)
+        objects = MO.objects.filter(contract__summa>0)
+        template = '../../cmp/templates/contracts.html'
+        context.update({'contract_list': objects})
+    elif num == 7:
+        # 7 Фильтр муниципальных образований, размещение заказа которых находится на этапе подачи заявок (4.7)
+        objects = Auction.objects.filter(stage=0)
+        template = '../../cmp/templates/auctions.html'
+        context.update({'auction_list': objects})
+    elif num == 8:
+        # 8 Фильтр муниципальных образований, размещение заказа которых находится на этапе работы комиссии (4.7)
+        objects = Auction.objects.filter(stage=1)
+        template = '../../cmp/templates/auctions.html'
+        context.update({'auction_list': objects})
+    elif num == 9:
+        # 9 Фильтр муниципальных образований, размещение заказа которых завершено по причине отсутствия участников (4.7)
+        objects = Auction.objects.filter(stage=3)
+        template = '../../cmp/templates/auctions.html'
+        context.update({'auction_list': objects})
+    elif num == 10:
+        # 10 Фильтр муниципальных образований, размещение заказа которых завершено, подана одна заявка (4.7)
+        objects = Auction.objects.filter(proposal_count=1)
+        template = '../../cmp/templates/auctions.html'
+        context.update({'auction_list': objects})
+    elif num == 11:
+        # 11 Фильтр муниципальных образований, размещение заказа которых завершено, не допущена ни одна заявка (4.7)
+        objects = Auction.objects.filter(stage=2)
+        template = '../../cmp/templates/auctions.html'
+        context.update({'auction_list': objects})
+    elif num == 12:
+        # 12 Фильтр муниципальных образований, размещение заказа которых отменено (4.7)
+        objects = Auction.objects.filter(stage=5)
+        template = '../../cmp/templates/auctions.html'
+        context.update({'auction_list': objects})
     if not objects:
-        context.update({'errorlist': _(u'Объекты, соответствующие запросу,  не найдены')})
+        context.update({'errorlist': _(u'Объекты, соответствующие запросу, не найдены')})
     return render_to_response(template, context, context_instance=RequestContext(request))

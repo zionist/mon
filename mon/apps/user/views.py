@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import permission_required, \
     login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
-from .forms import UserCustomCreationForm, UserChangeForm
+from .forms import UserCustomCreationForm, UserCustomChangeForm
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -22,34 +22,28 @@ def add_user(request):
                 instance.is_staff = True
                 instance.save(update_fields=['is_staff'])
             return redirect('users')
-        else:
-            context.update({'form': form, })
     else:
         form = UserCustomCreationForm()
-        context.update({'form': form, })
+    context.update({'form': form, })
     return render_to_response(template, context,
                               context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def update_user(request, pk):
-    context = {'title': _(u'Изменение пользователя')}
+    context = {'title': _(u'Редактирование пользователя')}
     user = User.objects.get(pk=pk)
     if request.method == "POST":
-        form = UserChangeForm(request.POST, instance=user)
+        form = UserCustomChangeForm(request.POST, instance=user)
         context.update({'object': user, 'form': form, })
         if form.is_valid():
             form.save()
             return redirect('users')
-        else:
-            context.update({'object': user, 'form': form, })
-            return render(request, 'user_updating.html', context,
-                          context_instance=RequestContext(request))
     else:
-        form = UserChangeForm(instance=user)
-        context.update({'object': user, 'form': form, })
-        return render(request, 'user_updating.html', context,
-                      context_instance=RequestContext(request))
+        form = UserCustomChangeForm(instance=user)
+    context.update({'object': user, 'form': form, })
+    return render(request, 'user_updating.html', context,
+                  context_instance=RequestContext(request))
 
 
 @user_passes_test(lambda u: u.is_superuser)
