@@ -17,6 +17,10 @@
                     <td><a class="btn btn-small" href="{% url 'pre-delete-result' object.id %}">
                         {% trans 'Удалить' %}</a></td>
                     <td>{{object.check_date}}</td>
+                    <td><a class="btn btn-small" href="{% url 'cmp-result-contract' object.id %}">
+                        {% trans 'Сравнить с контрактом' %}</a></td>
+                    <td><a class="btn btn-small" href="{% url 'cmp-result-building' object.id %}">
+                        {% trans 'Сравнить с объектом' %}</a></td>
                 </tr>
             <table>
 

@@ -11,7 +11,7 @@
     {% else %}
         {% if cmp_form and cmp_object %}
             <div class="right-cmp-object">
-            <h3>{% trans 'Строительный объект' %}</h3>
+            <h3>{{ cmp_object_title }}</h3>
             <table>
                 <tr>
                     <td><a class="btn btn-small" href="{% url 'update-building' cmp_object.id %}">
@@ -48,7 +48,7 @@
             </div>
         {% endif %}
         {% if form and object %}
-            <h3>{% trans 'Контракт' %}</h3>
+            <h3>{{ object_title }}</h3>
             <table>
                 <tr>
                     <td><a class="btn btn-small" href="{% url 'update-contract' object.id %}">

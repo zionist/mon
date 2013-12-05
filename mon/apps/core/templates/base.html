@@ -29,23 +29,28 @@
                     <li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>
                     <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
                     <li id="buildings"><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
+                    {% if user.is_staff %}
                     <li id="auctions"><a href="{% url 'auctions' %}">{% trans 'Аукционы' %}</a></li>
                     <li id="contracts"><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
                     <li id="results"><a href="{% url 'results' %}">{% trans 'Осмотры' %}</a></li>
+                    {% endif %}
                     <li id="creation" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Добавить' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
                             <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
                             <li><a href="{% url 'create-building' %}">{% trans 'Добавить строительный объект' %}</a></li>
                             <li><a href="{% url 'manage-developer' %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
+                            {% if user.is_staff %}
                             <li><a href="{% url 'create-auction' %}">{% trans 'Добавить заказ' %}</a></li>
                             <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li>
                             <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат осмотра' %}</a></li>
                             <li><a href="{% url 'manage-person' %}">{% trans 'Добавить участника осмотров' %}</a></li>
+                            {% endif %}
                         </ul>
                     </li>
 
                 <ul class="nav pull-right">
+                    {% if user.is_staff %}
                     <li id="filters" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Фильтры<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
@@ -54,7 +59,8 @@
                             <li><a href="{% url 'filter' 3 %}"> "Фильтр 3"</a></li>
                         </ul>
                     </li>
-                    <li id="filters" class="dropdown">
+                    {% endif %}
+                    <li id="manage" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
                             {% if user.is_superuser %}

@@ -23,7 +23,7 @@ from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form
 from apps.core.models import WC, Room, Hallway, Kitchen
 from apps.build.models import Contract
-from apps.build.forms import BuildingShowForm
+from apps.build.forms import BuildingShowForm, GroundShowForm
 
 
 def add_auction(request):
@@ -444,7 +444,8 @@ def manage_person(request, pk=None):
 
 
 def cmp_contract(request, pk):
-    context = {'title': _(u'Сравнение параметров')}
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Строительный объект')}
     contract = Contract.objects.get(pk=pk)
 
     form = ContractShowForm(instance=contract)
@@ -453,16 +454,72 @@ def cmp_contract(request, pk):
 
     if contract.building_set.all().exists():
         cmp_obj = contract.building_set.all()[0]
+        cmp_form = BuildingShowForm(instance=cmp_obj, cmp_initial=contract)
     elif contract.ground_set.all().exists():
         cmp_obj = contract.ground_set.all()[0]
+        cmp_form = GroundShowForm(instance=cmp_obj, cmp_initial=contract)
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
-    cmp_form = BuildingShowForm(instance=cmp_obj, cmp_initial=contract)
+
     room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract)
     context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
 
     context.update({'object': contract, 'cmp_object': cmp_obj,
+                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
+                    WC._meta.verbose_name, Kitchen._meta.verbose_name]})
+    return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+
+def cmp_result_building(request, pk):
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Результат'), 'cmp_object_title': _(u'Строительный объект')}
+    res = Result.objects.get(pk=pk)
+    result = res.cmp_data
+
+    form = CompareDataShowForm(instance=result)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result)
+    context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+
+    if res.building:
+        cmp_obj = res.building
+        cmp_form = BuildingShowForm(instance=cmp_obj, cmp_initial=result)
+    elif res.ground:
+        cmp_obj = res.ground
+        cmp_form = GroundShowForm(instance=cmp_obj, cmp_initial=result)
+    else:
+        context.update({'errorlist': _('No one matched object')})
+        return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=result)
+    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+
+    context.update({'object': result, 'cmp_object': cmp_obj,
+                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
+                    WC._meta.verbose_name, Kitchen._meta.verbose_name]})
+    return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+
+def cmp_result_contract(request, pk):
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Результат'), 'cmp_object_title': _(u'Контракт')}
+    res = Result.objects.get(pk=pk)
+    result = res.cmp_data
+    contract = res.contract
+
+    form = CompareDataShowForm(instance=result)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result)
+    context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+
+    if contract:
+        cmp_obj = contract
+        cmp_form = ContractShowForm(instance=cmp_obj, cmp_initial=result)
+    else:
+        context.update({'errorlist': _('No one matched object')})
+        return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=result)
+    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+
+    context.update({'object': result, 'cmp_object': cmp_obj,
                     'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
                     WC._meta.verbose_name, Kitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))

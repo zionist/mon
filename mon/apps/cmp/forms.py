@@ -25,7 +25,7 @@ class ContractForm(forms.ModelForm):
 class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
-        exclude = ('cmp_data',)
+        exclude = ('cmp_data', )
     recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), widget=forms.Textarea(attrs={'rows': 4 }))
 
 
@@ -59,12 +59,11 @@ class AuctionShowForm(forms.ModelForm):
 class ContractShowForm(forms.ModelForm):
     class Meta:
         model = Contract
-        exclude = ('room', 'hallway', 'wc', 'kitchen')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date')
 
     def __init__(self, *args, **kwargs):
 
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
-        print('initial', cmp_initial)
         super(ContractShowForm, self).__init__(*args, **kwargs)
 
         for field in self.fields:
@@ -73,7 +72,7 @@ class ContractShowForm(forms.ModelForm):
 
         if cmp_initial:
             for field in self.fields:
-                if self.instance.field and cmp_initial.field:
+                if hasattr(self.instance, field) and hasattr(cmp_initial, field):
                     if getattr(self.instance, field) != getattr(cmp_initial, field):
                         self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
@@ -93,13 +92,17 @@ class CompareDataShowForm(forms.ModelForm):
 class ResultShowForm(forms.ModelForm):
     class Meta:
         model = Result
-        exclude = ('cmp_data',)
+        exclude = ('cmp_data', )
 
     def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ResultShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
-
-
+        if cmp_initial:
+            for field in self.fields:
+                if hasattr(self.instance, field) and hasattr(cmp_initial, field):
+                    if getattr(self.instance, field) != getattr(cmp_initial, field):
+                        self.fields[field].widget.attrs['style'] = 'background-color: red;'

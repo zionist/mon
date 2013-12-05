@@ -2,12 +2,11 @@
 from django.shortcuts import redirect, render, render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
-from  django.contrib.auth.forms import UserCreationForm, \
-    UserChangeForm, PasswordChangeForm
 from django.contrib.auth.decorators import permission_required, \
     login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
+from .forms import UserCustomCreationForm, UserChangeForm
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -15,16 +14,18 @@ def add_user(request):
     template = 'user_creation.html'
     context = {'title': _(u'Добавление пользователя')}
     if request.method == "POST":
-        print "# post"
-        form = UserCreationForm(request.POST)
+        form = UserCustomCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.save()
+            if form.cleaned_data.get('is_staff'):
+                instance.is_staff = True
+                instance.save(update_fields=['is_staff'])
             return redirect('users')
         else:
-            print form.error_messages
             context.update({'form': form, })
     else:
-        form = UserCreationForm()
+        form = UserCustomCreationForm()
         context.update({'form': form, })
     return render_to_response(template, context,
                               context_instance=RequestContext(request))

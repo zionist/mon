@@ -63,3 +63,41 @@ input {
 .width_20_perc {
     width: 20%;
 }
+
+ul.errorlist {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.errorlist li {
+    font-size: 14px !important;
+    display: block;
+    padding: 4px 25px 4px 25px;
+    margin: 2px 0 2px 0;
+    border: 1px solid #802420;
+    color: white;
+    background: #ee5f5b url(../img/admin/icon_alert.gif) 5px .3em no-repeat;
+}
+
+.errorlist li a {
+ 	color: white;
+    text-decoration: underline;
+
+}
+
+td ul.errorlist {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+td ul.errorlist li {
+    margin: 0 !important;
+}
+
+.errors {
+    background: #ffc;
+}
+
+.errors input, .errors select, .errors textarea {
+    border: 1px solid red;
+}
