@@ -187,21 +187,21 @@ def get_filter(request, num, extra=None):
         context.update({'building_list': objects})
     elif num == 4:
         # 4 Фильтр муниципальных образований, которым выделены средства из федерального бюджета (1.2.4.2)
-        subs = Subvention.objects.filter(federal_budget__sub_sum>0).values('id')
-        objects = MO.objects.filter(subvention__in=[sub.get('id') for sub in subs])
+        subs = Subvention.objects.filter(fed_budget__sub_orph_home__gt=0).values('id')
+        objects = MO.objects.filter(departamentagreement__subvention__in=[sub.get('id') for sub in subs])
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
     elif num == 5:
         # 5 Фильтр муниципальных образований, которым выделены средства из краевого бюджета (1.2.4.1)
-        subs = Subvention.objects.filter(regional_budget__sub_sum>0).values('id')
-        objects = MO.objects.filter(subvention__in=[sub.get('id') for sub in subs])
+        subs = Subvention.objects.filter(reg_budget__sub_orph_home__gt=0).values('id')
+        objects = MO.objects.filter(departamentagreement__subvention__in=[sub.get('id') for sub in subs])
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
     elif num == 6:
         # 6 Фильтр всех муниципальных образований, которые заключили контракты с возможностью просмотра подробных сведений по каждому контракту (4.7)
-        objects = MO.objects.filter(contract__summa>0)
-        template = '../../cmp/templates/contracts.html'
-        context.update({'contract_list': objects})
+        objects = MO.objects.filter(contract__summa__gt=0)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
     elif num == 7:
         # 7 Фильтр муниципальных образований, размещение заказа которых находится на этапе подачи заявок (4.7)
         objects = Auction.objects.filter(stage=0)
