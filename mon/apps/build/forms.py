@@ -21,7 +21,7 @@ class BuildingForm(forms.ModelForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'need_approve')
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
 
     def __init__(self, *args, **kwargs):
         super(BuildingForm, self).__init__(*args, **kwargs)
@@ -31,7 +31,7 @@ class BuildingShowForm(BuildingForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'is_approved', 'contract',
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract',
                    'address', 'comment', 'complete_date', 'readiness', 'payment_perspective')
 
     def __init__(self, *args, **kwargs):

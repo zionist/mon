@@ -15,12 +15,14 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
+from django import forms
 
 from apps.build.models import Building
 from apps.build.forms import BuildingForm, BuildingShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, Developer
 from apps.core.forms import DeveloperForm
+from apps.user.models import CustomUser
 
 
 def add_building(request):
@@ -109,10 +111,26 @@ def get_building(request, pk, extra=None):
     context = {'title': _(u'Параметры объекта')}
     build = Building.objects.get(pk=pk)
     form = BuildingForm(instance=build)
+    if not request.user.is_staff or not request.user.is_superuser:
+        form.fields.pop('approve_status')
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
     context.update({'object': build, 'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name, WC._meta.verbose_name, Kitchen._meta.verbose_name]})
     return render(request, 'build.html', context, context_instance=RequestContext(request))
+
+
+def approve_building(request, pk):
+    """
+    Send for approve (set approve status = 1)
+    """
+    if request.method == "GET":
+        build = Building.objects.get(pk=pk)
+        user = CustomUser.objects.get(pk=request.user.pk)
+        if user.mo == build.mo:
+            build.approve_status = 1
+            build.save()
+
+    return redirect('buildings')
 
 
 def update_building(request, pk, extra=None):
@@ -121,6 +139,12 @@ def update_building(request, pk, extra=None):
     prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     if request.method == "POST":
         form = BuildingForm(request.POST, prefix=prefix, instance=build)
+        # check access rules. Add approve_status from object to form
+        if not request.user.is_staff or not request.user.is_superuser:
+            form.fields.update({'approve_status': forms.IntegerField()})
+            data = form.data.copy()
+            data['%s-approve_status' % form.prefix] = u'%s' % build.approve_status
+            form.data = data
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
@@ -128,6 +152,7 @@ def update_building(request, pk, extra=None):
                 obj.save()
             return redirect('buildings')
         else:
+            print form.errors
             form, text_area_form = split_form(form)
             context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
@@ -140,6 +165,9 @@ def update_building(request, pk, extra=None):
             return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
     else:
         form = BuildingForm(instance=build, prefix=prefix)
+        # remove approve_status field from view if not admin
+        if not request.user.is_staff or not request.user.is_superuser:
+            form.fields.pop('approve_status')
         form, text_area_form = split_form(form)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build)
         context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],

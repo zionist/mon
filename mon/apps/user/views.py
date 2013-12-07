@@ -4,9 +4,10 @@ from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import permission_required, \
     login_required, user_passes_test
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
+
 from .forms import UserCustomCreationForm, UserCustomChangeForm
+from apps.user.models import CustomUser
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -32,7 +33,7 @@ def add_user(request):
 @user_passes_test(lambda u: u.is_superuser)
 def update_user(request, pk):
     context = {'title': _(u'Редактирование пользователя')}
-    user = User.objects.get(pk=pk)
+    user = CustomUser.objects.get(pk=pk)
     if request.method == "POST":
         form = UserCustomChangeForm(request.POST, instance=user)
         context.update({'object': user, 'form': form, })
@@ -49,7 +50,7 @@ def update_user(request, pk):
 @user_passes_test(lambda u: u.is_superuser)
 def get_users(request):
     context = {'title': _(u'Пользователи')}
-    objects = User.objects.all()
+    objects = CustomUser.objects.all()
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -65,7 +66,7 @@ def get_users(request):
 
 def pre_delete_user(request, pk):
     context = {'title': _(u'Удаление пользователя')}
-    user =User.objects.get(pk=pk)
+    user = CustomUser.objects.get(pk=pk)
     context.update({'object': user})
     return render_to_response("user_deleting.html", context,
                               context_instance=RequestContext(request))
@@ -73,7 +74,7 @@ def pre_delete_user(request, pk):
 
 def delete_user(request, pk):
     context = {'title': _(u'Удаление пользователя')}
-    user = User.objects.get(pk=pk)
+    user = CustomUser.objects.get(pk=pk)
     if user and 'delete' in request.POST:
         user.delete()
         return redirect('users')

@@ -5,13 +5,27 @@
 
 {% block content %}
     <h4>{{ title }}</h4>
-    {% if object and user.is_staff%}
+    {# approve status 0 - "Не проверено" #}
+    {% if not user.is_staff and not user.is_superuser %}
+        {% if object and not object.approve_status %}
+            <div class="row">
+            <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
+                {% trans 'редактировать' %}</a></div>
+            <div class="span3"><a class="btn btn-warning" href="{% url 'approve-building' object.id %}">
+                {% trans 'Отправить на проверку' %}</a></div>
+            <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
+                {% trans 'Удалить' %}</a></div>
+            </div><br>
+        {% endif %}
+    {% else %}
+        {% if object %}
         <div class="row">
-        <div class="left left_padding_fix"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
-            {% trans 'Редактировать' %}</a></div>
-        <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
-            {% trans 'Удалить' %}</a></div>
-    </div><br>
+            <div class="left left_padding_fix"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
+                {% trans 'Редактировать' %}</a></div>
+            <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
+                {% trans 'Удалить' %}</a></div>
+        </div><br>
+        {% endif %}
     {% endif %}
     {% if form or formsets %}
         {% if form %}
