@@ -31,18 +31,22 @@
                 {% elif stage.grouper == 5 %}
                 <tr><th> {% trans 'Аукционы на этапе отмены размещения' %}</th></tr>
                 {% endif %}
+                <tr><th>{% trans '№ заказа' %}</th><th>{% trans 'МО' %}</th><th>{% trans 'Количество квартир' %}</th>
+                    <th>{% trans 'Площадь квартир' %}</th><th>{% trans 'Начальная цена' %}</th>
+                    <th>{% trans 'Дата опубликования заказа' %}</th><th>{% trans 'Дата и время проведения аукциона' %}</th>
+                    <th>{% trans 'Сумма заключенного контракта' %}</th>
+                </tr>
                 {% for item in stage.list %}
                 <tr onclick="location.href = '{% url 'change-auction' item.id %}'">
                     <td> <a href="{% url 'change-auction' item.id %}"> {{ item.num }} </a> </td>
-                    <td> {{ item.mo.name }} </td>
-                    <td> {{ item.open_date }} </td>
+                    <td>{{ item.mo.name }}</td><td>{{ item.flat_amount }}</td><td>{{ item.area }}</td>
+                    <td>{{ item.start_price }}</td><td>{{ item.public_date }}</td><td>{{ item.open_date }}</td>
+                    <td>{{ item.contract.summa }}</td>
                     {% if item.stage == 4 %}
                         {% if item.contract %}
-                            <td> <a class="btn btn-small" href="{% url 'change-contract' item.contract.id %}"> {% trans 'Контракт ' %}{{ item.contract.num }}</a> </td>
                             <td> {{ item.contract.building.address|truncatechars:50 }} </td>
                             <td> {{ item.contract.building.developer|truncatechars:50 }} </td>
-                        {% else %}
-                            <td> <a class="btn btn-small" href="{% url 'create-contract' %}"> {% trans 'Составить контракт' %}</a> </td>
+
                         {% endif %}
                     {% endif %}
                 </tr>

@@ -5,7 +5,7 @@
     <h2>{{title}}</h2>
     {% if user.is_staff %}
         <a class="btn btn-small" href="{% url 'create-building' %}">
-           {% trans 'Добавить строительный объект' %}</a>
+           {% trans 'Добавить объект рынка жилья' %}</a>
         &nbsp; <a class="btn btn-small" href="{% url 'manage-developer' %}">
            {% trans 'Добавить застройщика(владельца) объекта' %}</a>
            <br /> <br />
@@ -27,10 +27,14 @@
                             {% elif state.grouper == 2 %}
                                 <tr><th> {% trans 'Участки под строительство' %}</th></tr>
                             {% endif %}
-                            <tr><th> {% trans 'Адрес' %}</th> <th> {% trans 'Муниципальное образование' %}</th> <th>{% trans 'Застройщик' %}</th> </tr>
+                            <tr><th> {% trans 'Адрес' %}</th><th> {% trans 'Кадастровый номер' %}</th>
+                                <th> {% trans 'Муниципальное образование' %}</th> <th>{% trans 'Застройщик' %}</th>
+                                <th>{% trans 'Количество жилых помещений' %}</th> <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr>
                             {% for item in state.list %}
                               <tr onclick="location.href = '{% url 'change-building' item.id %}'">
-                                    <td> <a href="{% url 'change-building' item.id %}"> {{ item.address|truncatechars:50 }} </a> </td> <td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
+                                    <td> <a href="{% url 'change-building' item.id %}"> {{ item.address|truncatechars:50 }} </a> </td>
+                                  <td> {{ item.cad_num }} </td><td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
+                                  <td> {{ item.flats_amount }} </td><td> {{ item.complete_date }} </td>
                               </tr>
                             {% endfor %}
                     {% endfor %}

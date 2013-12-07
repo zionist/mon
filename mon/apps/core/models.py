@@ -94,15 +94,13 @@ class BaseBuilding(models.Model):
     class Meta:
         abstract = True
 
-#    offer = models.ForeignKey(File, help_text=_(u"Коммерческое предложение"), null=True, verbose_name=_(u"Коммерческое предложение"), blank=True, related_name='offer')
-#    permission = models.ForeignKey(File, help_text=_(u"Разрешение"), null=True, verbose_name=_(u"Разрешение"), blank=True, related_name='permission')
     state = models.IntegerField(help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
     address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=True, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
-
+    need_approve = models.NullBooleanField(blank=True, null=True, verbose_name=_(u"Необходима проверка"), help_text=_(u"Необходима проверка"))
 
 class BaseContract(BaseName, ):
 
@@ -118,7 +116,7 @@ class BaseResult(models.Model):
         abstract = True
 
     doc_files = models.ForeignKey(File, help_text=_(u"Предоставленные документы"), null=True, verbose_name=_(u"Предоставленные документы"), blank=True, )
-    check_date = models.DateField(help_text=_(u"Дата проверки"), null=True, verbose_name=_(u"Дата проверки"), blank=True, )
+    check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
     doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
     recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
 

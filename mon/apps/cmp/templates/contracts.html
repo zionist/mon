@@ -17,19 +17,16 @@
         {% if contract_list %}
             <div class="auction-table">
             <table class="table table-condensed">
-                <tr><th> {% trans 'Контракты' %}</th></tr>
+                <tr><th> {% trans '№ контракта' %}</th><th> {% trans 'МО' %}</th><th>{% trans 'Количество жилых помещений' %}</th>
+                    <th>{% trans 'Адрес жилых помещений' %}</th><th>{% trans 'Сумма' %}</th><th>{% trans 'Продавец/застройщик' %}</th>
+                    <th>{% trans 'Срок сдачи объекта в эксплуатацию' %}</th></tr>
                 {% for obj in contract_list %}
                     {% if obj.id %}
-                        <tr><td>
-                        &nbsp;&nbsp;<a href="{% url 'change-contract' obj.id %}">
-                        {% with obj.num as obj_num %}
-                            {% if obj_num|length > 80 %}
-                                {{obj_num|truncatechars:75}}...
-                            {% else  %}
-                                {{obj_num}}
-                            {% endif %}
-                        {% endwith %}</a>
-                        </td></tr>
+                        <tr>
+                            <td><a href="{% url 'change-contract' obj.id %}">{{obj.num|truncatechars:30}}</a></td>
+                            <td>{{obj.mo.name}}</td><td>{{obj.flats_amount}}</td><td>{{obj.building_set.all.0.address}}</td>
+                            <td>{{obj.summa}}</td><td>{{obj.developer.name}}</td><td>{{obj.building_set.all.0.complete_date}}</td>
+                        </tr>
                     {% endif %}
                 {% endfor %}
             </table>

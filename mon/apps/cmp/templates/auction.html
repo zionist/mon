@@ -18,6 +18,11 @@
                     <td><a class="btn btn-small" href="{% url 'pre-delete-auction' object.id %}">
                         {% trans 'Удалить' %}</a></td>
                     <td>{{object.num}}</td>
+                    {% if item.contract.id %}
+                    <td> <a class="btn btn-small" href="{% url 'change-contract' item.contract.id %}"> {% trans 'Контракт ' %}{{ item.contract.num }}</a> </td>
+                    {% else %}
+                    <td> <a class="btn btn-small" href="{% url 'create-contract' %}"> {% trans 'Составить контракт' %}</a> </td>
+                    {% endif %}
                 </tr>
             <table>
 

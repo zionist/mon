@@ -5,9 +5,9 @@
     <h2>{{title}}</h2>
     {% if user.is_staff %}
         <a class="btn btn-small" href="{% url 'create-result' %}">
-            {% trans 'Добавить результаты осмотра' %}</a>
+            {% trans 'Добавить результаты выезда' %}</a>
         &nbsp; <a class="btn btn-small" href="{% url 'manage-person' %}">
-           {% trans 'Добавить участника осмотров' %}</a>
+           {% trans 'Добавить участника выездов' %}</a>
         <br><br>
     {% endif %}
     {% if error %}
@@ -20,13 +20,14 @@
         {% if result_list %}
             <div class="auction-table">
             <table class="table table-condensed">
-                <tr><th> {% trans 'Осмотры' %}</th></tr>
+                <tr><th> {% trans 'Дата выезда' %}</th><th> {% trans 'Наименование МО' %}</th>
+                    <th> {% trans 'Замечания по результатам' %}</th><th> {% trans 'Дата следующего выезда' %}</th></tr>
                 {% for obj in result_list %}
                     {% if obj.id %}
-                        <tr><td>
-                        &nbsp;&nbsp;<a href="{% url 'change-result' obj.id %}">
-                        {{obj.check_date}}</a>
-                        </td></tr>
+                        <tr>
+                            <td><a href="{% url 'change-result' obj.id %}">{{obj.cmp_data.cmp_date}}</a></td>
+                            <td>{{obj.building.mo.name}}</td><td>{{obj.recommend}}</td><td>{{obj.check_date}}</td>
+                        </tr>
                     {% endif %}
                 {% endfor %}
             </table>

@@ -31,7 +31,6 @@ class Ground(BaseBuilding, BaseCompareData):
 
     cad_passport = models.ForeignKey(File, help_text=_(u"Выписка из кадастрового паспорта"), null=True, verbose_name=_(u"Выписка из кадастрового паспорта"), blank=True, related_name='cad_passport')
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
-    # contract = models.ForeignKey(Contract, help_text=_(u"Заключенный контракт"), null=True, verbose_name=_(u"Заключенный контракт"), blank=True, )
     cad_num = models.CharField(help_text=_(u"Адрес или кадастровый номер участка"), null=True, max_length=2048, verbose_name=_(u"Адрес или кадастровый номер участка"), blank=True, )
     start_date = models.DateField(help_text=_(u"Предполагаемый срок начала строительства"), null=True, verbose_name=_(u"Предполагаемый срок начала строительства"), blank=True, )
     finish_date = models.DateField(help_text=_(u"Предполагаемый срок окончания строительства"), null=True, verbose_name=_(u"Предполагаемый срок окончания строительства"), blank=True, )
@@ -48,6 +47,8 @@ class Building(BaseBuilding, BaseCompareData):
     def __unicode__(self):
         return "%s" % (self.address)
 
+    offer = models.ForeignKey(File, help_text=_(u"Коммерческое предложение"), null=True, verbose_name=_(u"Коммерческое предложение"), blank=True, related_name='offer')
+    permission = models.ForeignKey(File, help_text=_(u"Разрешение"), null=True, verbose_name=_(u"Разрешение"), blank=True, related_name='permission')
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"),
                                   verbose_name=_(u"Застройщик (владелец) объекта"), )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)

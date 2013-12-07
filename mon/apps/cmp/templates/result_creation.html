@@ -16,14 +16,20 @@
                 <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>
                 {% include "4_col_form.html" %}
                 {% endfor %}
-                {% if form %}
                 <br />
                 <h4>{% trans ' Общие параметры' %}</h4>
-                {% include "4_col_form.html" %}
-                {% with form=text_area_fields %}
-                {% include "2_col_form.html" %}
+                {% if cmp_form %}
+                {% with form=cmp_form %}
+                    {% include "4_col_form.html" %}
                 {% endwith %}
                 {% endif %}
+                {% if form %}
+                    {% include "4_col_form.html" %}
+                    {% with form=text_area_fields %}
+                    {% include "2_col_form.html" %}
+                    {% endwith %}
+                {% endif %}
+
                 <br>
                 <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
             </form>

@@ -281,7 +281,7 @@ def delete_contract(request, pk):
 
 def add_result(request):
     template = 'result_creation.html'
-    context = {'title': _(u'Добавление результатов осмотра')}
+    context = {'title': _(u'Добавление результатов выезда в МО')}
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
         form = ResultForm(request.POST, prefix=prefix)
@@ -319,7 +319,7 @@ def add_result(request):
 @login_required
 def get_results(request, pk=None):
     template = 'results.html'
-    context = {'title': _(u'Осмотры')}
+    context = {'title': _(u'Выезды в МО')}
     if Result.objects.all().exists():
         objects = Result.objects.all()
         if pk:
@@ -338,7 +338,7 @@ def get_results(request, pk=None):
 
 
 def get_result(request, pk, extra=None):
-    context = {'title': _(u'Параметры осмотра')}
+    context = {'title': _(u'Параметры выезда')}
     result = Result.objects.get(pk=pk)
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
@@ -355,7 +355,7 @@ def get_result(request, pk, extra=None):
 
 
 def update_result(request, pk, extra=None):
-    context = {'title': _(u'Параметры осмотра')}
+    context = {'title': _(u'Параметры выезда')}
     result = Result.objects.get(pk=pk)
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
@@ -396,14 +396,14 @@ def update_result(request, pk, extra=None):
 
 
 def pre_delete_result(request, pk):
-    context = {'title': _(u'Удаление осмотра')}
+    context = {'title': _(u'Удаление выезда')}
     result = Result.objects.get(pk=pk)
     context.update({'object': result})
     return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))
 
 
 def delete_result(request, pk):
-    context = {'title': _(u'Удаление осмотра')}
+    context = {'title': _(u'Удаление выезда')}
     result = Result.objects.get(pk=pk)
     if result and 'delete' in request.POST:
         result.cmp_data.delete()
@@ -416,7 +416,7 @@ def delete_result(request, pk):
     elif 'cancel' in request.POST:
         return redirect('results')
     else:
-        context.update({'error': _(u'Возникла ошибка при удалении результатов осмотра!')})
+        context.update({'error': _(u'Возникла ошибка при удалении результатов выезда!')})
     return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))
 
 

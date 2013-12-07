@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContract, BaseResult, Developer, \
@@ -35,7 +36,7 @@ class CompareData(BaseCompareData, ):
         return '%s' % self.id
 
     # result = models.ForeignKey(Result, help_text=_(u"Результат осмотра"), null=True, verbose_name=_(u"Результат осмотра"), blank=True, )
-    cmp_date = models.DateTimeField(help_text=_(u"Дата последнего сравнения"), auto_now=True, null=True, verbose_name=_(u"Дата последнего сравнения"), blank=True, )
+    cmp_date = models.DateTimeField(help_text=_(u"Дата последней проверки"), verbose_name=_(u"Дата последней проверки"), blank=True, default=datetime.now())
 
 
 class Result(BaseResult, ):

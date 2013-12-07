@@ -25,7 +25,7 @@ from apps.core.forms import DeveloperForm
 
 def add_building(request):
     template = 'build_creation.html'
-    context = {'title': _(u'Добавление строительного объекта')}
+    context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix = 'build'
     if request.method == "POST":
         form = BuildingForm(request.POST, prefix=prefix)
@@ -82,7 +82,7 @@ def manage_developer(request, pk=None):
 @login_required
 def get_buildings(request, pk=None, strv=None, numv=None):
     template = 'builds.html'
-    context = {'title': _(u'Строительные объекты')}
+    context = {'title': _(u'Объекты рынка жилья')}
     if Building.objects.all().exists():
         objects = Building.objects.all().order_by('state')
         if pk or strv or numv:
@@ -153,14 +153,14 @@ def update_building(request, pk, extra=None):
 
 
 def pre_delete_building(request, pk):
-    context = {'title': _(u'Удаление строения')}
+    context = {'title': _(u'Удаление объекта рынка жилья')}
     build = Building.objects.get(pk=pk)
     context.update({'object': build})
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
 
 
 def delete_building(request, pk):
-    context = {'title': _(u'Удаление строения')}
+    context = {'title': _(u'Удаление объекта рынка жилья')}
     build = Building.objects.get(pk=pk)
     if build and 'delete' in request.POST:
         build.room.delete()
@@ -171,5 +171,5 @@ def delete_building(request, pk):
     elif 'cancel' in request.POST:
         return redirect('buildings')
     else:
-        context.update({'error': _(u'Возникла ошибка при удалении строения!')})
+        context.update({'error': _(u'Возникла ошибка при удалении объекта рынка жилья!')})
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
