@@ -103,6 +103,7 @@ INSTALLED_APPS = (
     'apps.build',
     'apps.payment',
     'apps.user',
+    'webodt',
     'south',
 )
 
@@ -150,3 +151,9 @@ if DEBUG:
         'HIDE_DJANGO_SQL': False,
         'ENABLE_STACKTRACES' : True,
     }
+
+WEBODT_CONVERTER = 'webodt.converters.abiword.AbiwordODFConverter'
+# WEBODT_CONVERTER = 'webodt.converters.openoffice.OpenOfficeODFConverter'
+OOFFICE_SERVER = ('127.0.0.1', 2002)
+
+WEBODT_TEMPLATE_PATH = '/home/slaviann/work/monitoring/mon/mon/media/templates/'

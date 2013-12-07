@@ -56,5 +56,5 @@ class GroundShowForm(BuildingShowForm):
 
     class Meta:
         model = Ground
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'need_approve', 'contract',
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract',
                    'address', 'comment', 'complete_date', 'readiness', 'payment_perspective')

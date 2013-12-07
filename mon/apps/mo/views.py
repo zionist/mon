@@ -235,3 +235,5 @@ def get_filter(request, num, extra=None):
     if not objects:
         context.update({'errorlist': _(u'Объекты, соответствующие запросу, не найдены')})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+

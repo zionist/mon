@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import webodt
+import mimetypes
+from webodt.converters import converter
 from datetime import datetime
+
 from django.http import HttpResponse
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
@@ -15,6 +19,8 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
+from django.core.servers.basehttp import FileWrapper
+from django.template import Context
 from django import forms
 
 from apps.build.models import Building
@@ -152,7 +158,6 @@ def update_building(request, pk, extra=None):
                 obj.save()
             return redirect('buildings')
         else:
-            print form.errors
             form, text_area_form = split_form(form)
             context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
@@ -201,3 +206,5 @@ def delete_building(request, pk):
     else:
         context.update({'error': _(u'Возникла ошибка при удалении объекта рынка жилья!')})
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
+
+
