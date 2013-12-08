@@ -15,4 +15,5 @@ urlpatterns = patterns(
 
     url(r'^building/developer/(?P<pk>[0-9]*)/$', views.manage_developer, name='manage-developer'),
     url(r'^building/developer/add$', views.manage_developer, name='manage-developer'),
+    url(r'^building/developers/$', views.get_developers, name='developers'),
 )

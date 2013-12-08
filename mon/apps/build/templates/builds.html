@@ -2,14 +2,9 @@
 {% load i18n staticfiles %}
 
 {% block content %}
-    <h2>{{title}}</h2>
-    {% if user.is_staff %}
-        <a class="btn btn-small" href="{% url 'create-building' %}">
-           {% trans 'Добавить объект рынка жилья' %}</a>
-        &nbsp; <a class="btn btn-small" href="{% url 'manage-developer' %}">
-           {% trans 'Добавить застройщика(владельца) объекта' %}</a>
-           <br /> <br />
-    {% endif %}
+    <h4>{{title}}</h4>
+    <a class="btn btn-small" href="{% url 'create-building' %}">
+       {% trans 'Добавить объект рынка жилья' %}</a>
     {% if error %}
         <div class="error">{{ error }}</div><br>
     {% endif %}

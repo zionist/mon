@@ -64,6 +64,7 @@ def add_building(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def manage_developer(request, pk=None):
     template = 'developer_creation.html'
     context = {'title': _(u'Добавление застройщика(владельца) объекта')}
@@ -86,6 +87,24 @@ def manage_developer(request, pk=None):
     context.update({'form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
+
+@login_required
+def get_developers(request):
+    template = 'developers.html'
+    context = {'title': _(u'Застройщики(владельца) объекта')}
+    if Developer.objects.all().exists():
+        developers = Developer.objects.all()
+        page = request.GET.get('page', '1')
+        paginator = Paginator(developers, 50)
+        try:
+            objects = paginator.page(page)
+        except PageNotAnInteger:
+            objects = paginator.page(1)
+        except EmptyPage:
+            objects = paginator.page(paginator.num_pages)
+        context.update({'developer_list': objects})
+    return render(request, template, context,
+                  context_instance=RequestContext(request))
 
 @login_required
 def get_buildings(request, pk=None, strv=None, numv=None):

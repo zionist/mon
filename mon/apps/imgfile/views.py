@@ -3,7 +3,7 @@ import webodt
 import mimetypes
 from webodt.converters import converter
 
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.template import Context
 
@@ -31,7 +31,7 @@ def get_questions_list(request, pk):
     conv = converter()
     rtf_file = conv.convert(document, format='rtf')
     document.close()
-    response = HttpResponse(FileWrapper(rtf_file),
+    response = StreamingHttpResponse(FileWrapper(rtf_file),
                             content_type=mimetypes.guess_type(document.name)[0])
     response['Content-Disposition'] = 'attachment; filename=download.rtf'
     return response
