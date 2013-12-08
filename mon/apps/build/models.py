@@ -14,7 +14,7 @@ class Contract(BaseContract, BaseCompareData):
     def __unicode__(self):
         return '%s' % self.id
 
-    developer = models.ForeignKey(Developer, help_text=_(u"ФИО и должность руководителя"), null=True, verbose_name=_(u"ФИО и должность руководителя"), blank=True, )
+    developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), null=True, verbose_name=_(u"Застройщик"), blank=True, )
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
