@@ -6,11 +6,43 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
+from django.forms import MultipleChoiceField
+from django.forms.widgets import CheckboxSelectMultiple
 
 from .models import CompareData, Contract, Result, Auction, Person
+from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES
+
+
+class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
+    def value_from_datadict(self, data, files, name):
+        return ','.join(data.getlist(name))
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value:
+            value = value.split(',')
+        return super(CSICheckboxSelectMultiple, self).render(name, value, attrs=attrs, choices=choices)
+
+
+class CSIMultipleChoiceField(MultipleChoiceField):
+    widget = CSICheckboxSelectMultiple
+
+    def to_python(self, value):
+        return value
+
+    def validate(self, value):
+        if value:
+            value = value.split(',')
+        super(CSIMultipleChoiceField, self).validate(value)
+        return
 
 
 class CompareDataForm(forms.ModelForm):
+    internal_doors = forms.ChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+        widget=forms.Select, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = forms.ChoiceField(label=_(u"Материал входной двери"), required=False,
+        widget=forms.Select, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = forms.ChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+        widget=forms.Select, choices=WINDOW_CONSTRUCTIONS_CHOICES)
     class Meta:
         model = CompareData
         exclude = ('room', 'hallway', 'wc', 'kitchen')
@@ -18,12 +50,19 @@ class CompareDataForm(forms.ModelForm):
 
 
 class ContractForm(forms.ModelForm):
+    internal_doors = forms.ChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+        widget=forms.Select, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = forms.ChoiceField(label=_(u"Материал входной двери"), required=False,
+        widget=forms.Select, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = forms.ChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+        widget=forms.Select, choices=WINDOW_CONSTRUCTIONS_CHOICES)
     class Meta:
         model = Contract
         exclude = ('room', 'hallway', 'wc', 'kitchen')
 
 
 class ResultForm(forms.ModelForm):
+
     class Meta:
         model = Result
         exclude = ('cmp_data', )
@@ -31,6 +70,12 @@ class ResultForm(forms.ModelForm):
 
 
 class AuctionForm(forms.ModelForm):
+    internal_doors = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=WINDOW_CONSTRUCTIONS_CHOICES)
 
     class Meta:
         model = Auction

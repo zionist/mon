@@ -95,7 +95,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'debug_toolbar',
     'apps.imgfile',
     'apps.core',
     'apps.mo',
@@ -104,6 +103,7 @@ INSTALLED_APPS = (
     'apps.payment',
     'apps.user',
     'webodt',
+    'debug_toolbar',
     'south',
 )
 
@@ -156,4 +156,5 @@ WEBODT_CONVERTER = 'webodt.converters.abiword.AbiwordODFConverter'
 # WEBODT_CONVERTER = 'webodt.converters.openoffice.OpenOfficeODFConverter'
 OOFFICE_SERVER = ('127.0.0.1', 2002)
 
-WEBODT_TEMPLATE_PATH = '/home/slaviann/work/monitoring/mon/mon/media/templates/'
+WEBODT_TEMPLATE_PATH = os.path.join(PROJECT_PATH, 'media/templates/')
+#WEBODT_TEMPLATE_PATH = '/home/slaviann/work/monitoring/mon/mon/media/templates/'

@@ -215,9 +215,12 @@ class BaseCommonChars(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImpr
     is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
-    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
-    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
-    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
+#    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
+#    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
+#    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
+    internal_doors = models.CommaSeparatedIntegerField(max_length=250, help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"),)
+    entrance_door = models.CommaSeparatedIntegerField(max_length=16, help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"),)
+    window_constructions = models.CommaSeparatedIntegerField(max_length=16, help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"),)
 
 
 class BaseDevices(models.Model):
