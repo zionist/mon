@@ -21,7 +21,7 @@ from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, Perso
     ResultShowForm, CompareDataShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form
-from apps.core.models import WC, Room, Hallway, Kitchen
+from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen
 from apps.build.models import Contract
 from apps.build.forms import BuildingShowForm, GroundShowForm
 
@@ -32,7 +32,7 @@ def add_auction(request):
     prefix = 'auction'
     if request.method == "POST":
         form = AuctionForm(request.POST, prefix=prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=True)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             auction = form.save()
             auction.room = room_f.save()
@@ -46,14 +46,14 @@ def add_auction(request):
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         form = AuctionForm(prefix=prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
         # move text_area fields to another form
         context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
-                            Room._meta.verbose_name,
-                            Hallway._meta.verbose_name,
-                            WC._meta.verbose_name,
-                            Kitchen._meta.verbose_name,
+                            BaseRoom._meta.verbose_name,
+                            BaseHallway._meta.verbose_name,
+                            BaseWC._meta.verbose_name,
+                            BaseKitchen._meta.verbose_name,
                             ]})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -87,7 +87,7 @@ def get_auction(request, pk, extra=None):
         context.update({'form': form})
     else:
         form = AuctionShowForm(instance=auction)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction, multi=True)
         context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': auction})
     return render(request, 'auction.html', context, context_instance=RequestContext(request))
@@ -99,7 +99,7 @@ def update_auction(request, pk, extra=None):
     prefix = 'auction'
     if request.method == "POST":
         form = AuctionForm(request.POST, prefix=prefix, instance=auction)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, request=request, multi=True)
         context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
@@ -110,21 +110,21 @@ def update_auction(request, pk, extra=None):
             context.update({'object': auction, 'form': form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                             'titles': [
-                                Room._meta.verbose_name,
-                                Hallway._meta.verbose_name,
-                                WC._meta.verbose_name,
-                                Kitchen._meta.verbose_name,
+                                BaseRoom._meta.verbose_name,
+                                BaseHallway._meta.verbose_name,
+                                BaseWC._meta.verbose_name,
+                                BaseKitchen._meta.verbose_name,
                                 ]})
             return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
     else:
         form = AuctionForm(instance=auction, prefix=prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, multi=True)
         context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
             'titles': [
-                Room._meta.verbose_name,
-                Hallway._meta.verbose_name,
-                WC._meta.verbose_name,
-                Kitchen._meta.verbose_name,
+                BaseRoom._meta.verbose_name,
+                BaseHallway._meta.verbose_name,
+                BaseWC._meta.verbose_name,
+                BaseKitchen._meta.verbose_name,
                 ]})
     return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
 
@@ -176,10 +176,10 @@ def add_contract(request):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
-                            Room._meta.verbose_name,
-                            Hallway._meta.verbose_name,
-                            WC._meta.verbose_name,
-                            Kitchen._meta.verbose_name,
+                            BaseRoom._meta.verbose_name,
+                            BaseHallway._meta.verbose_name,
+                            BaseWC._meta.verbose_name,
+                            BaseKitchen._meta.verbose_name,
                             ]})
         return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -236,10 +236,10 @@ def update_contract(request, pk, extra=None):
             context.update({'object': contract, 'form': form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                             'titles': [
-                                Room._meta.verbose_name,
-                                Hallway._meta.verbose_name,
-                                WC._meta.verbose_name,
-                                Kitchen._meta.verbose_name,
+                                BaseRoom._meta.verbose_name,
+                                BaseHallway._meta.verbose_name,
+                                BaseWC._meta.verbose_name,
+                                BaseKitchen._meta.verbose_name,
                                 ]})
             return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
     else:
@@ -247,10 +247,10 @@ def update_contract(request, pk, extra=None):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
         context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
-                            Room._meta.verbose_name,
-                            Hallway._meta.verbose_name,
-                            WC._meta.verbose_name,
-                            Kitchen._meta.verbose_name,
+                            BaseRoom._meta.verbose_name,
+                            BaseHallway._meta.verbose_name,
+                            BaseWC._meta.verbose_name,
+                            BaseKitchen._meta.verbose_name,
                             ]})
     return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
 
@@ -308,10 +308,10 @@ def add_result(request):
         form, text_area_form = split_form(form)
         context.update({'form': form, 'cmp_form': cmp_form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
-                                            Room._meta.verbose_name,
-                                            Hallway._meta.verbose_name,
-                                            WC._meta.verbose_name,
-                                            Kitchen._meta.verbose_name,
+                                            BaseRoom._meta.verbose_name,
+                                            BaseHallway._meta.verbose_name,
+                                            BaseWC._meta.verbose_name,
+                                            BaseKitchen._meta.verbose_name,
                                         ]})
         return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -374,10 +374,10 @@ def update_result(request, pk, extra=None):
             context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                            'titles': [
-                                            Room._meta.verbose_name,
-                                            Hallway._meta.verbose_name,
-                                            WC._meta.verbose_name,
-                                            Kitchen._meta.verbose_name,
+                                            BaseRoom._meta.verbose_name,
+                                            BaseHallway._meta.verbose_name,
+                                            BaseWC._meta.verbose_name,
+                                            BaseKitchen._meta.verbose_name,
                                         ]})
             return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
     else:
@@ -387,10 +387,10 @@ def update_result(request, pk, extra=None):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data)
         context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                'titles': [
-                                    Room._meta.verbose_name,
-                                    Hallway._meta.verbose_name,
-                                    WC._meta.verbose_name,
-                                    Kitchen._meta.verbose_name,
+                                    BaseRoom._meta.verbose_name,
+                                    BaseHallway._meta.verbose_name,
+                                    BaseWC._meta.verbose_name,
+                                    BaseKitchen._meta.verbose_name,
                                 ]})
         return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
 
@@ -466,8 +466,8 @@ def cmp_contract(request, pk):
     context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
 
     context.update({'object': contract, 'cmp_object': cmp_obj,
-                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
-                    WC._meta.verbose_name, Kitchen._meta.verbose_name]})
+                    'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
@@ -494,8 +494,8 @@ def cmp_result_building(request, pk):
     context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
 
     context.update({'object': result, 'cmp_object': cmp_obj,
-                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
-                    WC._meta.verbose_name, Kitchen._meta.verbose_name]})
+                    'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
@@ -520,6 +520,6 @@ def cmp_result_contract(request, pk):
     context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
 
     context.update({'object': result, 'cmp_object': cmp_obj,
-                    'titles': [Room._meta.verbose_name, Hallway._meta.verbose_name,
-                    WC._meta.verbose_name, Kitchen._meta.verbose_name]})
+                    'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))

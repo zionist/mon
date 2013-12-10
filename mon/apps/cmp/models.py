@@ -3,7 +3,7 @@
 from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContract, BaseResult, Developer, \
+from apps.core.models import BaseModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
 from apps.imgfile.models import File, Image
 
@@ -55,7 +55,7 @@ class Result(BaseResult, ):
     establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
 
 
-class Auction(BaseContract, BaseCompareData,):
+class Auction(BaseContract, BaseAuctionData,):
 
     class Meta:
         app_label = "cmp"
@@ -64,11 +64,4 @@ class Auction(BaseContract, BaseCompareData,):
         return '%s' % self.id
 
     contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"), null=True, verbose_name=_(u"Данные по заключенному контракту"), blank=True, )
-    flat_amount = models.IntegerField(help_text=_(u"Количество квартир по номеру заказа"), null=True, verbose_name=_(u"Количество квартир по номеру заказа"), blank=True, )
-    flat_area = models.IntegerField(help_text=_(u"Площадь квартир по номеру заказа"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа"), blank=True, )
-    start_price = models.FloatField(help_text=_(u"Начальная (максимальная) цена руб."), null=True, verbose_name=_(u"Начальная (максимальная) цена руб."), blank=True, )
-    public_date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"), null=True, verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"), blank=True, )
-    open_date = models.DateTimeField(help_text=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"), auto_now=True, null=True, verbose_name=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"), blank=True, )
-    stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), null=True, blank=True, verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    proposal_count = models.IntegerField(help_text=_(u"Количество поданных заявок"), verbose_name=_(u"Количество поданных заявок"), blank=True, default=0)

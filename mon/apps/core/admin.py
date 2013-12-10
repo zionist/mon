@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Developer, Room, Kitchen, WC, Hallway
+from .models import Developer, Room, Kitchen, WC, Hallway, AuctionRoom, AuctionKitchen, AuctionWC, AuctionHallway
 
 
 class DeveloperAdmin(admin.ModelAdmin):
@@ -31,3 +31,27 @@ class HallwayAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(Hallway, HallwayAdmin)
+
+
+class AuctionRoomAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(AuctionRoom, AuctionRoomAdmin)
+
+
+class AuctionKitchenAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(AuctionKitchen, AuctionKitchenAdmin)
+
+
+class AuctionWCAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(AuctionWC, AuctionWCAdmin)
+
+
+class AuctionHallwayAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(AuctionHallway, AuctionHallwayAdmin)

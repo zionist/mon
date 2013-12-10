@@ -216,12 +216,9 @@ class BaseCommonChars(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImpr
     is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
-#    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
-#    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
-#    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
-    internal_doors = models.CommaSeparatedIntegerField(max_length=250, help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"),)
-    entrance_door = models.CommaSeparatedIntegerField(max_length=16, help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"),)
-    window_constructions = models.CommaSeparatedIntegerField(max_length=16, help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"),)
+    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
+    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
+    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
 
 
 class BaseDevices(models.Model):
@@ -239,7 +236,7 @@ class BaseDevices(models.Model):
 
 
 # common classes
-class Room(BaseMaterials, BaseDevices):
+class BaseRoom(BaseDevices):
 
     class Meta:
         app_label = "core"
@@ -248,7 +245,7 @@ class Room(BaseMaterials, BaseDevices):
         return '%s' % self.id
 
 
-class Kitchen(BaseMaterials, BaseDevices):
+class BaseKitchen(BaseDevices):
 
     class Meta:
         app_label = "core"
@@ -261,7 +258,7 @@ class Kitchen(BaseMaterials, BaseDevices):
     sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
 
 
-class WC(BaseMaterials, BaseDevices, ):
+class BaseWC(BaseDevices, ):
 
     class Meta:
         app_label = "core"
@@ -276,13 +273,29 @@ class WC(BaseMaterials, BaseDevices, ):
     sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
 
 
-class Hallway(BaseMaterials, BaseDevices, ):
+class BaseHallway(BaseDevices, ):
 
     class Meta:
         app_label = "core"
         verbose_name = "Прихожая"
     def __unicode__(self):
         return '%s' % self.id
+
+
+class Room(BaseMaterials, BaseRoom):
+    pass
+
+
+class Kitchen(BaseMaterials, BaseKitchen):
+    pass
+
+
+class WC(BaseMaterials, BaseWC, ):
+    pass
+
+
+class Hallway(BaseMaterials, BaseHallway, ):
+    pass
 
 
 class Developer(BaseDeveloper, ):
@@ -310,3 +323,63 @@ class BaseCompareData(BaseCommonChars, ):
     wc = models.ForeignKey(WC, null=True, blank=True, )
     hallway = models.ForeignKey(Hallway, null=True, blank=True, )
     kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )
+
+
+class BaseMultiMaterials(models.Model):
+
+    class Meta:
+        abstract = True
+
+    floor = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки пола"), null=True, blank=True, verbose_name=_(u"Материал отделки пола"))
+    wall = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки стен"), null=True, blank=True, verbose_name=_(u"Материал отделки стен"))
+    ceiling = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки потолка"), null=True, blank=True, verbose_name=_(u"Материал отделки потолка"))
+
+
+class AuctionRoom(BaseMultiMaterials, BaseRoom):
+    pass
+
+
+class AuctionKitchen(BaseMultiMaterials, BaseKitchen):
+    pass
+
+
+class AuctionWC(BaseMultiMaterials, BaseWC):
+    pass
+
+
+class AuctionHallway(BaseMultiMaterials, BaseHallway):
+    pass
+
+
+class BaseAuctionData(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImprovement, ):
+
+    class Meta:
+        abstract = True
+
+    flats_amount = models.IntegerField(help_text=_(u"Количество квартир по номеру заказа"), null=True, verbose_name=_(u"Количество квартир по номеру заказа"), blank=True, )
+    area = models.IntegerField(help_text=_(u"Площадь квартир по номеру заказа"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа"), blank=True, )
+    floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
+    driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
+
+    is_water_boiler = models.NullBooleanField(help_text=_(u"Водонагревательный прибор (бойлер)"), verbose_name=_(u"Водонагревательный прибор (бойлер)"), blank=True, )
+    is_heat_boiler = models.NullBooleanField(help_text=_(u"Отопительный котел"), verbose_name=_(u"Отопительный котел"), blank=True, )
+    is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
+    is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
+    is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
+    internal_doors = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал межкомнатных дверей"),
+                                                       null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"))
+    entrance_door = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал входной двери"),
+                                                      null=True, blank=True, verbose_name=_(u"Материал входной двери"))
+    window_constructions = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал оконных конструкций"),
+                                                             null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"))
+
+    stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), null=True, blank=True, verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
+    start_price = models.FloatField(help_text=_(u"Начальная (максимальная) цена руб."), null=True, verbose_name=_(u"Начальная (максимальная) цена руб."), blank=True, )
+    public_date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"), null=True, verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"), blank=True, )
+    open_date = models.DateTimeField(help_text=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"), auto_now=True, null=True, verbose_name=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"), blank=True, )
+    proposal_count = models.IntegerField(help_text=_(u"Количество поданных заявок"), verbose_name=_(u"Количество поданных заявок"), blank=True, default=0)
+
+    room = models.ForeignKey(AuctionRoom, null=True, blank=True, )
+    wc = models.ForeignKey(AuctionWC, null=True, blank=True, )
+    hallway = models.ForeignKey(AuctionHallway, null=True, blank=True, )
+    kitchen = models.ForeignKey(AuctionKitchen, null=True, blank=True, )

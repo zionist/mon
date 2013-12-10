@@ -6,8 +6,34 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
+from django.forms import MultipleChoiceField
+from django.forms.widgets import CheckboxSelectMultiple
 
-from .models import Room, WC, Hallway, Kitchen, Developer
+from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, AuctionKitchen, Developer
+from apps.core.models import FLOOR_CHOICES, WALL_CHOICES, CEILING_CHOICES
+
+
+class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
+    def value_from_datadict(self, data, files, name):
+        return ','.join(data.getlist(name))
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value:
+            value = value.split(',')
+        return super(CSICheckboxSelectMultiple, self).render(name, value, attrs=attrs, choices=choices)
+
+
+class CSIMultipleChoiceField(MultipleChoiceField):
+    widget = CSICheckboxSelectMultiple
+
+    def to_python(self, value):
+        return value
+
+    def validate(self, value):
+        if value:
+            value = value.split(',')
+        super(CSIMultipleChoiceField, self).validate(value)
+        return
 
 
 class DeveloperForm(forms.ModelForm):
@@ -116,6 +142,125 @@ class KitchenShowForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(KitchenShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+class BaseAuctionRoomForm(forms.ModelForm):
+    floor = CSIMultipleChoiceField(label=_(u"Материал отделки пола"), required=False,
+                                   widget=CSICheckboxSelectMultiple, choices=FLOOR_CHOICES)
+    wall = CSIMultipleChoiceField(label=_(u"Материал отделки стен"), required=False,
+                                  widget=CSICheckboxSelectMultiple, choices=WALL_CHOICES)
+    ceiling = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
+                                     widget=CSICheckboxSelectMultiple, choices=CEILING_CHOICES)
+
+    class Meta:
+        abstract = True
+
+
+class AuctionRoomForm(BaseAuctionRoomForm):
+
+    class Meta:
+        model = AuctionRoom
+
+
+class AuctionHallwayForm(BaseAuctionRoomForm):
+
+    class Meta:
+        model = AuctionHallway
+
+
+class AuctionWCForm(BaseAuctionRoomForm):
+
+    class Meta:
+        model = AuctionWC
+
+
+class AuctionKitchenForm(BaseAuctionRoomForm):
+
+    class Meta:
+        model = AuctionKitchen
+
+
+class BaseAuctionRoomShowForm(forms.ModelForm):
+    floor = CSIMultipleChoiceField(label=_(u"Материал отделки пола"), required=False,
+                                   widget=CSICheckboxSelectMultiple, choices=FLOOR_CHOICES)
+    wall = CSIMultipleChoiceField(label=_(u"Материал отделки стен"), required=False,
+                                  widget=CSICheckboxSelectMultiple, choices=WALL_CHOICES)
+    ceiling = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
+                                     widget=CSICheckboxSelectMultiple, choices=CEILING_CHOICES)
+
+    class Meta:
+        abstract = True
+
+
+class AuctionRoomShowForm(BaseAuctionRoomShowForm):
+
+    class Meta:
+        model = AuctionRoom
+
+    def __init__(self, *args, **kwargs):
+
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
+        super(AuctionRoomShowForm, self).__init__(*args, **kwargs)
+
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class AuctionHallwayShowForm(BaseAuctionRoomShowForm):
+
+    class Meta:
+        model = AuctionHallway
+
+    def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
+        super(AuctionHallwayShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+class AuctionWCShowForm(BaseAuctionRoomShowForm):
+
+    class Meta:
+        model = AuctionWC
+
+    def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
+        super(AuctionWCShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            for field in self.fields:
+                if getattr(self.instance, field) != getattr(cmp_initial, field):
+                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+class AuctionKitchenShowForm(BaseAuctionRoomShowForm):
+
+    class Meta:
+        model = Kitchen
+
+    def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
+        super(AuctionKitchenShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
