@@ -6,9 +6,35 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
+from django.forms import MultipleChoiceField
+from django.forms.widgets import CheckboxSelectMultiple
 
 from .models import CompareData, Result, Auction, Person
 from apps.build.models import Contract
+from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES
+
+
+class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
+    def value_from_datadict(self, data, files, name):
+        return ','.join(data.getlist(name))
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value:
+            value = value.split(',')
+        return super(CSICheckboxSelectMultiple, self).render(name, value, attrs=attrs, choices=choices)
+
+
+class CSIMultipleChoiceField(MultipleChoiceField):
+    widget = CSICheckboxSelectMultiple
+
+    def to_python(self, value):
+        return value
+
+    def validate(self, value):
+        if value:
+            value = value.split(',')
+        super(CSIMultipleChoiceField, self).validate(value)
+        return
 
 
 class CompareDataForm(forms.ModelForm):
