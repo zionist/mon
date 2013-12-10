@@ -49,17 +49,17 @@ class MO(BaseName, ):
         return '%s' % self.name
 
     creation_form = models.IntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
-                                        verbose_name=_(u"Форма создания специализированного жилого фонда"),
+                                        verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         blank=True, null=True, choices=CREATION_FORM_CHOICES , )
     has_trouble = models.NullBooleanField(blank=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
-    home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлено жильё"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
+    home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
 
 
 class DepartamentAgreement(BaseDepartamentAgreement, ):
 
     class Meta:
         app_label = "mo"
-        verbose_name = _(u"Реквизиты соглашения")
+        verbose_name = _(u"Реквизиты соглашения с министерством")
 
     def __unicode__(self):
         return '%s' % self.id
@@ -88,6 +88,8 @@ class PeopleAmount(models.Model):
         return '%s' % self.id
 
     privilege_people = models.IntegerField(help_text=_(u"Численность граждан, состоящих на льготном учете, по состоянию на текущий год."), null=True, verbose_name=_(u"Численность граждан, состоящих на льготном учете, по состоянию на текущий год."), blank=True, )
-    unhome_orphan = models.IntegerField(help_text=_(u"Численность детей-сирот в возрасте от 18 до 23 лет и старше 23 лет, не реализовавших свое право на жильё."), null=True,
-                                        verbose_name=_(u"Численность детей-сирот."), blank=True, )
+    unhome_orphan = models.IntegerField(help_text=_(u"Численность детей-сирот в возрасте от 18 до 23 лет и старше 23 лет, которые до "
+                                                    u"1 января текущего года не реализовали свое право на получение жилого помещения "
+                                                    u"в предыдущие годы (учитываются состоявшие и не состоявшие на льготном учете)."),
+        null=True, verbose_name=_(u"Численность детей-сирот."), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Наименование муниципального образования"), verbose_name=_(u"Наименование муниципального образования"), )

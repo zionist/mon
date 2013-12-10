@@ -12,6 +12,12 @@ from apps.build.models import Contract
 
 
 class CompareDataForm(forms.ModelForm):
+    internal_doors = forms.ChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+        widget=forms.Select, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = forms.ChoiceField(label=_(u"Материал входной двери"), required=False,
+        widget=forms.Select, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = forms.ChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+        widget=forms.Select, choices=WINDOW_CONSTRUCTIONS_CHOICES)
     class Meta:
         model = CompareData
         exclude = ('room', 'hallway', 'wc', 'kitchen')
@@ -19,12 +25,19 @@ class CompareDataForm(forms.ModelForm):
 
 
 class ContractForm(forms.ModelForm):
+    internal_doors = forms.ChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+        widget=forms.Select, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = forms.ChoiceField(label=_(u"Материал входной двери"), required=False,
+        widget=forms.Select, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = forms.ChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+        widget=forms.Select, choices=WINDOW_CONSTRUCTIONS_CHOICES)
     class Meta:
         model = Contract
         exclude = ('room', 'hallway', 'wc', 'kitchen')
 
 
 class ResultForm(forms.ModelForm):
+
     class Meta:
         model = Result
         exclude = ('cmp_data', )
@@ -32,6 +45,12 @@ class ResultForm(forms.ModelForm):
 
 
 class AuctionForm(forms.ModelForm):
+    internal_doors = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=WINDOW_CONSTRUCTIONS_CHOICES)
 
     class Meta:
         model = Auction
