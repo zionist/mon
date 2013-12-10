@@ -95,7 +95,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'debug_toolbar',
+
     'apps.imgfile',
     'apps.core',
     'apps.mo',
@@ -104,6 +104,7 @@ INSTALLED_APPS = (
     'apps.payment',
     'apps.user',
     'webodt',
+    'debug_toolbar',
     'south',
 )
 
