@@ -232,6 +232,21 @@ def get_filter(request, num, extra=None):
         objects = Auction.objects.filter(stage=5)
         template = '../../cmp/templates/auctions.html'
         context.update({'auction_list': objects})
+    elif num == 16:
+        # 16 Фильтр муниципальных образований, к которым есть замечания
+        objects = MO.objects.filter(has_trouble=True)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
+    elif num == 17:
+        # 17 Фильтр муниципальных образований, к которым нет замечаний
+        objects = MO.objects.filter(has_trouble=False)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
+    elif num == 18:
+        # 18 Фильтр муниципальных образований, у которых отсутствуют документы по заключенным контрактам
+        objects = MO.objects.filter(contract__summa__gt=0)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
     if not objects:
         context.update({'errorlist': _(u'Объекты, соответствующие запросу, не найдены')})
     return render_to_response(template, context, context_instance=RequestContext(request))

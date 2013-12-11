@@ -6,6 +6,32 @@ from apps.mo.models import MO
 from apps.imgfile.models import File, Image
 
 
+class ContractDocuments(BaseModel):
+
+    class Meta:
+        app_label = "cmp"
+        verbose_name = "Contract Documents"
+    def __unicode__(self):
+        return '%s' % self.id
+
+    protocols = models.ForeignKey(Image, null=True, blank=True, related_name='protocols', help_text=_(u"Протоколы о подведении итогов торгов"),
+        verbose_name=_(u"Протоколы о подведении итогов торгов"), )
+    mun_contracts = models.ForeignKey(Image, null=True, blank=True, related_name='mun_contracts', help_text=_(u"Муниципальные контракты с приложениями"),
+        verbose_name=_(u"Муниципальные контракты с приложениями."), )
+    transmission_acts = models.ForeignKey(Image, null=True, blank=True, related_name='transmission_acts', help_text=_(u"Акты приема-передачи жилых помещений"),
+        verbose_name=_(u"Акты приема-передачи жилых помещений"), )
+    facility_permission = models.ForeignKey(Image, null=True, blank=True, related_name='facility_permission', help_text=_(u"Разрешения на ввод объекта в эксплуатацию."),
+        verbose_name=_(u"Разрешения на ввод объекта в эксплуатацию"), )
+    land_right_stating = models.ForeignKey(Image, null=True, blank=True, related_name='land_right_stating', help_text=_(u"Правоустанавливающие документы на земельные участки"),
+        verbose_name=_(u"Правоустанавливающие документы на земельные участки"), )
+    building_permissions = models.ForeignKey(Image, null=True, blank=True, related_name='building_permissions', help_text=_(u"Разрешения на строительство"),
+        verbose_name=_(u"Разрешения на строительство"), )
+    acceptance_acts = models.ForeignKey(Image, null=True, blank=True, related_name='acceptance_acts', help_text=_(u"Акты о приемке выполненных работ (форма № КС-2)"),
+        verbose_name=_(u"Акты о приемке выполненных работ (форма № КС-2)"), )
+    cost_infos = models.ForeignKey(Image, null=True, blank=True, related_name='cost_infos', help_text=_(u"Справки о стоимости выполненных работ и затрат (форма № КС-3)"),
+        verbose_name=_(u"Справки о стоимости выполненных работ и затрат (форма № КС-3)"), )
+
+
 class Contract(BaseContract, BaseCompareData):
 
     class Meta:
@@ -14,10 +40,11 @@ class Contract(BaseContract, BaseCompareData):
     def __unicode__(self):
         return '%s' % self.id
 
-    developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), null=True, verbose_name=_(u"Застройщик"), blank=True, )
+    developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), verbose_name=_(u"Застройщик"), null=True, blank=True, )
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
+    docs = models.ForeignKey(ContractDocuments, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
 
 
 class Ground(BaseBuilding, BaseCompareData):
