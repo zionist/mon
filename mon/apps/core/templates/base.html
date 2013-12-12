@@ -38,7 +38,13 @@
                     <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
                     <li id="auctions"><a href="{% url 'auctions' %}">{% trans 'Аукционы' %}</a></li>
                     <li id="contracts"><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
-                    <li id="results"><a href="{% url 'results' %}">{% trans 'Выезды' %}</a></li>
+                    <li id="results" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Выезды' %}<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'results' %}">{% trans 'Объекты' %}</a></li>
+                            <li><a href="{% url 'select-mo-form' %}">{% trans 'Создать бланк осмотра' %}</a></li>
+                        </ul>
+                    </li>
                     {% endif %}
                     <li id="creation" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Добавить' %}<b class="caret"></b></a>

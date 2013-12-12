@@ -1,0 +1,25 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form %}
+            <form method="POST" action="{% url 'questions-list' %}"> {% csrf_token %}
+
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                <button class="btn-info" type="submit" name="build"> {% trans 'Выбрать' %} </button>
+                <br>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
