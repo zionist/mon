@@ -1,13 +1,32 @@
 from django.contrib import admin
 from django import forms
-from .models import CompareData, Contract, Result, Person, Auction
+from .models import CompareData, Result, Person, Auction, AuctionDocuments
+from apps.build.models import Contract, ContractDocuments
 from apps.imgfile.models import File, Image
+
+
+class AuctionDocumentsAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(AuctionDocuments, AuctionDocumentsAdmin)
+
+
+class AuctionAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Auction, AuctionAdmin)
 
 
 class CompareDataAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(CompareData, CompareDataAdmin)
+
+
+class ContractDocumentsAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(ContractDocuments, ContractDocumentsAdmin)
 
 
 class ContractAdmin(admin.ModelAdmin):
@@ -26,9 +45,3 @@ class ResultAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(Result, ResultAdmin)
-
-
-class AuctionAdmin(admin.ModelAdmin):
-    pass
-
-admin.site.register(Auction, AuctionAdmin)

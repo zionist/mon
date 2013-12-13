@@ -14,7 +14,6 @@ from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WIND
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple
 
 
-
 class CompareDataForm(forms.ModelForm):
 
     class Meta:
@@ -48,7 +47,7 @@ class AuctionForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
 
 
 class PersonForm(forms.ModelForm):
@@ -62,7 +61,7 @@ class PersonForm(forms.ModelForm):
 class AuctionShowForm(forms.ModelForm):
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
 
     def __init__(self, *args, **kwargs):
         super(AuctionShowForm, self).__init__(*args, **kwargs)

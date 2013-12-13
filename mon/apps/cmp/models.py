@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
-from apps.imgfile.models import File, Image
+from apps.imgfile.models import File, Image, BaseImage
 
 from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground, Contract
@@ -55,7 +56,7 @@ class Result(BaseResult, ):
     establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
 
 
-class AuctionDocuments(BaseModel):
+class AuctionDocuments(BaseModel, BaseImage):
 
     class Meta:
         app_label = "cmp"
@@ -63,15 +64,20 @@ class AuctionDocuments(BaseModel):
     def __unicode__(self):
         return '%s' % self.id
 
-    notice = models.ForeignKey(Image, null=True, blank=True, related_name='notice', help_text=_(u"Извещение"), verbose_name=_(u"Извещение"), )
-    mun_contract_project = models.ForeignKey(Image, null=True, blank=True, related_name='mun_contract_project', help_text=_(u"Проект муниципального контракта"), verbose_name=_(u"Проект муниципального контракта"), )
-    technical_specification = models.ForeignKey(Image, null=True, blank=True, related_name='technical_specification', help_text=_(u"Техническое задание"), verbose_name=_(u"Техническое задание"), )
-    max_price_substantiation = models.ForeignKey(Image, null=True, blank=True, related_name='max_price_substantiation', help_text=_(u"Обоснование начальной максимальной цены контракта"), verbose_name=_(u"Обоснование начальной максимальной цены контракта"), )
-    notice_rec = models.ForeignKey(Image, null=True, blank=True, related_name='notice_rec', help_text=_(u"Извещение с комментариями и рекомендациями"), verbose_name=_(u"Извещение с комментариями и рекомендациями"), )
-    mun_contract_project_rec = models.ForeignKey(Image, null=True, blank=True, related_name='mun_contract_project_rec', help_text=_(u"Проект муниципального контракта с комментариями и рекомендациями"), verbose_name=_(u"Проект муниципального контракта с комментариями и рекомендациями"), )
-    technical_specification_rec = models.ForeignKey(Image, null=True, blank=True, related_name='technical_specification_rec', help_text=_(u"Техническое задание с комментариями и рекомендациями"), verbose_name=_(u"Техническое задание с комментариями и рекомендациями"), )
-    max_price_substantiation_rec = models.ForeignKey(Image, null=True, blank=True, related_name='max_price_substantiation_rec', help_text=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"),
+    notice = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение"), verbose_name=_(u"Извещение"), )
+    mun_contract_project = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта"), verbose_name=_(u"Проект муниципального контракта"), )
+    technical_specification = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание"), verbose_name=_(u"Техническое задание"), )
+    max_price_substantiation = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта"), verbose_name=_(u"Обоснование начальной максимальной цены контракта"), )
+    notice_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение с комментариями и рекомендациями"), verbose_name=_(u"Извещение с комментариями и рекомендациями"), )
+    mun_contract_project_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта с комментариями и рекомендациями"), verbose_name=_(u"Проект муниципального контракта с комментариями и рекомендациями"), )
+    technical_specification_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание с комментариями и рекомендациями"), verbose_name=_(u"Техническое задание с комментариями и рекомендациями"), )
+    max_price_substantiation_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"),
         verbose_name=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"), )
+
+    def to_list(self):
+        attrs = deepcopy(self.__dict__)
+        l = [getattr(self, k[:-3]) for k in attrs if k and '_id' in k and getattr(self, k[:-3])]
+        return l
 
 
 class Auction(BaseContract, BaseAuctionData,):
@@ -84,4 +90,4 @@ class Auction(BaseContract, BaseAuctionData,):
 
     contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"), null=True, verbose_name=_(u"Данные по заключенному контракту"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    docs = models.ForeignKey(AuctionDocuments, help_text=_(u"Аукционная документация"), verbose_name=_(u"Аукционная документация"), )
+    docs = models.ForeignKey(AuctionDocuments, help_text=_(u"Аукционная документация"), verbose_name=_(u"Аукционная документация"), null=True, blank=True, )

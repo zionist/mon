@@ -16,21 +16,24 @@ from django.forms.models import inlineformset_factory, formset_factory, modelfor
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
-from .models import Result, Auction, Person, CompareData
+from .models import Result, AuctionDocuments, Auction, Person, CompareData
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen
-from apps.build.models import Contract
+from apps.build.models import Contract, ContractDocuments
 from apps.build.forms import BuildingShowForm, GroundShowForm
+from apps.imgfile.models import Image
 
 
 def add_auction(request):
     template = 'auction_creation.html'
     context = {'title': _(u'Добавление аукциона')}
-    prefix = 'auction'
+    prefix, images_prefix = 'auction', 'auction_images'
+    ImageFormSet = modelformset_factory(AuctionDocuments, can_delete=False, extra=1)
     if request.method == "POST":
+        formset = ImageFormSet(request.POST, request.FILES, prefix=images_prefix)
         form = AuctionForm(request.POST, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=True)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
@@ -42,13 +45,14 @@ def add_auction(request):
             auction.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('auctions')
         else:
-            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            context.update({'form': form, 'images': formset, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
+        formset = ImageFormSet(prefix=images_prefix)
         form = AuctionForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
         # move text_area fields to another form
-        context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'images': formset, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,
@@ -156,8 +160,10 @@ def delete_auction(request, pk):
 def add_contract(request):
     template = 'contract_creation.html'
     context = {'title': _(u'Добавление контракта')}
-    prefix = 'contract'
+    prefix, images_prefix = 'contract', 'contract_images'
+    ImageFormSet = modelformset_factory(ContractDocuments, can_delete=False, extra=1)
     if request.method == "POST":
+        formset = ImageFormSet(request.POST, request.FILES, prefix=images_prefix)
         form = ContractForm(request.POST, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
@@ -169,12 +175,13 @@ def add_contract(request):
             contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('contracts')
         else:
-            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            context.update({'form': form, 'prefix': prefix, 'images': formset, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
+        formset = ImageFormSet(prefix=images_prefix)
         form = ContractForm(prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-        context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'prefix': prefix, 'images': formset, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,
