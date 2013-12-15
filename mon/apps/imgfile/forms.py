@@ -52,3 +52,9 @@ class QuestionsListForm(forms.Form):
     persons_list = forms.MultipleChoiceField(
         label=u"Список участников осмотра",
         choices=choices)
+    choices = []
+    choices.insert(1, ("0", u"Нет"))
+    choices.insert(2, ("1", u"Да"))
+    choices.insert(0, ("", u"----"))
+    list_sent_to_mo = forms.ChoiceField(choices=choices,
+        label="Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")

@@ -283,19 +283,27 @@ class BaseHallway(BaseDevices, ):
 
 
 class Room(BaseMaterials, BaseRoom):
-    pass
+
+    class Meta:
+        verbose_name = "Комната"
 
 
 class Kitchen(BaseMaterials, BaseKitchen):
-    pass
+
+    class Meta:
+        verbose_name = "Кухня"
 
 
 class WC(BaseMaterials, BaseWC, ):
-    pass
+
+    class Meta:
+        verbose_name = "Санузел"
 
 
 class Hallway(BaseMaterials, BaseHallway, ):
-    pass
+
+    class Meta:
+        verbose_name = "Прихожая"
 
 
 class Developer(BaseDeveloper, ):

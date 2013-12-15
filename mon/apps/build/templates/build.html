@@ -22,7 +22,7 @@
             <div class="row">
                 <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
                     {% trans 'редактировать' %}</a></div>
-                <div class="span3"><a class="btn" href="{% url 'get-questions-list' %}?building={{ object.id }}">
+                <div class="span3"><a class="btn" href="{% url 'questions-list' %}?building={{ object.id }}">
                     {% trans 'Скачать бланк опроса' %}</a></div>
                 <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
                     {% trans 'Удалить' %}</a></div>
