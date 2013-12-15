@@ -31,6 +31,16 @@ def get_choice_or_value(form, field_name):
 def yes_no_rus(value):
     if value == True:
         return u"Да"
-    if value == False:
+    elif value == False:
         return u"Нет"
+    else:
+        return value
+
+@register.filter
+def dict_val(d, key):
+    try:
+        d[key]
+    except KeyError:
+        return ''
+    return d[key]
 

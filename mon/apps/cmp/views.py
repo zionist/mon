@@ -221,7 +221,14 @@ def get_contract(request, pk, extra=None):
     else:
         form = ContractShowForm(instance=contract)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
-        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [
+                            BaseRoom._meta.verbose_name,
+                            BaseHallway._meta.verbose_name,
+                            BaseWC._meta.verbose_name,
+                            BaseKitchen._meta.verbose_name,
+                            ]})
+
     context.update({'object': contract})
     return render(request, 'contract.html', context, context_instance=RequestContext(request))
 

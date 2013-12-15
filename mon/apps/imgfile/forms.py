@@ -38,13 +38,13 @@ class QuestionsListForm(forms.Form):
             label=u"Муниципальное образование",
             widget=forms.TextInput(attrs={'readonly': True}))
         choices = [(a.id, a.num) for a in Auction.objects.filter(mo=mo.pk)]
-        choices.insert(0, (0, u"----"))
-        self.fields['auction'] = forms.ChoiceField(label=u"Аукцион",
+        choices.insert(0, ("", u"----"))
+        self.fields['auction'] = forms.ChoiceField(label=u"Аукцион", required=True,
                                                    choices=choices)
-        choices = [(c.id, c.num) for c in Contract.objects.filter(mo=mo.pk)]
-        choices.insert(0, (0, u"----"))
-        self.fields['contract'] = forms.ChoiceField(label=u"Контракт",
-                                                 choices=choices)
+        # choices = [(c.id, c.num) for c in Contract.objects.filter(mo=mo.pk)]
+        # choices.insert(0, (0, u"----"))
+        # self.fields['contract'] = forms.ChoiceField(label=u"Контракт",
+        #                                          choices=choices)
 
     responsible_person = forms.CharField(
         label=u"Исполнитель работ от муниципального образования")
@@ -52,3 +52,9 @@ class QuestionsListForm(forms.Form):
     persons_list = forms.MultipleChoiceField(
         label=u"Список участников осмотра",
         choices=choices)
+    choices = []
+    choices.insert(1, ("0", u"Нет"))
+    choices.insert(2, ("1", u"Да"))
+    choices.insert(0, ("", u"----"))
+    list_sent_to_mo = forms.ChoiceField(choices=choices,
+        label="Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")
