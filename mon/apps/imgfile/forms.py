@@ -38,13 +38,13 @@ class QuestionsListForm(forms.Form):
             label=u"Муниципальное образование",
             widget=forms.TextInput(attrs={'readonly': True}))
         choices = [(a.id, a.num) for a in Auction.objects.filter(mo=mo.pk)]
-        choices.insert(0, (0, u"----"))
-        self.fields['auction'] = forms.ChoiceField(label=u"Аукцион",
+        choices.insert(0, ("", u"----"))
+        self.fields['auction'] = forms.ChoiceField(label=u"Аукцион", required=True,
                                                    choices=choices)
-        choices = [(c.id, c.num) for c in Contract.objects.filter(mo=mo.pk)]
-        choices.insert(0, (0, u"----"))
-        self.fields['contract'] = forms.ChoiceField(label=u"Контракт",
-                                                 choices=choices)
+        # choices = [(c.id, c.num) for c in Contract.objects.filter(mo=mo.pk)]
+        # choices.insert(0, (0, u"----"))
+        # self.fields['contract'] = forms.ChoiceField(label=u"Контракт",
+        #                                          choices=choices)
 
     responsible_person = forms.CharField(
         label=u"Исполнитель работ от муниципального образования")
