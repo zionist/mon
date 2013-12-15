@@ -32,8 +32,14 @@ class Subvention(BaseSubvention, ):
         app_label = "mo"
         verbose_name = "Subvention"
 
+    def get_dep(self):
+        if self.departamentagreement_set.all().exists():
+            return self.departamentagreement_set.all()[0]
+        return ' '
+
     def __unicode__(self):
-        return '%s' % self.id
+        string = '%s' + _(u' по соглашению №') + '%s'
+        return string % (self.amount, self.get_dep())
 
     fed_budget = models.ForeignKey(FederalBudget, help_text=_(u"Федеральный бюджет"), verbose_name=_(u"Федеральный бюджет"), blank=True, null=True, )
     reg_budget = models.ForeignKey(RegionalBudget, help_text=_(u"Краевой бюджет"), verbose_name=_(u"Краевой бюджет"), blank=True, null=True, )
@@ -62,7 +68,7 @@ class DepartamentAgreement(BaseDepartamentAgreement, ):
         verbose_name = _(u"Реквизиты соглашения с министерством")
 
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.num
 
     mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование муниципального образования"), verbose_name=_(u"Наименование муниципального образования"), )
     subvention = models.ForeignKey(Subvention, blank=True, null=True, help_text=_(u"Субвенция"), verbose_name=_(u"Субвенция"), )

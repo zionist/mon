@@ -23,6 +23,7 @@ SEPARATE_CHOICES = ((0, _(u'Совместный')),  (1, _(u'Раздельны
 STAGE_CHOICES = ((0, _(u'Подача заявок')),  (1, _(u'Работа комиссии')), (2, _(u'Размещение завершено, аукцион признан несостоявшимся, не допущена ни одна заявка')), (3, _(u'Размещение завершено, аукцион признан несостоявшимся, не подана ни одна заявка')), (4, _(u'Заключен контракт')), (5, _(u'Размещение отменено')))
 PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения денежных средств, выделенных на текущий год. Без дополнительного финансирования')),   (1, _(u'Перспективы освоения ДОПОЛНИТЕЛЬНЫХ денежных средств, в текущем году.')),  (2, _(u'Перспективы освоения денежных средств в планируемом году.')))
 APPROVE_CHOICES = ((0, _(u'Не проверено')), (1, _(u'Требуется проверка')), (2, (u'Проверено')), )
+STOVE_CHOICES = ((0, _(u'Не указано')), (1, _(u'Газовая кухонная плита')), (2, (u'Электрическая кухонная плита')), )
 
 
 class BaseName(models.Model):
@@ -109,7 +110,8 @@ class BaseContract(BaseName, ):
     class Meta:
         abstract = True
 
-    num = models.CharField(help_text=_(u"Номер"), max_length=2048, verbose_name=_(u"Номер"), )
+    num = models.CharField(help_text=_(u"Номер контракта"), max_length=2048, verbose_name=_(u"Номер контракта"), )
+    has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 
 class BaseResult(models.Model):
@@ -156,8 +158,8 @@ class BasePayment(models.Model):
     class Meta:
         abstract = True
 
-    date = models.DateField(null=True, blank=True, )
-    amount = models.CharField(max_length=2048, null=True, blank=True, )
+    date = models.DateField(auto_now=True, help_text=_(u"Дата совершения платежа"), verbose_name=_(u"Дата совершения платежа"),)
+    amount = models.CharField(max_length=2048, help_text=_(u"Сумма платежа"), verbose_name=_(u"Сумма платежа"),)
 
 
 class BaseMaterials(models.Model):
@@ -175,11 +177,18 @@ class BaseEngineerNetworks(models.Model):
     class Meta:
         abstract = True
 
-    water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
-    hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
     water_removal = models.IntegerField(help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), choices=WATER_REMOVAL_CHOICES , )
     electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
     gas_supply = models.NullBooleanField(help_text=_(u"Газоснабжение"), blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
+
+
+class BaseWaterSupply(BaseEngineerNetworks):
+
+    class Meta:
+        abstract = True
+
+    water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
+    hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
 
 
 class BaseSocialObjects(models.Model):
@@ -199,14 +208,14 @@ class BaseTerritoryImprovement(models.Model):
     class Meta:
         abstract = True
 
-    is_routes = models.NullBooleanField(help_text=_(u"Подъездные"), verbose_name=_(u"Подъездные"), blank=True, )
+    is_routes = models.NullBooleanField(help_text=_(u"Подъездные пути"), verbose_name=_(u"Подъездные пути"), blank=True, )
     is_playground = models.NullBooleanField(help_text=_(u"Детская площадка"), verbose_name=_(u"Детская площадка"), blank=True, )
     is_clother_drying = models.NullBooleanField(help_text=_(u"Площадка для сушки белья"), verbose_name=_(u"Площадка для сушки белья"), blank=True, )
     is_parking = models.NullBooleanField(help_text=_(u"Парковка"), verbose_name=_(u"Парковка"), blank=True, )
     is_dustbin_area = models.NullBooleanField(help_text=_(u"Площадка для мусорных контейнеров"), verbose_name=_(u"Площадка для мусорных контейнеров"), blank=True, )
 
 
-class BaseCommonChars(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImprovement, ):
+class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImprovement, ):
 
     class Meta:
         abstract = True
@@ -253,8 +262,6 @@ class BaseKitchen(BaseDevices):
     def __unicode__(self):
         return '%s' % self.id
 
-    gas_stove = models.NullBooleanField(help_text=_(u"Газовая кухонная плита"), verbose_name=_(u"Газовая кухонная плита"), blank=True, )
-    electrix_stove = models.NullBooleanField(help_text=_(u"Электрическая кухонная плита"), verbose_name=_(u"Электрическая кухонная плита"), blank=True, )
     sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
 
 
@@ -266,7 +273,6 @@ class BaseWC(BaseDevices, ):
     def __unicode__(self):
         return '%s' % self.id
 
-    separate = models.IntegerField(help_text=_(u"Санузел"), null=True, blank=True, verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES , )
     is_tower_dryer = models.NullBooleanField(help_text=_(u"Полотенцесушитель"), verbose_name=_(u"Полотенцесушитель"), blank=True, )
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.NullBooleanField(help_text=_(u"Ванна со смесителем"), verbose_name=_(u"Ванна со смесителем"), blank=True, )
@@ -287,11 +293,11 @@ class Room(BaseMaterials, BaseRoom):
 
 
 class Kitchen(BaseMaterials, BaseKitchen):
-    pass
+    stove = models.IntegerField(help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"), default=0, choices=STOVE_CHOICES)
 
 
 class WC(BaseMaterials, BaseWC, ):
-    pass
+    separate = models.IntegerField(help_text=_(u"Санузел"), null=True, blank=True, verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES , )
 
 
 class Hallway(BaseMaterials, BaseHallway, ):
@@ -335,23 +341,32 @@ class BaseMultiMaterials(models.Model):
     ceiling = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки потолка"), null=True, blank=True, verbose_name=_(u"Материал отделки потолка"))
 
 
+class BaseMultiWaterSupply(BaseEngineerNetworks):
+
+    class Meta:
+        abstract = True
+
+    water_settlement = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), )
+    hot_water_supply = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), )
+
+
 class AuctionRoom(BaseMultiMaterials, BaseRoom):
     pass
 
 
 class AuctionKitchen(BaseMultiMaterials, BaseKitchen):
-    pass
+    stove = models.CommaSeparatedIntegerField(max_length=16, null=True, blank=True, help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"))
 
 
 class AuctionWC(BaseMultiMaterials, BaseWC):
-    pass
+    separate = models.CommaSeparatedIntegerField(max_length=16, null=True, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"))
 
 
 class AuctionHallway(BaseMultiMaterials, BaseHallway):
     pass
 
 
-class BaseAuctionData(BaseEngineerNetworks, BaseSocialObjects, BaseTerritoryImprovement, ):
+class BaseAuctionData(BaseMultiWaterSupply, BaseSocialObjects, BaseTerritoryImprovement, ):
 
     class Meta:
         abstract = True

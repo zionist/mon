@@ -10,7 +10,7 @@ from django.forms import MultipleChoiceField
 from django.forms.widgets import CheckboxSelectMultiple
 
 from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, AuctionKitchen, Developer
-from apps.core.models import FLOOR_CHOICES, WALL_CHOICES, CEILING_CHOICES
+from apps.core.models import FLOOR_CHOICES, WALL_CHOICES, CEILING_CHOICES, STOVE_CHOICES, SEPARATE_CHOICES
 
 
 class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
@@ -176,12 +176,16 @@ class AuctionHallwayForm(BaseAuctionRoomForm):
 
 
 class AuctionWCForm(BaseAuctionRoomForm):
+    separate = CSIMultipleChoiceField(label=_(u"Санузел"), required=False,
+                                      widget=CSICheckboxSelectMultiple, choices=SEPARATE_CHOICES)
 
     class Meta:
         model = AuctionWC
 
 
 class AuctionKitchenForm(BaseAuctionRoomForm):
+    stove = CSIMultipleChoiceField(label=_(u"Кухонная плита"), required=False,
+                                   widget=CSICheckboxSelectMultiple, choices=STOVE_CHOICES)
 
     class Meta:
         model = AuctionKitchen
@@ -199,6 +203,23 @@ class BaseAuctionRoomShowForm(forms.ModelForm):
         abstract = True
 
 
+def cmp_single(obj, cmp_obj):
+    for field in obj.fields:
+        if getattr(obj.instance, field) != getattr(cmp_obj, field):
+            obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+def cmp_multi(obj, cmp_obj):
+    for field in obj.fields:
+        if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden') \
+            and isinstance(obj.fields[field].widget, 'CSICheckboxSelectMultiple'):
+            if getattr(obj.instance, field) not in getattr(cmp_obj, field):
+                obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+        else:
+            if getattr(obj.instance, field) != getattr(cmp_obj, field):
+                obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
 class AuctionRoomShowForm(BaseAuctionRoomShowForm):
 
     class Meta:
@@ -210,9 +231,10 @@ class AuctionRoomShowForm(BaseAuctionRoomShowForm):
         super(AuctionRoomShowForm, self).__init__(*args, **kwargs)
 
         if cmp_initial:
-            for field in self.fields:
-                if getattr(self.instance, field) != getattr(cmp_initial, field):
-                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+            cmp_single(self, cmp_initial)
+            #for field in self.fields:
+            #    if getattr(self.instance, field) != getattr(cmp_initial, field):
+            #        self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
@@ -237,6 +259,8 @@ class AuctionHallwayShowForm(BaseAuctionRoomShowForm):
 
 
 class AuctionWCShowForm(BaseAuctionRoomShowForm):
+    separate = CSIMultipleChoiceField(label=_(u"Санузел"), required=False,
+                                      widget=CSICheckboxSelectMultiple, choices=SEPARATE_CHOICES)
 
     class Meta:
         model = AuctionWC
@@ -248,12 +272,15 @@ class AuctionWCShowForm(BaseAuctionRoomShowForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
-            for field in self.fields:
-                if getattr(self.instance, field) != getattr(cmp_initial, field):
-                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+            cmp_multi(self, cmp_initial)
+            #for field in self.fields:
+            #    if getattr(self.instance, field) != getattr(cmp_initial, field):
+            #        self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class AuctionKitchenShowForm(BaseAuctionRoomShowForm):
+    stove = CSIMultipleChoiceField(label=_(u"Кухонная плита"), required=False,
+                                   widget=CSICheckboxSelectMultiple, choices=STOVE_CHOICES)
 
     class Meta:
         model = Kitchen

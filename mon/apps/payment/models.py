@@ -13,8 +13,11 @@ class Payment(BasePayment, ):
         app_label = "payment"
         verbose_name = "Payment"
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s: %s' % (self.date, self.amount)
 
-    contract = models.ForeignKey(Contract, )
-    subvention = models.ForeignKey(Subvention, )
-    attribute = models.ForeignKey(File, )
+    contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"),
+                                 verbose_name=_(u"Данные по заключенному контракту"), )
+    subvention = models.ForeignKey(Subvention, help_text=_(u"Данные по расходуемой субвенции"),
+                                   verbose_name=_(u"Данные по расходуемой субвенции"),)
+    pay_order = models.ForeignKey(File, help_text=_(u"Платежное поручение"),
+                                  verbose_name=_(u"Платежное поручение"), )

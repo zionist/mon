@@ -30,6 +30,7 @@ urlpatterns = patterns(
     url(r'^result/person/add$', views.manage_person, name='manage-person'),
 
     url(r'^cmp/contract/(?P<pk>[0-9]+)/$', views.cmp_contract, name='cmp-contract'),
+    url(r'^cmp/contract/auction/(?P<pk>[0-9]+)/$', views.cmp_contract_auction, name='cmp-contract-auction'),
     url(r'^cmp/result/(?P<pk>[0-9]+)/$', views.cmp_result_building, name='cmp-result-building'),
     url(r'^cmp/result/contract/(?P<pk>[0-9]+)/$', views.cmp_result_contract, name='cmp-result-contract'),
 )

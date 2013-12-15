@@ -8,9 +8,10 @@ from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 
 
-from .models import CompareData, Result, Auction, Person
-from apps.build.models import Contract
-from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES
+from .models import CompareData, Result, Auction, Person, AuctionDocuments
+from apps.build.models import Contract, ContractDocuments
+from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES, \
+    WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple
 
 
@@ -26,7 +27,7 @@ class ContractForm(forms.ModelForm):
 
     class Meta:
         model = Contract
-        exclude = ('room', 'hallway', 'wc', 'kitchen')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
 
 
 class ResultForm(forms.ModelForm):
@@ -37,6 +38,18 @@ class ResultForm(forms.ModelForm):
     recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), widget=forms.Textarea(attrs={'rows': 4 }))
 
 
+class AuctionDocumentsForm(forms.ModelForm):
+
+    class Meta:
+        model = AuctionDocuments
+
+
+class ContractDocumentsForm(forms.ModelForm):
+
+    class Meta:
+        model = ContractDocuments
+
+
 class AuctionForm(forms.ModelForm):
     internal_doors = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
                                             widget=CSICheckboxSelectMultiple, choices=INTERNAL_DOORS_CHOICES)
@@ -44,6 +57,10 @@ class AuctionForm(forms.ModelForm):
                                            widget=CSICheckboxSelectMultiple, choices=ENTRANCE_DOOR_CHOICES)
     window_constructions = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
                                                   widget=CSICheckboxSelectMultiple, choices=WINDOW_CONSTRUCTIONS_CHOICES)
+    water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
+                                              widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
+    hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,
+                                              widget=CSICheckboxSelectMultiple, choices=HOT_WATER_SUPPLY_CHOICES)
 
     class Meta:
         model = Auction
@@ -59,6 +76,17 @@ class PersonForm(forms.ModelForm):
 
 
 class AuctionShowForm(forms.ModelForm):
+    internal_doors = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+                                            widget=CSICheckboxSelectMultiple, choices=INTERNAL_DOORS_CHOICES)
+    entrance_door = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
+                                           widget=CSICheckboxSelectMultiple, choices=ENTRANCE_DOOR_CHOICES)
+    window_constructions = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+                                                  widget=CSICheckboxSelectMultiple, choices=WINDOW_CONSTRUCTIONS_CHOICES)
+    water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
+                                              widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
+    hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,
+                                              widget=CSICheckboxSelectMultiple, choices=HOT_WATER_SUPPLY_CHOICES)
+
     class Meta:
         model = Auction
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
@@ -73,7 +101,7 @@ class AuctionShowForm(forms.ModelForm):
 class ContractShowForm(forms.ModelForm):
     class Meta:
         model = Contract
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date', 'docs')
 
     def __init__(self, *args, **kwargs):
 

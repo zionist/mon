@@ -27,9 +27,9 @@
             {% endif %}
             {% if images %}
                 <h4>{% trans ' Документация' %}</h4>
-                {% for form in images %}
+                {% with form=images %}
                     {% include "4_col_form.html" %}
-                {% endfor %}
+                {% endwith %}
             {% endif %}
             <br>
             <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>

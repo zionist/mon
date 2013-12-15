@@ -64,7 +64,7 @@ class Contract(BaseContract, BaseCompareData):
         app_label = "cmp"
         verbose_name = "Contract"
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.num
 
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), verbose_name=_(u"Застройщик"), null=True, blank=True, )
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )

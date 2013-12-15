@@ -10,6 +10,10 @@
                 {% trans 'редактировать' %}</a></div>
             <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-contract' object.id %}">
                 {% trans 'Удалить' %}</a></div>
+            <td><a class="btn btn-small" href="{% url 'cmp-contract' object.id %}">
+                        {% trans 'Сравнить с объектом' %}</a></td>
+                    <td><a class="btn btn-small" href="{% url 'cmp-contract-auction' object.id %}">
+                        {% trans 'Сравнить с аукционом' %}</a></td>
         </div><br />
         {% if form or formsets %}
             {% if form %}
