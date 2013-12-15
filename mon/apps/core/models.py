@@ -110,7 +110,7 @@ class BaseContract(BaseName, ):
     class Meta:
         abstract = True
 
-    num = models.CharField(help_text=_(u"Номер контракта"), max_length=2048, verbose_name=_(u"Номер контракта"), )
+    num = models.CharField(help_text=_(u"Номер"), max_length=2048, verbose_name=_(u"Номер"), )
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 

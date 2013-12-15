@@ -162,8 +162,8 @@ def add_contract(request):
     context = {'title': _(u'Добавление контракта')}
     prefix, images_prefix = 'contract', 'contract_images'
     if request.method == "POST":
-        image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         form = ContractForm(request.POST, prefix=prefix)
+        image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             contract = form.save()

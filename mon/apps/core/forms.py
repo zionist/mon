@@ -2,6 +2,7 @@
 
 from django import forms
 from django.forms.formsets import formset_factory
+from django.db.models import CommaSeparatedIntegerField
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
@@ -212,11 +213,14 @@ def cmp_single(obj, cmp_obj):
 def cmp_multi(obj, cmp_obj):
     for field in obj.fields:
         if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden') \
-            and isinstance(obj.fields[field].widget, 'CSICheckboxSelectMultiple'):
-            if getattr(obj.instance, field) not in getattr(cmp_obj, field):
+            and isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
+            if getattr(obj.instance, field) != '' and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
                 obj.fields[field].widget.attrs['style'] = 'background-color: red;'
-        else:
+
+        elif hasattr(obj.instance, field) and hasattr(cmp_obj, field) \
+        and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(cmp_obj, field), CommaSeparatedIntegerField):
             if getattr(obj.instance, field) != getattr(cmp_obj, field):
+                print(field)
                 obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
@@ -232,9 +236,6 @@ class AuctionRoomShowForm(BaseAuctionRoomShowForm):
 
         if cmp_initial:
             cmp_single(self, cmp_initial)
-            #for field in self.fields:
-            #    if getattr(self.instance, field) != getattr(cmp_initial, field):
-            #        self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
@@ -253,9 +254,7 @@ class AuctionHallwayShowForm(BaseAuctionRoomShowForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
-            for field in self.fields:
-                if getattr(self.instance, field) != getattr(cmp_initial, field):
-                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+            cmp_single(self, cmp_initial)
 
 
 class AuctionWCShowForm(BaseAuctionRoomShowForm):
@@ -273,9 +272,6 @@ class AuctionWCShowForm(BaseAuctionRoomShowForm):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
             cmp_multi(self, cmp_initial)
-            #for field in self.fields:
-            #    if getattr(self.instance, field) != getattr(cmp_initial, field):
-            #        self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class AuctionKitchenShowForm(BaseAuctionRoomShowForm):
@@ -292,6 +288,4 @@ class AuctionKitchenShowForm(BaseAuctionRoomShowForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
-            for field in self.fields:
-                if getattr(self.instance, field) != getattr(cmp_initial, field):
-                    self.fields[field].widget.attrs['style'] = 'background-color: red;'
+            cmp_multi(self, cmp_initial)
