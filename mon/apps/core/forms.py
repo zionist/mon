@@ -215,17 +215,13 @@ def cmp_multi(obj, cmp_obj):
         if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
 
             if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
-                print(field, str(getattr(obj.instance, field)))
                 if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
-                    print(getattr(cmp_obj, field))
                     obj.fields[field].widget.attrs['style'] = 'background-color: red;'
                     obj.fields[field].label = _("ERROR ") + obj.fields[field].label
 
             elif hasattr(obj.instance, field) and hasattr(cmp_obj, field) \
             and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(obj.instance, field), CommaSeparatedIntegerField):
-                print(field, type(getattr(obj.instance, field)))
                 if getattr(obj.instance, field) != getattr(cmp_obj, field):
-                    print(field)
                     obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
