@@ -12,7 +12,7 @@ from .models import CompareData, Result, Auction, Person, AuctionDocuments
 from apps.build.models import Contract, ContractDocuments
 from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES, \
     WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES
-from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple
+from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple, cmp_single, cmp_multi
 
 
 class CompareDataForm(forms.ModelForm):
@@ -92,10 +92,13 @@ class AuctionShowForm(forms.ModelForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
 
     def __init__(self, *args, **kwargs):
+        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(AuctionShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            cmp_multi(self, cmp_initial)
 
 
 class ContractShowForm(forms.ModelForm):

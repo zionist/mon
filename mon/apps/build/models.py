@@ -70,7 +70,7 @@ class Contract(BaseContract, BaseCompareData):
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    docs = models.ForeignKey(ContractDocuments, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
+    docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
 
 
 class Ground(BaseBuilding, BaseCompareData):
