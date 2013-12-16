@@ -75,7 +75,7 @@ def get_fk_show_forms(parent=None, multi=None):
 def get_fk_cmp_forms(parent=None, cmp=None, multi=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_cmp', 'hallway_cmp', 'wc_cmp', 'kitchen_cmp'
     forms = [RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm] if not multi \
-        else [AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm]
+        else [AuctionRoomShowForm, AuctionHallwayShowForm, AuctionWCShowForm, AuctionKitchenShowForm]
     room_f = forms[0](prefix=room_p, instance=parent.room, cmp_initial=cmp.room)
     hallway_f = forms[1](prefix=hallway_p, instance=parent.hallway, cmp_initial=cmp.hallway)
     wc_f = forms[2](prefix=wc_p, instance=parent.wc, cmp_initial=cmp.wc)

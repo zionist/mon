@@ -501,7 +501,7 @@ def cmp_contract_auction(request, pk):
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
-    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract)
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract, multi=True)
     context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
 
     context.update({'object': contract, 'cmp_object': cmp_obj,
