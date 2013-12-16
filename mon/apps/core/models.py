@@ -7,19 +7,19 @@ from apps.imgfile.models import File, Image
 FACE_LIST_CHOICES = ((0, _(u'Юридическое лицо')),  (1, _(u'Физическое лицо')),)
 STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
 READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
-FLOOR_CHOICES = ((0, _(u'Ламинат')),  (1, _(u'Паркет')),  (2, _(u'Линолеум')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
-WALL_CHOICES = ((0, _(u'Обои')),  (1, _(u'Водоэмульсионная краска')),  (2, _(u'Штукатурка')), (3, _(u'Плитка')),   (4, _(u'Не указано')))
-CEILING_CHOICES = ((0, _(u'Натяжной')),  (1, _(u'Штукатурка')),  (2, _(u'Не указано')))
-INTERNAL_DOORS_CHOICES = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые')),  (2, _(u'Не указано')))
-ENTRANCE_DOOR_CHOICES = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые')),  (2, _(u'Не указано')))
-WINDOW_CONSTRUCTIONS_CHOICES = ((0, _(u'Деревянные')),  (1, _(u'Пластиковые стеклопакеты')),  (2, _(u'Не указано')))
-WATER_SETTLEMENT_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-HOT_WATER_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+FLOOR_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ламинат')),  (2, _(u'Паркет')),  (3, _(u'Линолеум')), (4, _(u'Плитка')))
+WALL_CHOICES = ((0, _(u'Не указано')), (1, _(u'Обои')),  (2, _(u'Водоэмульсионная краска')),  (3, _(u'Штукатурка')), (4, _(u'Плитка')), )
+CEILING_CHOICES = ((0, _(u'Не указано')), (1, _(u'Натяжной')),  (2, _(u'Штукатурка')))
+INTERNAL_DOORS_CHOICES = ((0, _(u'Не указано')), (1, _(u'Деревянные')),  (2, _(u'Пластиковые')))
+ENTRANCE_DOOR_CHOICES = ((0, _(u'Не указано')), (1, _(u'Деревянные')),  (2, _(u'Пластиковые')))
+WINDOW_CONSTRUCTIONS_CHOICES = ((0, _(u'Не указано')), (1, _(u'Деревянные')),  (2, _(u'Пластиковые стеклопакеты')))
+WATER_SETTLEMENT_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
+HOT_WATER_SUPPLY_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 WATER_REMOVAL_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
 ELECTRIC_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
 GAS_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
 CREATION_FORM_CHOICES = ((0, _(u'Приобретение')),  (1, _(u'Долевое строительство')), (2, _(u'Строительство')),)
-SEPARATE_CHOICES = ((0, _(u'Совместный')),  (1, _(u'Раздельный')),)
+SEPARATE_CHOICES = ((0, _(u'Не указано')),  (1, _(u'Совместный')),  (2, _(u'Раздельный')),)
 STAGE_CHOICES = ((0, _(u'Подача заявок')),  (1, _(u'Работа комиссии')), (2, _(u'Размещение завершено, аукцион признан несостоявшимся, не допущена ни одна заявка')), (3, _(u'Размещение завершено, аукцион признан несостоявшимся, не подана ни одна заявка')), (4, _(u'Заключен контракт')), (5, _(u'Размещение отменено')))
 PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения денежных средств, выделенных на текущий год. Без дополнительного финансирования')),   (1, _(u'Перспективы освоения ДОПОЛНИТЕЛЬНЫХ денежных средств, в текущем году.')),  (2, _(u'Перспективы освоения денежных средств в планируемом году.')))
 APPROVE_CHOICES = ((0, _(u'Не проверено')), (1, _(u'Требуется проверка')), (2, (u'Проверено')), )
@@ -167,9 +167,9 @@ class BaseMaterials(models.Model):
     class Meta:
         abstract = True
 
-    floor = models.IntegerField(help_text=_(u"Материал отделки пола"), null=True, blank=True, verbose_name=_(u"Материал отделки пола"), choices=FLOOR_CHOICES , )
-    wall = models.IntegerField(help_text=_(u"Материал отделки стен"), null=True, blank=True, verbose_name=_(u"Материал отделки стен"), choices=WALL_CHOICES , )
-    ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка"), null=True, blank=True, verbose_name=_(u"Материал отделки потолка"), choices=CEILING_CHOICES , )
+    floor = models.IntegerField(help_text=_(u"Материал отделки пола"), default=0, blank=True, verbose_name=_(u"Материал отделки пола"), choices=FLOOR_CHOICES , )
+    wall = models.IntegerField(help_text=_(u"Материал отделки стен"), default=0, blank=True, verbose_name=_(u"Материал отделки стен"), choices=WALL_CHOICES , )
+    ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка"), choices=CEILING_CHOICES , )
 
 
 class BaseEngineerNetworks(models.Model):
@@ -225,9 +225,9 @@ class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImproveme
     is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
-    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
-    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), null=True, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
-    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
+    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), default=0, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
+    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), default=0, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
+    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
 
 
 class BaseDevices(models.Model):
@@ -336,9 +336,9 @@ class BaseMultiMaterials(models.Model):
     class Meta:
         abstract = True
 
-    floor = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки пола"), null=True, blank=True, verbose_name=_(u"Материал отделки пола"))
-    wall = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки стен"), null=True, blank=True, verbose_name=_(u"Материал отделки стен"))
-    ceiling = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки потолка"), null=True, blank=True, verbose_name=_(u"Материал отделки потолка"))
+    floor = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки пола"), default=0, blank=True, verbose_name=_(u"Материал отделки пола"))
+    wall = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки стен"), default=0, blank=True, verbose_name=_(u"Материал отделки стен"))
+    ceiling = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки потолка"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка"))
 
 
 class BaseMultiWaterSupply(BaseEngineerNetworks):
@@ -382,11 +382,11 @@ class BaseAuctionData(BaseMultiWaterSupply, BaseSocialObjects, BaseTerritoryImpr
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
     internal_doors = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал межкомнатных дверей"),
-                                                       null=True, blank=True, verbose_name=_(u"Материал межкомнатных дверей"))
+                                                       default=0, blank=True, verbose_name=_(u"Материал межкомнатных дверей"))
     entrance_door = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал входной двери"),
-                                                      null=True, blank=True, verbose_name=_(u"Материал входной двери"))
+                                                      default=0, blank=True, verbose_name=_(u"Материал входной двери"))
     window_constructions = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал оконных конструкций"),
-                                                             null=True, blank=True, verbose_name=_(u"Материал оконных конструкций"))
+                                                             default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"))
 
     stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), null=True, blank=True, verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
     start_price = models.FloatField(help_text=_(u"Начальная (максимальная) цена руб."), null=True, verbose_name=_(u"Начальная (максимальная) цена руб."), blank=True, )

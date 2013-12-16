@@ -64,7 +64,7 @@ class AuctionForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs', 'num', 'name')
 
 
 class PersonForm(forms.ModelForm):
@@ -89,7 +89,8 @@ class AuctionShowForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'open_date', 'public_date', 'stage', 'proposal_count',
+                   'contract', 'name', 'num',  'docs', 'has_trouble_docs', 'start_price')
 
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
@@ -104,7 +105,8 @@ class AuctionShowForm(forms.ModelForm):
 class ContractShowForm(forms.ModelForm):
     class Meta:
         model = Contract
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date', 'docs')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date',
+                   'docs', 'has_trouble_docs', 'developer', 'area', 'flats_amount')
 
     def __init__(self, *args, **kwargs):
 

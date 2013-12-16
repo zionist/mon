@@ -212,16 +212,21 @@ def cmp_single(obj, cmp_obj):
 
 def cmp_multi(obj, cmp_obj):
     for field in obj.fields:
-        if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden') \
-            and isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
-            if getattr(obj.instance, field) != '' and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
-                obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+        if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
 
-        elif hasattr(obj.instance, field) and hasattr(cmp_obj, field) \
-        and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(cmp_obj, field), CommaSeparatedIntegerField):
-            if getattr(obj.instance, field) != getattr(cmp_obj, field):
-                print(field)
-                obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+            if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
+                print(field, str(getattr(obj.instance, field)))
+                if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
+                    print(getattr(cmp_obj, field))
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+                    obj.fields[field].label = _("ERROR ") + obj.fields[field].label
+
+            elif hasattr(obj.instance, field) and hasattr(cmp_obj, field) \
+            and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(obj.instance, field), CommaSeparatedIntegerField):
+                print(field, type(getattr(obj.instance, field)))
+                if getattr(obj.instance, field) != getattr(cmp_obj, field):
+                    print(field)
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class AuctionRoomShowForm(BaseAuctionRoomShowForm):
@@ -234,12 +239,11 @@ class AuctionRoomShowForm(BaseAuctionRoomShowForm):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(AuctionRoomShowForm, self).__init__(*args, **kwargs)
 
-        if cmp_initial:
-            cmp_single(self, cmp_initial)
-
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+        if cmp_initial:
+            cmp_single(self, cmp_initial)
 
 
 class AuctionHallwayShowForm(BaseAuctionRoomShowForm):
