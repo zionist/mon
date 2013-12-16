@@ -25,9 +25,11 @@ class FileForm(forms.ModelForm):
 
 
 class SelectMoForm(forms.Form):
-    choices = [(mo.id, mo.name) for mo in MO.objects.all()]
-    mo = forms.ChoiceField(label=u"Муниципальное образование",
-                           choices=choices)
+    def __init__(self, *args, **kwargs):
+        super(SelectMoForm, self).__init__(*args, **kwargs)
+        choices = [(mo.id, mo.name) for mo in MO.objects.all()]
+        self.fields['mo'] = forms.ChoiceField(label=u"Муниципальное образование",
+                               choices=choices)
 
 
 class QuestionsListForm(forms.Form):
@@ -41,20 +43,17 @@ class QuestionsListForm(forms.Form):
         choices.insert(0, ("", u"----"))
         self.fields['auction'] = forms.ChoiceField(label=u"Аукцион", required=True,
                                                    choices=choices)
-        # choices = [(c.id, c.num) for c in Contract.objects.filter(mo=mo.pk)]
-        # choices.insert(0, (0, u"----"))
-        # self.fields['contract'] = forms.ChoiceField(label=u"Контракт",
-        #                                          choices=choices)
-
-    responsible_person = forms.CharField(
-        label=u"Исполнитель работ от муниципального образования")
-    choices = [(p.id, p.name) for p in Person.objects.all()]
-    persons_list = forms.MultipleChoiceField(
-        label=u"Список участников осмотра",
-        choices=choices)
-    choices = []
-    choices.insert(1, ("0", u"Нет"))
-    choices.insert(2, ("1", u"Да"))
-    choices.insert(0, ("", u"----"))
-    list_sent_to_mo = forms.ChoiceField(choices=choices,
-        label="Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")
+        self.fields['responsible_person'] = forms.CharField(
+            label=u"Исполнитель работ от муниципального образования")
+        choices = [(p.id, p.name) for p in Person.objects.all()]
+        self.fields['persons_list'] = forms.MultipleChoiceField(
+            label=u"Список участников осмотра",
+            choices=choices)
+        choices = []
+        choices.insert(1, ("0", u"Нет"))
+        choices.insert(2, ("1", u"Да"))
+        choices.insert(0, ("", u"----"))
+        self.fields['objects_equal'] = forms.ChoiceField(choices=choices,
+                                                    label=u"Все объекты типовые")
+        self.fields['list_sent_to_mo'] = forms.ChoiceField(choices=choices,
+            label=u"Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")

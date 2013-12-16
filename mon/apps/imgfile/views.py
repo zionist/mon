@@ -24,6 +24,7 @@ from apps.imgfile.forms import QuestionsListForm, SelectMoForm
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 
 
@@ -42,7 +43,7 @@ def get_questions_list_form(request):
     context = {'title': u'Создать форму опроса'}
     template = 'qet_questions_list_form.html'
     # form from get_questions_list was wrong
-    if request.method == 'GET':
+    if request.method == 'GET' and request.session.get('wrong_post'):
         wrong_post = request.session.get('wrong_post')
         mo = MO.objects.filter(name=wrong_post['mo'])[0]
         form = QuestionsListForm(mo, request.session['wrong_post'])
@@ -55,6 +56,8 @@ def get_questions_list_form(request):
         except ObjectDoesNotExist:
             return HttpResponseNotFound("Not found")
         form = QuestionsListForm(mo=mo)
+    else:
+        return HttpResponseNotFound("Not found")
     context.update({'form': form})
     return render_to_response(template, context,
                               context_instance=RequestContext(request))
@@ -76,6 +79,7 @@ def get_questions_list(request):
 
     context['responsible_person'] = request.POST.get('responsible_person')
     context['list_sent_to_mo'] = request.POST.get('list_sent_to_mo')
+    context['objects_equal'] = request.POST.get('objects_equal')
     context['persons_list'] = []
     for p in request.POST.getlist('persons_list'):
         context['persons_list'].append(Person.objects.get(pk=p))
@@ -85,8 +89,19 @@ def get_questions_list(request):
         exclude(contract_id__gt=0, )
     perspective = 0
     for building in buildings_for_perspective:
-        perspective += building.flats_amount
+        if building.flats_amount:
+            perspective += building.flats_amount
     context['perspective'] = perspective
+    context['perspective_forms'] = []
+
+    # pass forms and formsts for perspective buildings to template via dicts in array
+    for building in Building.objects.filter(Q(payment_perspective=0) |
+            Q(payment_perspective=1)):
+        object_form = BuildingForm(instance=building)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
+        object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
+        context['perspective_forms'].append({object_form: object_formsets})
+    print context['perspective_forms']
 
     # empty result
     cmp_form = CompareDataForm()
@@ -94,6 +109,7 @@ def get_questions_list(request):
     hallway_f = HallwayShowForm()
     wc_f = WCShowForm()
     kitchen_f = KitchenShowForm()
+    context['building_form'] = BuildingForm()
     context['empty_formsets'] = [room_f, hallway_f, wc_f, kitchen_f]
 
     # auction always should be
@@ -107,6 +123,15 @@ def get_questions_list(request):
     if auction.contract:
         contract = auction.contract
         contract_form = ContractForm(instance=contract)
+        context['building_forms'] = []
+
+        # pass forms and formsts for contract building to template via dicts in array
+        for building in Building.objects.filter(contract=contract):
+            object_form = BuildingForm(instance=building)
+            room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
+            object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
+            context['building_forms'].append({object_form: object_formsets})
+
         context["contract"] = contract
         context["contract_form"] = contract_form
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)

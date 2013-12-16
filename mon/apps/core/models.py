@@ -283,25 +283,31 @@ class BaseHallway(BaseDevices, ):
 
     class Meta:
         app_label = "core"
-        verbose_name = "Прихожая"
+        verbose_name = u"Прихожая"
     def __unicode__(self):
         return '%s' % self.id
 
 
 class Room(BaseMaterials, BaseRoom):
-    pass
+    class Meta:
+        verbose_name = u"Комната"
 
 
 class Kitchen(BaseMaterials, BaseKitchen):
     stove = models.IntegerField(help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"), default=0, choices=STOVE_CHOICES)
+    class Meta:
+        verbose_name = u"Кухня"
 
 
 class WC(BaseMaterials, BaseWC, ):
     separate = models.IntegerField(help_text=_(u"Санузел"), null=True, blank=True, verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES , )
+    class Meta:
+        verbose_name = u"Санузел"
 
 
 class Hallway(BaseMaterials, BaseHallway, ):
-    pass
+    class Meta:
+        verbose_name = u"Прихожая"
 
 
 class Developer(BaseDeveloper, ):
