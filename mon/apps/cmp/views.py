@@ -25,6 +25,7 @@ from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen
 from apps.build.models import Contract, ContractDocuments
 from apps.build.forms import BuildingShowForm, GroundShowForm
 from apps.imgfile.models import Image
+from apps.mo.models import MO
 
 
 def add_auction(request):
@@ -62,15 +63,54 @@ def add_auction(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+def count_flats(obj_set, vals, **kwargs):
+    amount = 0
+    val = ', '.join(vals) if len(vals) > 1 else vals[0]
+    objs = obj_set.filter(**kwargs).values(val)
+    for obj in objs:
+        for val in vals:
+            amount += int(obj.get(val))
+    return amount
+
 @login_required
 def get_auctions(request, pk=None):
     template = 'auctions.html'
     context = {'title': _(u'Аукционы')}
+    if MO.objects.all().exists():
+        mos = MO.objects.all().order_by('name')
+        objects = [{'id': mo.id, 'name': mo.name, 'auctions': mo.auction_set,
+                    'amount_0': mo.departamentagreement_set.all()[0].subvention_performance,
+                    'amount_1': mo.auction_set.filter(stage=0).count(),
+                    'amount_2': mo.auction_set.filter(stage=1).count(),
+                    'amount_3': mo.auction_set.filter(stage=3).count(),
+                    'amount_4': mo.auction_set.filter(stage=4).count()} for mo in mos]
+        for obj in objects:
+            for name in ['amount_1', 'amount_2', 'amount_3', 'amount_4']:
+                obj.update({name: count_flats(obj.get('auctions'), vals=['flats_amount'], **{'stage': name[-1:]})})
+
+        page = request.GET.get('page', '1')
+        paginator = Paginator(objects, 50)
+        try:
+            objects = paginator.page(page)
+        except PageNotAnInteger:
+            objects = paginator.page(1)
+        except EmptyPage:
+            objects = paginator.page(paginator.num_pages)
+        context.update({'objects_list': objects})
+    return render(request, template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def get_mo_auctions(request, pk=None):
+    template = 'mo_auctions.html'
+    context = {'title': _(u'Аукционы')}
     if Auction.objects.all().exists():
-        objects = Auction.objects.all().order_by('stage')
         if pk:
-            auction_object = Auction.objects.get(pk=pk)
-            context.update({'object': auction_object})
+            mo_object = MO.objects.get(pk=pk)
+            objects = Auction.objects.filter(mo=pk).order_by('stage')
+            context.update({'object': mo_object})
+        else:
+            objects = Auction.objects.all().order_by('stage')
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:

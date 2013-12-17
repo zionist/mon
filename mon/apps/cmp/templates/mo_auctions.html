@@ -1,0 +1,66 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h2>{{title}}</h2>
+    {% if user.is_staff %}
+        <a class="btn btn-small" href="{% url 'create-auction' %}">
+            {% trans 'Добавить аукцион' %}</a><br><br>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+
+        {% if auction_list and object %}
+            {% trans 'Наменование МО: ' %}{{ object.name }}<br>
+            {% trans 'СРЗ: ' %}
+            {% with object.creation_form as form %}
+                {% if form == 0 %}П{% elif form == 1%}ДС{% elif form == 2%}С{% endif %}
+            {% endwith %}<br>
+            {% trans 'Выделенных квартир на текущий год: ' %}{{ object.departamentagreement_set.all.0.flats_amount }}<br>
+            <table class="table table-striped table-condensed table-hover">
+                {% regroup auction_list by stage as objects_list %}
+                {% for stage in objects_list %}
+                {% if stage.grouper == 0 %}
+                <tr><th> {% trans 'Аукционы на этапе подачи заявки' %}</th></tr>
+                {% elif stage.grouper == 1 %}
+                <tr><th> {% trans 'Аукционы на этапе работы комиссии' %}</th></tr>
+                {% elif stage.grouper == 2 %}
+                <tr><th> {% trans 'Аукционы на этапе завершения работы (не допущена ни одна заявка)' %}</th></tr>
+                {% elif stage.grouper == 3 %}
+                <tr><th> {% trans 'Аукционы на этапе завершения работы (не подана ни одна заявка)' %}</th></tr>
+                {% elif stage.grouper == 4 %}
+                <tr><th> {% trans 'Аукционы на этапе заключения контракта' %}</th></tr>
+                {% elif stage.grouper == 5 %}
+                <tr><th> {% trans 'Аукционы на этапе отмены размещения' %}</th></tr>
+                {% endif %}
+                <tr><th>{% trans '№ заказа' %}</th><th>{% trans 'Количество квартир' %}</th>
+                    <th>{% trans 'Площадь квартир' %}</th><th>{% trans 'Начальная цена' %}</th>
+                    <th>{% trans 'Дата опубликования заказа' %}</th><th>{% trans 'Дата и время проведения аукциона' %}</th>
+                    <th>{% trans 'Сумма заключенного контракта' %}</th>
+                </tr>
+                {% for item in stage.list %}
+                <tr onclick="location.href = '{% url 'change-auction' item.id %}'">
+                    <td> <a href="{% url 'change-auction' item.id %}"> {{ item.num }} </a> </td>
+                    <td>{{ item.flats_amount }}</td><td>{{ item.area }}</td>
+                    <td>{{ item.start_price }}</td><td>{{ item.public_date }}</td><td>{{ item.open_date }}</td>
+                    <td>{{ item.contract.summa }}</td>
+                    {% if item.stage == 4 %}
+                        {% if item.contract %}
+                            <td> {{ item.contract.building.address|truncatechars:50 }} </td>
+                            <td> {{ item.contract.building.developer|truncatechars:50 }} </td>
+
+                        {% endif %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+                {% for obj in building_list %}
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endif %}
+{% endblock %}
