@@ -142,7 +142,7 @@ def pre_delete_mo(request, pk):
 
 
 def delete_mo(request, pk):
-    context = {'title': _(u'Удаление осмотра')}
+    context = {'title': _(u'Удаление муниципального образования')}
     mo = MO.objects.get(pk=pk)
     if mo and 'delete' in request.POST:
         dep_agreement = DepartamentAgreement.objects.get(mo=pk)

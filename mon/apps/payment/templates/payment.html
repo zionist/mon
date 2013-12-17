@@ -1,0 +1,32 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form and object %}
+            <h4>{% trans 'Платежи' %}</h4>
+            <table>
+                <tr>
+                    <td><a class="btn btn-small" href="{% url 'update-payment' object.id %}">
+                        {% trans 'Редактировать' %}</a></td>
+                    <td><a class="btn btn-small" href="{% url 'pre-delete-payment' object.id %}">
+                        {% trans 'Удалить' %}</a></td>
+                    <td>{{object.num}}</td>
+                </tr>
+            </table>
+
+            <h3>{% trans 'Параметры' %}</h3>
+            <table border="0">
+                {% for field in form %}
+                <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endif %}
+{% endblock %}

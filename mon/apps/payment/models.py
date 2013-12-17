@@ -2,12 +2,12 @@
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BasePayment
-from apps.imgfile.models import File, Image
+from apps.imgfile.models import File, Image, BaseImage
 from apps.cmp.models import Contract
 from apps.mo.models import Subvention
 
 
-class Payment(BasePayment, ):
+class Payment(BasePayment, BaseImage):
 
     class Meta:
         app_label = "payment"
@@ -19,5 +19,5 @@ class Payment(BasePayment, ):
                                  verbose_name=_(u"Данные по заключенному контракту"), )
     subvention = models.ForeignKey(Subvention, help_text=_(u"Данные по расходуемой субвенции"),
                                    verbose_name=_(u"Данные по расходуемой субвенции"),)
-    pay_order = models.ForeignKey(File, help_text=_(u"Платежное поручение"),
+    pay_order = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Платежное поручение"),
                                   verbose_name=_(u"Платежное поручение"), )

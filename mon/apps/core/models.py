@@ -143,8 +143,9 @@ class BasePayment(models.Model):
     class Meta:
         abstract = True
 
-    date = models.DateField(auto_now=True, help_text=_(u"Дата совершения платежа"), verbose_name=_(u"Дата совершения платежа"),)
-    amount = models.CharField(max_length=2048, help_text=_(u"Сумма платежа"), verbose_name=_(u"Сумма платежа"),)
+    num = models.CharField(max_length=2048, help_text=_(u"Номер платежа"), verbose_name=_(u"Номер платежа"),)
+    date = models.DateField(auto_now=True, db_index=True, help_text=_(u"Дата совершения платежа"), verbose_name=_(u"Дата совершения платежа"),)
+    amount = models.FloatField(null=True, blank=True, help_text=_(u"Сумма платежа"), verbose_name=_(u"Сумма платежа"),)
 
 
 class BaseMaterials(models.Model):

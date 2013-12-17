@@ -1,0 +1,40 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h2>{{title}}</h2>
+    {% if user.is_staff %}
+        <a class="btn btn-small" href="{% url 'create-payment' %}">
+            {% trans 'Добавить платеж' %}</a><br><br>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+
+        {% if payment_list %}
+            <div class="auction-table">
+            <table class="table table-condensed table-striped table-hover">
+                <tr>
+                    <th> {% trans 'Наименование МО' %}</th>
+                    <th> {% trans 'Номер платежа' %}</th>
+                    <th> {% trans 'Дата платежа' %}</th>
+                    <th> {% trans 'Сумма платежа' %}</th>
+                </tr>
+                {% for obj in payment_list %}
+                    {% if obj.id %}
+                        <tr>
+                            <td>{{obj.departamentagreement.mo.name}}</td>
+                            <td><a href="{% url 'change-payment' obj.id %}">{{obj.num}}</a></td>
+                            <td>{{obj.date}}</td>
+                            <td>{{obj.amount}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}

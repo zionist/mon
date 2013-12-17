@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form or formsets %}
+
+            <form method="POST" action="{% url 'update-payment' object.id %}"> {% csrf_token %}
+                <br>
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                <br>
+                <button type="submit" name="pay"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
