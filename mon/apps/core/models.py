@@ -6,7 +6,7 @@ from apps.imgfile.models import File, Image
 
 FACE_LIST_CHOICES = ((0, _(u'Юридическое лицо')),  (1, _(u'Физическое лицо')),)
 STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
-READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
+READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж в комментариях)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
 FLOOR_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ламинат')),  (2, _(u'Паркет')),  (3, _(u'Линолеум')), (4, _(u'Плитка')))
 WALL_CHOICES = ((0, _(u'Не указано')), (1, _(u'Обои')),  (2, _(u'Водоэмульсионная краска')),  (3, _(u'Штукатурка')), (4, _(u'Плитка')), )
 CEILING_CHOICES = ((0, _(u'Не указано')), (1, _(u'Натяжной')),  (2, _(u'Штукатурка')))
@@ -105,6 +105,7 @@ class BaseBuilding(models.Model):
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
+
 class BaseContract(BaseName, ):
 
     class Meta:
@@ -123,22 +124,6 @@ class BaseResult(models.Model):
     check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
     doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
     recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
-
-
-class BaseImage(models.Model):
-
-    class Meta:
-        abstract = True
-
-    image = models.FileField(max_length=2048, null=True, blank=True, )
-
-
-class BaseFile(models.Model):
-
-    class Meta:
-        abstract = True
-
-    file = models.FileField(max_length=2048, null=True, blank=True, )
 
 
 class BaseDeveloper(BaseName, ):
@@ -187,8 +172,8 @@ class BaseWaterSupply(BaseEngineerNetworks):
     class Meta:
         abstract = True
 
-    water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
-    hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
+    water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), default=0, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
+    hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), default=0, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
 
 
 class BaseSocialObjects(models.Model):
@@ -294,13 +279,13 @@ class Room(BaseMaterials, BaseRoom):
 
 
 class Kitchen(BaseMaterials, BaseKitchen):
-    stove = models.IntegerField(help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"), default=0, choices=STOVE_CHOICES)
+    stove = models.IntegerField(default=0, blank=True, help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"), choices=STOVE_CHOICES)
     class Meta:
         verbose_name = u"Кухня"
 
 
 class WC(BaseMaterials, BaseWC, ):
-    separate = models.IntegerField(help_text=_(u"Санузел"), null=True, blank=True, verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES , )
+    separate = models.IntegerField(default=0, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES)
     class Meta:
         verbose_name = u"Санузел"
 
@@ -317,9 +302,6 @@ class Developer(BaseDeveloper, ):
         verbose_name = "Developer"
     def __unicode__(self):
         return '%s' % self.name
-
-    doc = models.ForeignKey(File, null=True, blank=True, )
-    image = models.ForeignKey(Image, null=True, blank=True, )
 
 
 class BaseCompareData(BaseCommonChars, ):
