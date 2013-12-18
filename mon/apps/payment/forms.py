@@ -13,3 +13,14 @@ from .models import Payment
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
+
+
+class PaymentShowForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+
+    def __init__(self, *args, **kwargs):
+        super(PaymentShowForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
+                self.fields[field].widget.attrs['disabled'] = 'disabled'
