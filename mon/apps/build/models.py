@@ -10,7 +10,7 @@ from apps.imgfile.models import File, BaseImage
 class ContractDocuments(BaseModel, BaseImage):
 
     class Meta:
-        app_label = "cmp"
+        app_label = "build"
         verbose_name = "Contract Documents"
     def __unicode__(self):
         return '%s' % self.id
@@ -61,7 +61,7 @@ class ContractDocuments(BaseModel, BaseImage):
 class Contract(BaseContract, BaseCompareData):
 
     class Meta:
-        app_label = "cmp"
+        app_label = "build"
         verbose_name = "Contract"
     def __unicode__(self):
         return '%s' % self.num

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
+import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -8,73 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'ContractDocuments'
-        db.create_table(u'cmp_contractdocuments', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, null=True, blank=True)),
-            ('protocols', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('mun_contracts', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('transmission_acts', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('facility_permission', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('land_right_stating', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('building_permissions', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('acceptance_acts', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('cost_infos', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('mo_certificate', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('mun_act_to_fond', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('tec_passport_tec_plan', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('photos', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('mo_notice_to_citizen', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('approval_citizen_statement', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('hiring_contract', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-        ))
-        db.send_create_signal('cmp', ['ContractDocuments'])
-
-        # Adding model 'Contract'
-        db.create_table(u'cmp_contract', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
-            ('num', self.gf('django.db.models.fields.CharField')(max_length=2048)),
-            ('has_trouble_docs', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('water_removal', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('electric_supply', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('gas_supply', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('water_settlement', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
-            ('hot_water_supply', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
-            ('public_transport', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('market', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('kindergarden', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('school', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('clinic', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('is_routes', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_playground', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_clother_drying', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_parking', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_dustbin_area', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_water_boiler', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_heat_boiler', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_intercom', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_loggia', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('is_balcony', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('internal_doors', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
-            ('entrance_door', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
-            ('window_constructions', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
-            ('floors', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('driveways', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('flats_amount', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('area', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('room', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Room'], null=True, blank=True)),
-            ('wc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.WC'], null=True, blank=True)),
-            ('hallway', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Hallway'], null=True, blank=True)),
-            ('kitchen', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Kitchen'], null=True, blank=True)),
-            ('developer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Developer'], null=True, blank=True)),
-            ('summa', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('sign_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-            ('mo', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['mo.MO'])),
-            ('docs', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.ContractDocuments'], null=True, blank=True)),
-        ))
-        db.send_create_signal('cmp', ['Contract'])
-
         # Adding model 'Person'
         db.create_table(u'cmp_person', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -120,7 +53,7 @@ class Migration(SchemaMigration):
             ('wc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.WC'], null=True, blank=True)),
             ('hallway', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Hallway'], null=True, blank=True)),
             ('kitchen', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Kitchen'], null=True, blank=True)),
-            ('cmp_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2013, 12, 19, 0, 0), blank=True)),
+            ('cmp_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2013, 12, 20, 0, 0), blank=True)),
         ))
         db.send_create_signal('cmp', ['CompareData'])
 
@@ -132,7 +65,7 @@ class Migration(SchemaMigration):
             ('doc_list', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
             ('readiness', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('recommend', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
-            ('contract', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.Contract'], null=True, blank=True)),
+            ('contract', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Contract'], null=True, blank=True)),
             ('building', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Building'], null=True, blank=True)),
             ('ground', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Ground'], null=True, blank=True)),
             ('cmp_data', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.CompareData'], null=True, blank=True)),
@@ -198,7 +131,7 @@ class Migration(SchemaMigration):
             ('wc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.AuctionWC'], null=True, blank=True)),
             ('hallway', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.AuctionHallway'], null=True, blank=True)),
             ('kitchen', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.AuctionKitchen'], null=True, blank=True)),
-            ('contract', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.Contract'], null=True, blank=True)),
+            ('contract', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Contract'], null=True, blank=True)),
             ('mo', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['mo.MO'])),
             ('docs', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.AuctionDocuments'], null=True, blank=True)),
         ))
@@ -206,12 +139,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Deleting model 'ContractDocuments'
-        db.delete_table(u'cmp_contractdocuments')
-
-        # Deleting model 'Contract'
-        db.delete_table(u'cmp_contract')
-
         # Deleting model 'Person'
         db.delete_table(u'cmp_person')
 
@@ -237,7 +164,7 @@ class Migration(SchemaMigration):
             'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'complete_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.Contract']", 'null': 'True', 'blank': 'True'}),
+            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
             'developer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Developer']", 'null': 'True', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -276,6 +203,69 @@ class Migration(SchemaMigration):
             'wc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.WC']", 'null': 'True', 'blank': 'True'}),
             'window_constructions': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         },
+        'build.contract': {
+            'Meta': {'object_name': 'Contract'},
+            'area': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'developer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Developer']", 'null': 'True', 'blank': 'True'}),
+            'docs': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.ContractDocuments']", 'null': 'True', 'blank': 'True'}),
+            'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Hallway']", 'null': 'True', 'blank': 'True'}),
+            'has_trouble_docs': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'hot_water_supply': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'internal_doors': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'is_balcony': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_clother_drying': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_dustbin_area': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_heat_boiler': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_intercom': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_loggia': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_parking': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_playground': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_routes': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'is_water_boiler': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'kindergarden': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'kitchen': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Kitchen']", 'null': 'True', 'blank': 'True'}),
+            'market': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'mo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mo.MO']"}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
+            'num': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
+            'public_transport': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'room': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Room']", 'null': 'True', 'blank': 'True'}),
+            'school': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'sign_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'summa': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'water_removal': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'water_settlement': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'wc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.WC']", 'null': 'True', 'blank': 'True'}),
+            'window_constructions': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
+        },
+        'build.contractdocuments': {
+            'Meta': {'object_name': 'ContractDocuments'},
+            'acceptance_acts': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'approval_citizen_statement': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'building_permissions': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'cost_infos': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
+            'facility_permission': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'hiring_contract': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'land_right_stating': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'mo_certificate': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'mo_notice_to_citizen': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'mun_act_to_fond': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'mun_contracts': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'photos': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'protocols': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'tec_passport_tec_plan': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'transmission_acts': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
+        },
         'build.ground': {
             'Meta': {'object_name': 'Ground'},
             'address': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
@@ -286,7 +276,7 @@ class Migration(SchemaMigration):
             'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'complete_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.Contract']", 'null': 'True', 'blank': 'True'}),
+            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
             'developer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Developer']", 'null': 'True', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -331,7 +321,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Auction'},
             'area': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.Contract']", 'null': 'True', 'blank': 'True'}),
+            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
             'docs': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.AuctionDocuments']", 'null': 'True', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -390,7 +380,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CompareData'},
             'area': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'cmp_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 19, 0, 0)', 'blank': 'True'}),
+            'cmp_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 20, 0, 0)', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
@@ -421,69 +411,6 @@ class Migration(SchemaMigration):
             'water_settlement': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'wc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.WC']", 'null': 'True', 'blank': 'True'}),
             'window_constructions': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
-        },
-        'cmp.contract': {
-            'Meta': {'object_name': 'Contract'},
-            'area': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'developer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Developer']", 'null': 'True', 'blank': 'True'}),
-            'docs': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.ContractDocuments']", 'null': 'True', 'blank': 'True'}),
-            'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Hallway']", 'null': 'True', 'blank': 'True'}),
-            'has_trouble_docs': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'hot_water_supply': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'internal_doors': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'is_balcony': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_clother_drying': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_dustbin_area': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_heat_boiler': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_intercom': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_loggia': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_parking': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_playground': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_routes': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'is_water_boiler': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'kindergarden': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'kitchen': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Kitchen']", 'null': 'True', 'blank': 'True'}),
-            'market': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'mo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mo.MO']"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
-            'num': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
-            'public_transport': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'room': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Room']", 'null': 'True', 'blank': 'True'}),
-            'school': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'sign_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'summa': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'water_removal': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'water_settlement': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
-            'wc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.WC']", 'null': 'True', 'blank': 'True'}),
-            'window_constructions': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
-        },
-        'cmp.contractdocuments': {
-            'Meta': {'object_name': 'ContractDocuments'},
-            'acceptance_acts': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'approval_citizen_statement': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'building_permissions': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'cost_infos': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'null': 'True', 'blank': 'True'}),
-            'facility_permission': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'hiring_contract': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'land_right_stating': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'mo_certificate': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'mo_notice_to_citizen': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'mun_act_to_fond': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'mun_contracts': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'photos': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'protocols': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'tec_passport_tec_plan': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'transmission_acts': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
         'cmp.person': {
             'Meta': {'object_name': 'Person'},
@@ -499,7 +426,7 @@ class Migration(SchemaMigration):
             'building': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Building']", 'null': 'True', 'blank': 'True'}),
             'check_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'cmp_data': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.CompareData']", 'null': 'True', 'blank': 'True'}),
-            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.Contract']", 'null': 'True', 'blank': 'True'}),
+            'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
             'doc_files': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['imgfile.File']", 'null': 'True', 'blank': 'True'}),
             'doc_list': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
             'establish_pers': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'establish_pers'", 'null': 'True', 'to': "orm['cmp.Person']"}),
