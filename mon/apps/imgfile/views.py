@@ -86,7 +86,7 @@ def get_questions_list(request):
         context['persons_list'].append(Person.objects.get(pk=p))
 
     # is tthere a building with payment perpective == 1
-    is_perspective = [p for p in Building.objects.all().values("payment_perspective" ,) if p.get("payment_perspective") == 1]
+    is_perspective = [p for p in Building.objects.all().values("payment_perspective" ,) if p.get("payment_perspective") != 2]
     context['perspective'] = 0
     if is_perspective:
         context['perspective'] = 1
