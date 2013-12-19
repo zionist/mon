@@ -73,7 +73,6 @@ def get_questions_list(request):
     context['mo'] = mo
     form = QuestionsListForm(mo, request.POST)
     if not form.is_valid():
-        context['form'] = form
         request.session['wrong_post'] = request.POST.copy()
         return HttpResponseRedirect(reverse('questions-list-form'))
 
@@ -85,7 +84,7 @@ def get_questions_list(request):
     for p in request.POST.getlist('persons_list'):
         context['persons_list'].append(Person.objects.get(pk=p))
 
-    # is tthere a building with payment perpective == 1
+    # is there a building with payment perpective
     is_perspective = [p for p in Building.objects.all().values("payment_perspective" ,) if p.get("payment_perspective") != 2]
     context['perspective'] = 0
     if is_perspective:
@@ -99,14 +98,6 @@ def get_questions_list(request):
         object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
         context['perspective_forms'].append({object_form: object_formsets})
 
-    # empty result
-    cmp_form = CompareDataForm()
-    room_f = RoomShowForm()
-    hallway_f = HallwayShowForm()
-    wc_f = WCShowForm()
-    kitchen_f = KitchenShowForm()
-    context['empty_formsets'] = [room_f, hallway_f, wc_f, kitchen_f]
-
     # auction always should be
     auction = Auction.objects.get(pk=request.POST['auction'])
     auction_form = AuctionForm(instance=auction)
@@ -116,16 +107,12 @@ def get_questions_list(request):
     if auction.contract:
         contract = auction.contract
         contract_form = ContractForm(instance=contract)
-
         # pass forms and formsts for contract building to template via dicts in array
         for building in Building.objects.filter(contract=contract):
             object_form = BuildingForm(instance=building)
             room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
             object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
-
-            # setattr(object_form, )
             context['building_forms'].append({object_form: object_formsets})
-
         context["contract"] = contract
         context["contract_form"] = contract_form
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
