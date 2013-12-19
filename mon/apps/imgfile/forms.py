@@ -10,6 +10,7 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 from apps.cmp.models import MO
 from apps.cmp.models import Person
 from apps.cmp.models import Auction, Contract
+from apps.core.models import YES_NO_CHOICES
 
 from .models import Image, File
 
@@ -39,7 +40,8 @@ class QuestionsListForm(forms.Form):
         self.fields['mo'] = forms.CharField(initial=mo.name,
             label=u"Муниципальное образование",
             widget=forms.TextInput(attrs={'readonly': True}))
-        choices = [(a.id, a.num) for a in Auction.objects.filter(mo=mo.pk)]
+        choices = [(a.get('id'), a.get('num'))
+                   for a in Auction.objects.filter(mo=mo.pk).values('id', 'num')]
         choices.insert(0, ("", u"----"))
         self.fields['auction'] = forms.ChoiceField(label=u"Аукцион", required=True,
                                                    choices=choices)
@@ -50,10 +52,7 @@ class QuestionsListForm(forms.Form):
             label=u"Список участников осмотра",
             choices=choices)
         choices = []
-        choices.insert(1, ("0", u"Нет"))
-        choices.insert(2, ("1", u"Да"))
-        choices.insert(0, ("", u"----"))
-        self.fields['objects_equal'] = forms.ChoiceField(choices=choices,
+        self.fields['objects_equal'] = forms.ChoiceField(choices=YES_NO_CHOICES,
                                                     label=u"Все объекты типовые")
-        self.fields['list_sent_to_mo'] = forms.ChoiceField(choices=choices,
+        self.fields['list_sent_to_mo'] = forms.ChoiceField(choices=YES_NO_CHOICES,
             label=u"Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")

@@ -24,7 +24,6 @@ from apps.imgfile.forms import QuestionsListForm, SelectMoForm
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 
 
 
@@ -59,6 +58,7 @@ def get_questions_list_form(request):
     else:
         return HttpResponseNotFound("Not found")
     context.update({'form': form})
+    print context
     return render_to_response(template, context,
                               context_instance=RequestContext(request))
 
@@ -81,27 +81,23 @@ def get_questions_list(request):
     context['list_sent_to_mo'] = request.POST.get('list_sent_to_mo')
     context['objects_equal'] = request.POST.get('objects_equal')
     context['persons_list'] = []
+    context['building_forms'] = []
     for p in request.POST.getlist('persons_list'):
         context['persons_list'].append(Person.objects.get(pk=p))
 
-    # count perspective for MO
-    buildings_for_perspective = Building.objects.filter(mo=1). \
-        exclude(contract_id__gt=0, )
-    perspective = 0
-    for building in buildings_for_perspective:
-        if building.flats_amount:
-            perspective += building.flats_amount
-    context['perspective'] = perspective
-    context['perspective_forms'] = []
+    # is tthere a building with payment perpective == 1
+    is_perspective = [p for p in Building.objects.all().values("payment_perspective" ,) if p.get("payment_perspective") == 1]
+    context['perspective'] = 0
+    if is_perspective:
+        context['perspective'] = 1
 
+    context['perspective_forms'] = []
     # pass forms and formsts for perspective buildings to template via dicts in array
-    for building in Building.objects.filter(Q(payment_perspective=0) |
-            Q(payment_perspective=1)):
+    for building in Building.objects.filter(mo=mo).exclude(payment_perspective=2):
         object_form = BuildingForm(instance=building)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
         object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
         context['perspective_forms'].append({object_form: object_formsets})
-    print context['perspective_forms']
 
     # empty result
     cmp_form = CompareDataForm()
@@ -109,35 +105,32 @@ def get_questions_list(request):
     hallway_f = HallwayShowForm()
     wc_f = WCShowForm()
     kitchen_f = KitchenShowForm()
-    context['building_form'] = BuildingForm()
     context['empty_formsets'] = [room_f, hallway_f, wc_f, kitchen_f]
 
     # auction always should be
-    if request.POST.get("auction") != u"0":
-        auction = Auction.objects.get(pk=request.POST['auction'])
-        auction_form = AuctionForm(instance=auction)
-        context["auction"] = auction
-        context["auction_form"] = auction_form
-        cmp_form = CompareDataForm(auction_form.initial)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction)
+    auction = Auction.objects.get(pk=request.POST['auction'])
+    auction_form = AuctionForm(instance=auction)
+    context["auction"] = auction
+    context["auction_form"] = auction_form
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction)
     if auction.contract:
         contract = auction.contract
         contract_form = ContractForm(instance=contract)
-        context['building_forms'] = []
 
         # pass forms and formsts for contract building to template via dicts in array
         for building in Building.objects.filter(contract=contract):
             object_form = BuildingForm(instance=building)
             room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
             object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
+
+            # setattr(object_form, )
             context['building_forms'].append({object_form: object_formsets})
 
         context["contract"] = contract
         context["contract_form"] = contract_form
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
 
-    context.update({'cmp_form': cmp_form,
-                    'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+    context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [
                         Room._meta.verbose_name,
                         Hallway._meta.verbose_name,

@@ -69,7 +69,8 @@ def count_flats(obj_set, vals, **kwargs):
     objs = obj_set.filter(**kwargs).values(val)
     for obj in objs:
         for val in vals:
-            amount += int(obj.get(val))
+            if obj.get(val):
+                amount += int(obj.get(val))
     return amount
 
 @login_required
