@@ -15,9 +15,11 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
+from django.conf import settings
+from django.utils.encoding import smart_str
 
 from .models import Payment
-from .forms import PaymentForm
+from .forms import PaymentForm, PaymentShowForm
 
 
 def add_payment(request):
@@ -101,3 +103,10 @@ def delete_payment(request, pk):
     else:
         context.update({'error': _(u'Возникла ошибка при удалении платежа!')})
     return render_to_response("payment_deleting.html", context, context_instance=RequestContext(request))
+
+
+def download_payment(request, name):
+    response = HttpResponse(mimetype='application/force-download')
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(name)
+    response['X-Sendfile'] = smart_str(settings.MEDIA_ROOT + name)
+    return response
