@@ -14,6 +14,27 @@ from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionH
 from apps.core.models import FLOOR_CHOICES, WALL_CHOICES, CEILING_CHOICES, STOVE_CHOICES, SEPARATE_CHOICES
 
 
+def cmp_single(obj, cmp_obj):
+    for field in obj.fields:
+        if getattr(obj.instance, field) != getattr(cmp_obj, field):
+            obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+def cmp_multi(obj, cmp_obj):
+    for field in obj.fields:
+        if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
+
+            if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
+                if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+                    obj.fields[field].label = _("ERROR ") + obj.fields[field].label
+
+            elif hasattr(obj.instance, field) and hasattr(cmp_obj, field)\
+                 and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(obj.instance, field), CommaSeparatedIntegerField):
+                if getattr(obj.instance, field) != getattr(cmp_obj, field):
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
 class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
     def value_from_datadict(self, data, files, name):
         return ','.join(data.getlist(name))
@@ -202,27 +223,6 @@ class BaseAuctionRoomShowForm(forms.ModelForm):
 
     class Meta:
         abstract = True
-
-
-def cmp_single(obj, cmp_obj):
-    for field in obj.fields:
-        if getattr(obj.instance, field) != getattr(cmp_obj, field):
-            obj.fields[field].widget.attrs['style'] = 'background-color: red;'
-
-
-def cmp_multi(obj, cmp_obj):
-    for field in obj.fields:
-        if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
-
-            if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
-                if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
-                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
-                    obj.fields[field].label = _("ERROR ") + obj.fields[field].label
-
-            elif hasattr(obj.instance, field) and hasattr(cmp_obj, field) \
-            and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(obj.instance, field), CommaSeparatedIntegerField):
-                if getattr(obj.instance, field) != getattr(cmp_obj, field):
-                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 class AuctionRoomShowForm(BaseAuctionRoomShowForm):
