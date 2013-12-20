@@ -91,12 +91,20 @@ def get_questions_list(request):
         context['perspective'] = 1
 
     context['perspective_forms'] = []
+    context['contract_cmp_data'] = []
+    context['perspective_cmp_data'] = []
     # pass forms and formsts for perspective buildings to template via dicts in array
-    for building in Building.objects.filter(mo=mo).exclude(payment_perspective=2):
+    for building in Building.objects.filter(mo=mo, payment_perspective=1):
         object_form = BuildingForm(instance=building)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
         object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
         context['perspective_forms'].append({object_form: object_formsets})
+        # get only last cmp form for displaying
+        if building.result_set:
+            if building.result_set.order_by('cmp_data__cmp_date'):
+                last_cmp = building.result_set.order_by('cmp_data__cmp_date')[0]
+                last_cmp_form = ResultForm(instance=last_cmp)
+                context['perspective_cmp_data'].append({building.pk: last_cmp_form})
 
     # auction always should be
     auction = Auction.objects.get(pk=request.POST['auction'])
@@ -113,6 +121,12 @@ def get_questions_list(request):
             room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
             object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
             context['building_forms'].append({object_form: object_formsets})
+            # get only last cmp form for displaying
+            if building.result_set:
+                if building.result_set.order_by('cmp_data__cmp_date'):
+                    last_cmp = building.result_set.order_by('cmp_data__cmp_date')[0]
+                    last_cmp_form = ResultForm(instance=last_cmp)
+                    context['contract_cmp_data'].append({building.pk: last_cmp_form})
         context["contract"] = contract
         context["contract_form"] = contract_form
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
