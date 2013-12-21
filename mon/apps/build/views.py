@@ -4,8 +4,10 @@ import webodt
 import mimetypes
 from webodt.converters import converter
 from datetime import datetime
+from copy import deepcopy
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, \
+    HttpResponseBadRequest
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_list_or_404, \
@@ -21,6 +23,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.servers.basehttp import FileWrapper
 from django.template import Context
+from django.core.exceptions import ObjectDoesNotExist
 from django import forms
 
 from apps.build.models import Building
@@ -202,6 +205,41 @@ def update_building(request, pk, extra=None):
                             Kitchen._meta.verbose_name,
                             ]})
         return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
+
+
+@login_required()
+def copy_building(request, pk):
+
+    def copy_object(obj):
+        new_obj = deepcopy(obj)
+        new_obj.id = None
+        new_obj.pk = None
+        return new_obj
+
+    if request.method != "GET":
+        return HttpResponseNotFound()
+    try:
+        building = Building.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound('Not found')
+
+    new_building = copy_object(building)
+    if new_building.flat_num:
+        new_building.flat_num += 1
+    new_building.room = copy_object(building.room)
+    new_building.room.save()
+    new_building.room_id = new_building.room.id
+    new_building.hallway = copy_object(building.hallway)
+    new_building.hallway.save()
+    new_building.hallway_id = new_building.hallway.id
+    new_building.wc = copy_object(building.wc)
+    new_building.wc.save()
+    new_building.wc_id = new_building.wc.id
+    new_building.kitchen = copy_object(building.kitchen)
+    new_building.kitchen.save()
+    new_building.kitchen_id = new_building.kitchen.id
+    new_building.save()
+    return redirect('update-building', pk=new_building.pk)
 
 
 def pre_delete_building(request, pk):

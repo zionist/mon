@@ -108,3 +108,4 @@ class Building(BaseBuilding, BaseCompareData, BaseImage):
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
     offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
     permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
+    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")

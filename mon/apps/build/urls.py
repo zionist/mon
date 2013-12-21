@@ -9,6 +9,7 @@ urlpatterns = patterns(
     url(r'^building/add/$', views.add_building, name='create-building'),
     url(r'^building/building/(?P<pk>[0-9]+)/$', views.get_building, name='change-building'),
     url(r'^building/update/(?P<pk>[0-9]+)/$', views.update_building, name='update-building'),
+    url(r'^building/copy/(?P<pk>[0-9]+)/$', views.copy_building, name='copy-building'),
     url(r'^building/approve/(?P<pk>[0-9]+)/$', views.approve_building, name='approve-building'),
     url(r'^building/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_building, name='pre-delete-building'),
     url(r'^building/delete/(?P<pk>[0-9]+)/$', views.delete_building, name='delete-building'),
