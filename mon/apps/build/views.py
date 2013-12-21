@@ -276,7 +276,6 @@ def update_building(request, pk, state=None, extra=None):
         return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
 
 
-<<<<<<< HEAD
 @login_required()
 def copy_building(request, pk):
 
@@ -309,7 +308,8 @@ def copy_building(request, pk):
     new_building.kitchen.save()
     new_building.kitchen_id = new_building.kitchen.id
     new_building.save()
-    return redirect('update-building', pk=new_building.pk)
+    return redirect('update-building', pk=new_building.pk,
+                    state=new_building.state)
 
 
 def pre_delete_building(request, pk, state=None):
