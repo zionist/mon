@@ -3,7 +3,7 @@
 <table class="table table-hover table-striped table-condensed">
     <tbody>
     {% for field in form %}
-    <tr> <td> {{ field.label }} </td><td class="border-left width_20_perc"> {{ form|get_choice_or_value:field.name|default_if_none:"Не указано"  }} </td> </tr>
+    <tr> <td> {{ field.label }} </td><td class="border-left width_20_perc"> {{ form|get_choice_or_value:field.name|yes_no_rus|default_if_none:"Не указано"  }} </td> </tr>
     {% endfor %}
     <tr>
     </tr>

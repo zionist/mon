@@ -125,7 +125,7 @@ def get_mo_auctions(request, pk=None):
 
 
 def get_auction(request, pk, extra=None):
-    context = {'title': _(u'Параметры объекта')}
+    context = {'title': _(u'Параметры аукциона')}
     auction = Auction.objects.get(pk=pk)
     if request.method == "POST":
         form = AuctionShowForm(request.POST, instance=auction)
@@ -139,7 +139,7 @@ def get_auction(request, pk, extra=None):
 
 
 def update_auction(request, pk, extra=None):
-    context = {'title': _(u'Параметры заказа')}
+    context = {'title': _(u'Параметры аукциона')}
     auction = Auction.objects.get(pk=pk)
     prefix = 'auction'
     if request.method == "POST":
