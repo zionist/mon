@@ -10,7 +10,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'update-building' object.id %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'update-building' object.id object.state %}"> {% csrf_token %}
                 {% for form in formsets %}
                 <br />
                 <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>

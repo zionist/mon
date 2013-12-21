@@ -9,22 +9,22 @@
     {% if not user.is_staff and not user.is_superuser %}
         {% if object and not object.approve_status %}
             <div class="row">
-            <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
+            <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id object.state %}">
                 {% trans 'редактировать' %}</a></div>
-            <div class="span3"><a class="btn btn-warning" href="{% url 'approve-building' object.id %}">
+            <div class="span3"><a class="btn btn-warning" href="{% url 'approve-building' object.id object.state %}">
                 {% trans 'Отправить на проверку' %}</a></div>
-            <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
+            <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id object.state %}">
                 {% trans 'Удалить' %}</a></div>
             </div><br />
         {% endif %}
     {% else %}
         {% if object %}
             <div class="row">
-                <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id %}">
-                    {% trans 'редактировать' %}</a></div>
+                <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id object.state %}">
+                    {% trans 'Редактировать' %}</a></div>
                 <div class="span3"><a class="btn" href="{% url 'questions-list' %}?building={{ object.id }}">
                     {% trans 'Скачать бланк опроса' %}</a></div>
-                <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id %}">
+                <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id object.state %}">
                     {% trans 'Удалить' %}</a></div>
             </div><br />
         {% endif %}

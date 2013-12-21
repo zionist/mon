@@ -26,7 +26,7 @@
                 {% for obj in payment_list %}
                     {% if obj.id %}
                         <tr>
-                            <td>{{obj.departamentagreement.mo.name}}</td>
+                            <td>{{obj.contract.mo}}</td>
                             <td><a href="{% url 'change-payment' obj.id %}">{{obj.num}}</a></td>
                             <td>{{obj.date}}</td>
                             <td>{{obj.amount}}</td>

@@ -63,26 +63,30 @@ def add_building(request, dev_pk=None, state=None):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if select and int(select) == 2:
             form = GroundForm(request.POST, prefix=prefix)
+            state_int = int(select)
         elif select and int(select) in [0, 1]:
             form = BuildingForm(request.POST, prefix=prefix)
+            state_int = int(select)
         if not dev:
             dev_form = DeveloperForm(request.POST, prefix=dev_prefix)
             context.update({'dev_form': dev_form})
             if dev_form.is_valid():
-                developer = dev_form.save()
+                dev = dev_form.save()
             else:
                 form, text_area_form = split_form(form)
                 context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
                 return render_to_response(template, context, context_instance=RequestContext(request))
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
-            building = form.save()
-            building.state = select
-            building.developer = developer
+            building = form.save(commit=False)
+            building.state = state_int
+            building.developer = dev
+            building.save()
+            print building.state, building.developer, building.room
             building.room = room_f.save()
             building.hallway = hallway_f.save()
             building.wc = wc_f.save()
             building.kitchen = kitchen_f.save()
-            building.save(update_fields=['state', 'developer', 'room', 'hallway', 'wc', 'kitchen'])
+            building.save(update_fields=['room', 'kitchen', 'wc', 'hallway'])
             return redirect('buildings')
         else:
             form, text_area_form = split_form(form)
@@ -156,7 +160,7 @@ def get_buildings(request, pk=None, strv=None, numv=None):
     template = 'builds.html'
     context = {'title': _(u'Объекты рынка жилья')}
     if Building.objects.all().exists() or Ground.objects.all().exists():
-        objects = []
+        objects, build_objects, ground_objects = [], [], []
         if Building.objects.all().exists():
             build_objects = Building.objects.all().order_by('state')
             get = Building.objects.get
