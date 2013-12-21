@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
     RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, RegionalBudgetShowForm
-from apps.build.models import Building
+from apps.build.models import Building, Ground
 from apps.cmp.models import Auction
 
 
@@ -182,7 +182,7 @@ def get_filter(request, num, extra=None):
         context.update({'building_list': objects})
     elif num == 3:
         # Фильтр земельных участков по всем муниципальным образованиям (3.3)
-        objects = Building.objects.filter(state=2)
+        objects = Ground.objects.filter(state=2)
         template = '../../build/templates/builds.html'
         context.update({'building_list': objects})
     elif num == 4:

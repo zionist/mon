@@ -104,7 +104,7 @@ class BaseBuilding(models.Model):
         abstract = True
 
     approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки документа"), help_text=_(u"Статус проверки документа"))
-    state = models.IntegerField(help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
+    state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
     address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=True, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
@@ -143,7 +143,7 @@ class BaseDeveloper(BaseName, ):
     face_list = models.IntegerField(help_text=_(u"Юридическое/Физическое лицо"), null=True, blank=True,
                                     verbose_name=_(u"Юридическое/Физическое лицо"), choices=FACE_LIST_CHOICES,)
     address = models.CharField(help_text=_(u"Фактический адрес"), null=True, max_length=2048, verbose_name=_(u"Фактический адрес"), blank=True, )
-    boss_position = models.CharField(help_text=_(u"Ф.И.О. и должность руководителя"), null=True, max_length=2048, verbose_name=_(u"Ф.И.О. и должность руководителя"), blank=True, )
+    boss_position = models.CharField(help_text=_(u"Ф.И.О. и должность руководителя"), max_length=2048, verbose_name=_(u"Ф.И.О. и должность руководителя"), )
 
 
 class BasePayment(models.Model):
@@ -310,7 +310,8 @@ class Developer(BaseDeveloper, ):
         app_label = "core"
         verbose_name = "Developer"
     def __unicode__(self):
-        return '%s' % self.name
+        name = self.name if self.name else self.address
+        return '%s' % name
 
 
 class BaseCompareData(BaseCommonChars, ):

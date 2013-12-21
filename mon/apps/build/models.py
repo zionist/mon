@@ -77,14 +77,16 @@ class Ground(BaseBuilding, BaseCompareData, BaseImage):
 
     class Meta:
         app_label = "build"
-        verbose_name = _(u"Земальный участок")
+        verbose_name = _(u"Земельный участок")
 
     def __unicode__(self):
-        return self.cad_num
+        name = self.cad_num if self.cad_num else self.address
+        return "%s" % name
 
-    cad_num = models.CharField(help_text=_(u"Rадастровый номер участка"), null=True, max_length=2048, verbose_name=_(u"Адрес или кадастровый номер участка"), blank=True, )
+    cad_num = models.CharField(help_text=_(u"Кадастровый номер участка"), null=True, max_length=2048, verbose_name=_(u"Кадастровый номер участка"), blank=True, )
     start_date = models.DateField(help_text=_(u"Предполагаемый срок начала строительства"), null=True, verbose_name=_(u"Предполагаемый срок начала строительства"), blank=True, )
     finish_date = models.DateField(help_text=_(u"Предполагаемый срок окончания строительства"), null=True, verbose_name=_(u"Предполагаемый срок окончания строительства"), blank=True, )
+
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )

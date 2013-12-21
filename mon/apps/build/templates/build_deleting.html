@@ -23,7 +23,7 @@
     {% else %}
         <h3>{% trans ' Вы действительно хотите удалить объект по адресу ' %} {{ object.address }}? </h3>
 
-        <form method="POST" action="{% url 'delete-building' object.id %}"> {% csrf_token %}
+        <form method="POST" action="{% url 'delete-building' object.id object.state %}"> {% csrf_token %}
             <br>
             <button type="submit" name="delete"> {% trans ' Удалить ' %} </button>
             &nbsp;<button type="cancel" name="cancel"> {% trans ' Отменить ' %} </button>
