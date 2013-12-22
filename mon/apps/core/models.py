@@ -33,6 +33,25 @@ YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
 
 
 
+class Choices(models.Model):
+    name = models.CharField(help_text="Имя списка выбора",
+                            verbose_name="Имя списка выбора", max_length=2048)
+    class Meta:
+        verbose_name = "Список выбора"
+    def __unicode__(self):
+        return '%s' % self.id
+
+
+class Choice(models.Model):
+
+    class Meta:
+        verbose_name = "Выбор"
+    choices = models.ForeignKey(Choices, help_text="Имя списка выбора", verbose_name="Имя списка выбора")
+    num = models.IntegerField(help_text="Порядковый номер", verbose_name="Порядковый номер", blank=True, null=True)
+    value = models.CharField(help_text="Значение", verbose_name="Значение", max_length=4096, blank=True, null=True)
+
+
+
 class BaseName(models.Model):
 
     class Meta:

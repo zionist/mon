@@ -10,7 +10,8 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 from django.forms import MultipleChoiceField
 from django.forms.widgets import CheckboxSelectMultiple
 
-from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, AuctionKitchen, Developer
+from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, \
+    AuctionKitchen, Developer, Choices
 from apps.core.models import FLOOR_CHOICES, WALL_CHOICES, CEILING_CHOICES, STOVE_CHOICES, SEPARATE_CHOICES
 
 
@@ -289,3 +290,9 @@ class AuctionKitchenShowForm(BaseAuctionRoomShowForm):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
             cmp_multi(self, cmp_initial)
+
+
+class ChoicesForm(forms.ModelForm):
+
+    class Meta:
+        model = Choices

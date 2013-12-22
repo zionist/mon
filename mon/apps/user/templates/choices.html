@@ -1,0 +1,20 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h4>{{title}}</h4>
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+        {% if choices_list %}
+            <table class="table table-condensed table-striped table-hover">
+                <tr><th> {% trans 'Имя' %}</th> </tr>
+                <tr><td><a href="{% url 'update-choices' obj.id %}">{{object.name}}</a></td></tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endif %}
+{% endblock %}

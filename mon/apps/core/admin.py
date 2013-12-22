@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django import forms
-from .models import Developer, Room, Kitchen, WC, Hallway, AuctionRoom, AuctionKitchen, AuctionWC, AuctionHallway
+from .models import Developer, Room, Kitchen, WC, Hallway, \
+    AuctionRoom, AuctionKitchen, AuctionWC, AuctionHallway, Choices, \
+    Choice
 
 
 class DeveloperAdmin(admin.ModelAdmin):
@@ -55,3 +57,14 @@ class AuctionHallwayAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(AuctionHallway, AuctionHallwayAdmin)
+
+
+class ChoiceAdmin(admin.TabularInline):
+    model = Choice
+
+
+class ChoicesAdmin(admin.ModelAdmin):
+    inlines = [ChoiceAdmin, ]
+
+admin.site.register(Choices, ChoicesAdmin)
+

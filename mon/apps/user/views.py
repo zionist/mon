@@ -5,9 +5,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.decorators import permission_required, \
     login_required, user_passes_test
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
+from django.forms.models import inlineformset_factory
 
 from .forms import UserCustomCreationForm, UserCustomChangeForm
 from apps.user.models import CustomUser
+from apps.core.models import Choices, Choice
+from apps.core.forms import ChoicesForm
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -84,3 +87,23 @@ def delete_user(request, pk):
         context.update({'error': _(u'Возникла ошибка при удалении пользователя!')})
     return render_to_response("user_deleting.html", context,
                               context_instance=RequestContext(request))
+
+
+def update_choices(request, pk):
+    template = 'choices_updating.html'
+    context = {'title': _(u'Добавление списка выбора')}
+    choices = Choices.objects.get(pk=pk)
+    form = ChoicesForm(instance=choices)
+    formset = inlineformset_factory(Choices, Choice, extra=3)
+    if request.method == "POST":
+        formset = formset(request.POST, instance=choices)
+        form = ChoicesForm(request.POST, instance=choices)
+        if formset.is_valid() and form.is_valid():
+            form.save()
+            formset.save()
+    else:
+        formset = formset(instance=choices)
+    context.update({'formset': formset, 'form': form, 'object': choices})
+    return render_to_response(template, context,
+                              context_instance=RequestContext(request))
+

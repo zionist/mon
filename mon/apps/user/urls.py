@@ -10,4 +10,6 @@ urlpatterns = patterns(
     url(r'^user/update/(?P<pk>[0-9]+)/$', views.update_user, name='update-user'),
     url(r'^user/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_user, name='pre-delete-user'),
     url(r'^user/delete/(?P<pk>[0-9]+)/$', views.delete_user, name='delete-user'),
+
+    url(r'^choices/update/(?P<pk>[0-9]+)/$', views.update_choices, name='update-choices'),
     )
