@@ -94,7 +94,7 @@
                             {% if user.is_superuser %}
                             <li><a href="{% url 'create-user' %}">{% trans 'Создать пользователя' %}</a></li>
                             <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
-                            <li><a href="{% url 'choices' %}">{% trans 'Материалы' %}</a></li>
+                            <li><a href="{% url 'choices' %}">{% trans 'Список материалов' %}</a></li>
                             {% endif %}
                             <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
                         </ul>

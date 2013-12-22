@@ -27,12 +27,17 @@ input {
 }
 
 .table th {
-    color: steelblue;
+    /* color: steelblue; */
     border-top-style: None;
+    font-weight: normal;
 }
 
 .blue {
     color: steelblue;
+}
+
+.black {
+    color: black;
 }
 
 .left {
@@ -101,3 +106,4 @@ td ul.errorlist li {
 .errors input, .errors select, .errors textarea {
     border: 1px solid red;
 }
+

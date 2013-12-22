@@ -3,7 +3,7 @@
 
 
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h4>{{ title }}</h4>
     {% if errorlist or error %}
         {% if errorlist %}
             <div class="error">
@@ -21,12 +21,12 @@
             <br>
         {% endif %}
     {% else %}
-        <h3>{% trans ' Вы действительно хотите удалить заказ под номером ' %} {{ object.num }}? </h3>
+        {% trans ' Вы действительно хотите удалить аукцион под номером ' %} {{ object.num }}?
 
         <form method="POST" action="{% url 'delete-auction' object.id %}"> {% csrf_token %}
             <br>
-            <button type="submit" name="delete"> {% trans ' Удалить ' %} </button>
-            &nbsp;<button type="cancel" name="cancel"> {% trans ' Отменить ' %} </button>
+            <button class="btn-danger" type="submit" name="delete"> {% trans ' Удалить ' %} </button>
+            &nbsp;<button class="btn-info" type="cancel" name="cancel"> {% trans ' Отменить ' %} </button>
         </form>
             <br>
     {% endif %}

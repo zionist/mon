@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h4>{{ title }}</h4>
     {% if errorlist %}
         <div class="error">
             {{ errorlist }}
@@ -19,7 +19,7 @@
                 </table>
                 {% endif %}
                 <br>
-                <button type="submit" name="pay"> {% trans ' Сохранить ' %} </button>
+                <button class="btn-info" type="submit" name="pay"> {% trans ' Сохранить ' %} </button>
             </form>
         {% endif %}
     {% endif %}
