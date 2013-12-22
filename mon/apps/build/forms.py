@@ -48,7 +48,7 @@ class BuildingForm(GroundForm):
 
 class BuildingSelectForm(forms.Form):
     state = forms.ChoiceField(label=_(u'Тип объекта'), required=True, choices=STATE_CHOICES, help_text=_(u"Тип объекта"), )
-    developer = forms.ModelChoiceField(label=_(u'Выберите застройщика (будет предложено добавить нового при пустом значении)'),
+    developer = forms.ModelChoiceField(label=_(u'Выберите застройщика'),
         required=False, queryset=Developer.objects.all(),
         help_text=_(u"Выберите застройщика (будет предложено добавить нового при пустом значении)"), )
 

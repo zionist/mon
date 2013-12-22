@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h4>{{ title }}</h4>
     {% if errorlist %}
         <div class="error">
             {{ errorlist }}
@@ -12,19 +12,19 @@
             <form method="POST" action="{% url 'create-contract' %}"> {% csrf_token %}
                 {% for form in formsets %}
                 <br />
-                <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>
+                <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
                 {% include "4_col_form.html" %}
                 {% endfor %}
                 {% if form %}
                 <br />
-                <h4>{% trans ' Общие параметры' %}</h4>
+                <p class="blue">{% trans ' Общие параметры' %}</p>
                 {% include "4_col_form.html" %}
                 {% with form=text_area_fields %}
                 {% include "2_col_form.html" %}
                 {% endwith %}
                 {% endif %}
                 {% if images %}
-                <h4>{% trans ' Документация' %}</h4>
+                <p class="blue">{% trans ' Документация' %}</p>
                 {% with form=images %}
                     {% include "4_col_form.html" %}
                 {% endwith %}
