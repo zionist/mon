@@ -244,11 +244,24 @@ def get_filter(request, num, extra=None):
         context.update({'mo_list': objects})
     elif num == 18:
         # 18 Фильтр муниципальных образований, у которых отсутствуют документы по заключенным контрактам
-        objects = MO.objects.filter(contract__summa__gt=0)
+        objects = MO.objects.filter(contract__docs__count=0)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
+    elif num == 19:
+        # 19 МО, которые освоили выделенную субвенцию в полном объеме
+        objects = MO.objects.filter(has_trouble=True)
+        template = '../../payment/templates/payments.html'
+        context.update({'payment_list': objects})
+    elif num == 20:
+        # 20 МО, которые предоставили жилые помещения детям-сиротам
+        objects = MO.objects.filter(home_orphans__gt=0)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
+    elif num == 21:
+        # 21 МО, которые имеют перспективы освоения дополнительных денежных средств на текущий год.
+        objects = MO.objects.filter(has_trouble=True)
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
     if not objects:
         context.update({'errorlist': _(u'Объекты, соответствующие запросу, не найдены')})
     return render_to_response(template, context, context_instance=RequestContext(request))
-
-
