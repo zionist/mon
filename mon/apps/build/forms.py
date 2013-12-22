@@ -8,18 +8,23 @@ from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 
 from .models import Building, Ground
-from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES, \
-    STATE_CHOICES, WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
+from apps.core.models import STATE_CHOICES, \
+    WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
 from apps.core.forms import cmp_single
+from apps.core.models import Choices
 
 
 class GroundForm(forms.ModelForm):
-    internal_doors = forms.ChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
-        widget=forms.Select, choices=INTERNAL_DOORS_CHOICES)
-    entrance_door = forms.ChoiceField(label=_(u"Материал входной двери"), required=False,
-        widget=forms.Select, choices=ENTRANCE_DOOR_CHOICES)
-    window_constructions = forms.ChoiceField(label=_(u"Материал оконных конструкций"), required=False,
-        widget=forms.Select, choices=WINDOW_CONSTRUCTIONS_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super(GroundForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
+
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
@@ -39,8 +44,6 @@ class BuildingForm(GroundForm):
         model = Building
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
 
-    def __init__(self, *args, **kwargs):
-        super(BuildingForm, self).__init__(*args, **kwargs)
 
 
 class BuildingSelectForm(forms.Form):

@@ -84,7 +84,7 @@ def add_building(request, dev_pk=None, state=None):
             building.state = state_int
             building.developer = dev
             building.save()
-            print building.state, building.developer, building.room
+            # print building.state, building.developer, building.room
             building.room = room_f.save()
             building.hallway = hallway_f.save()
             building.wc = wc_f.save()

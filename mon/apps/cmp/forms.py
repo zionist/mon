@@ -10,9 +10,9 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 
 from .models import CompareData, Result, Auction, Person, AuctionDocuments
 from apps.build.models import Contract, ContractDocuments
-from apps.core.models import INTERNAL_DOORS_CHOICES, ENTRANCE_DOOR_CHOICES, WINDOW_CONSTRUCTIONS_CHOICES, \
-    WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES
+from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple, cmp_single, cmp_multi
+from apps.core.models import Choices
 
 
 class CompareDataForm(forms.ModelForm):
@@ -51,12 +51,18 @@ class ContractDocumentsForm(forms.ModelForm):
 
 
 class AuctionForm(forms.ModelForm):
-    internal_doors = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
-                                            widget=CSICheckboxSelectMultiple, choices=INTERNAL_DOORS_CHOICES)
-    entrance_door = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
-                                           widget=CSICheckboxSelectMultiple, choices=ENTRANCE_DOOR_CHOICES)
-    window_constructions = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
-                                                  widget=CSICheckboxSelectMultiple, choices=WINDOW_CONSTRUCTIONS_CHOICES)
+    def __init__(self, *args, **kwargs):
+        super(AuctionForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+                                        widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
+                                               widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+                                                  widget=CSICheckboxSelectMultiple, choices=choices)
+
     water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
                                               widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,
@@ -76,12 +82,17 @@ class PersonForm(forms.ModelForm):
 
 
 class AuctionShowForm(forms.ModelForm):
-    internal_doors = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
-                                            widget=CSICheckboxSelectMultiple, choices=INTERNAL_DOORS_CHOICES)
-    entrance_door = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
-                                           widget=CSICheckboxSelectMultiple, choices=ENTRANCE_DOOR_CHOICES)
-    window_constructions = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
-                                                  widget=CSICheckboxSelectMultiple, choices=WINDOW_CONSTRUCTIONS_CHOICES)
+    def __init__(self, *args, **kwargs):
+        super(AuctionShowForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+                                                               widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
+                                                              widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+                                                                     widget=CSICheckboxSelectMultiple, choices=choices)
     water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
                                               widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,

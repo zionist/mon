@@ -7,12 +7,6 @@ from apps.imgfile.models import File, Image
 FACE_LIST_CHOICES = ((0, _(u'Юридическое лицо')),  (1, _(u'Физическое лицо')),)
 STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
 READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж в комментариях)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
-FLOOR_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ламинат')),  (2, _(u'Паркет')),  (3, _(u'Линолеум')), (4, _(u'Плитка')))
-WALL_CHOICES = ((0, _(u'Не указано')), (1, _(u'Обои')),  (2, _(u'Водоэмульсионная краска')),  (3, _(u'Штукатурка')), (4, _(u'Плитка')), )
-CEILING_CHOICES = ((0, _(u'Не указано')), (1, _(u'Натяжной')),  (2, _(u'Штукатурка')))
-INTERNAL_DOORS_CHOICES = ((0, _(u'Не указано')), (1, _(u'Деревянные')),  (2, _(u'Пластиковые')))
-ENTRANCE_DOOR_CHOICES = ((0, _(u'Не указано')), (1, _(u'Деревянные')),  (2, _(u'Пластиковые')))
-WINDOW_CONSTRUCTIONS_CHOICES = ((0, _(u'Не указано')), (1, _(u'Деревянные')),  (2, _(u'Пластиковые стеклопакеты')))
 WATER_SETTLEMENT_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 HOT_WATER_SUPPLY_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 WATER_REMOVAL_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
@@ -34,21 +28,24 @@ YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
 
 
 class Choices(models.Model):
-    name = models.CharField(help_text="Имя списка выбора",
-                            verbose_name="Имя списка выбора", max_length=2048)
+    name = models.CharField(help_text=u"Внутреннее имя списка выбора", blank=True,
+                            verbose_name=u"Внутреннее имя списка выбора", max_length=2048)
+    verbose_name = models.CharField(help_text=u"Имя списка выбора", null=True, blank=True,
+                            verbose_name=u"Имя списка выбора", max_length=2048)
     class Meta:
-        verbose_name = "Список выбора"
+        verbose_name = u"Список выбора"
+
     def __unicode__(self):
-        return '%s' % self.id
+        return '%s' % self.verbose_name
 
 
 class Choice(models.Model):
 
     class Meta:
-        verbose_name = "Выбор"
-    choices = models.ForeignKey(Choices, help_text="Имя списка выбора", verbose_name="Имя списка выбора")
-    num = models.IntegerField(help_text="Порядковый номер", verbose_name="Порядковый номер", blank=True, null=True)
-    value = models.CharField(help_text="Значение", verbose_name="Значение", max_length=4096, blank=True, null=True)
+        verbose_name = u"Выбор"
+    choices = models.ForeignKey(Choices, help_text=u"Имя списка выбора", verbose_name="Имя списка выбора")
+    num = models.IntegerField(help_text=u"Порядковый номер", verbose_name=u"Порядковый номер", blank=True, null=True)
+    value = models.CharField(help_text=u"Значение", verbose_name=u"Значение", max_length=4096, blank=True, null=True)
 
 
 
@@ -180,9 +177,9 @@ class BaseMaterials(models.Model):
     class Meta:
         abstract = True
 
-    floor = models.IntegerField(help_text=_(u"Материал отделки пола"), default=0, blank=True, verbose_name=_(u"Материал отделки пола"), choices=FLOOR_CHOICES , )
-    wall = models.IntegerField(help_text=_(u"Материал отделки стен"), default=0, blank=True, verbose_name=_(u"Материал отделки стен"), choices=WALL_CHOICES , )
-    ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка"), choices=CEILING_CHOICES , )
+    floor = models.IntegerField(help_text=_(u"Материал отделки пола"), default=0, blank=True, verbose_name=_(u"Материал отделки пола"), )
+    wall = models.IntegerField(help_text=_(u"Материал отделки стен"), default=0, blank=True, verbose_name=_(u"Материал отделки стен") )
+    ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка"), )
 
 
 class BaseEngineerNetworks(models.Model):
@@ -238,9 +235,9 @@ class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImproveme
     is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
-    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), default=0, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), choices=INTERNAL_DOORS_CHOICES , )
-    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), default=0, blank=True, verbose_name=_(u"Материал входной двери"), choices=ENTRANCE_DOOR_CHOICES , )
-    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"), choices=WINDOW_CONSTRUCTIONS_CHOICES , )
+    internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), default=0, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), )
+    entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), default=0, blank=True, verbose_name=_(u"Материал входной двери"), )
+    window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"), )
 
 
 class BaseDevices(models.Model):

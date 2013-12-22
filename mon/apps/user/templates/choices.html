@@ -11,8 +11,8 @@
     {% else %}
         {% if choices_list %}
             <table class="table table-condensed table-striped table-hover">
-                <tr><th> {% trans 'Имя' %}</th> </tr>
-                <tr><td><a href="{% url 'update-choices' obj.id %}">{{object.name}}</a></td></tr>
+                {% for choices in choices_list %}
+                <tr><td><a href="{% url 'update-choices' choices.id %}">{{choices.verbose_name}}</a></td></tr>
                 {% endfor %}
             </table>
         {% endif %}

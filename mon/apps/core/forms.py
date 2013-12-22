@@ -12,7 +12,7 @@ from django.forms.widgets import CheckboxSelectMultiple
 
 from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, \
     AuctionKitchen, Developer, Choices
-from apps.core.models import FLOOR_CHOICES, WALL_CHOICES, CEILING_CHOICES, STOVE_CHOICES, SEPARATE_CHOICES
+from apps.core.models import STOVE_CHOICES, SEPARATE_CHOICES
 
 
 def cmp_single(obj, cmp_obj):
@@ -84,11 +84,29 @@ class RoomForm(forms.ModelForm):
     class Meta:
         model = Room
 
+    def __init__(self, *args, **kwargs):
+        super(RoomForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wall'] = forms.ChoiceField(label=u"Материал отделки стен", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
+
 
 class HallwayForm(forms.ModelForm):
 
     class Meta:
         model = Hallway
+
+    def __init__(self, *args, **kwargs):
+        super(HallwayForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wall'] = forms.ChoiceField(label=u"Материал отделки стен", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
 
 
 class WCForm(forms.ModelForm):
@@ -96,11 +114,29 @@ class WCForm(forms.ModelForm):
     class Meta:
         model = WC
 
+    def __init__(self, *args, **kwargs):
+        super(WCForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wall'] = forms.ChoiceField(label=u"Материал отделки стен", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
+
 
 class KitchenForm(forms.ModelForm):
 
     class Meta:
         model = Kitchen
+
+    def __init__(self, *args, **kwargs):
+        super(KitchenForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wall'] = forms.ChoiceField(label=u"Материал отделки стен", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
 
 
 class RoomShowForm(forms.ModelForm):
@@ -175,13 +211,17 @@ class KitchenShowForm(forms.ModelForm):
 
 
 class BaseAuctionRoomForm(forms.ModelForm):
-    floor = CSIMultipleChoiceField(label=_(u"Материал отделки пола"), required=False,
-                                   widget=CSICheckboxSelectMultiple, choices=FLOOR_CHOICES)
-    wall = CSIMultipleChoiceField(label=_(u"Материал отделки стен"), required=False,
-                                  widget=CSICheckboxSelectMultiple, choices=WALL_CHOICES)
-    ceiling = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
-                                     widget=CSICheckboxSelectMultiple, choices=CEILING_CHOICES)
-
+    def __init__(self, *args, **kwargs):
+        super(BaseAuctionRoomForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['floor'] = CSIMultipleChoiceField(label=_(u"Материал отделки пола"), required=False,
+                                       widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wall'] = CSIMultipleChoiceField(label=_(u"Материал отделки стен"), required=False,
+                                      widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['ceiling'] = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
+                                         widget=CSICheckboxSelectMultiple, choices=choices)
     class Meta:
         abstract = True
 
@@ -215,12 +255,18 @@ class AuctionKitchenForm(BaseAuctionRoomForm):
 
 
 class BaseAuctionRoomShowForm(forms.ModelForm):
-    floor = CSIMultipleChoiceField(label=_(u"Материал отделки пола"), required=False,
-                                   widget=CSICheckboxSelectMultiple, choices=FLOOR_CHOICES)
-    wall = CSIMultipleChoiceField(label=_(u"Материал отделки стен"), required=False,
-                                  widget=CSICheckboxSelectMultiple, choices=WALL_CHOICES)
-    ceiling = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
-                                     widget=CSICheckboxSelectMultiple, choices=CEILING_CHOICES)
+
+    def __init__(self, *args, **kwargs):
+        super(BaseAuctionRoomShowForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['floor'] = CSIMultipleChoiceField(label=_(u"Материал отделки пола"), required=False,
+                                                      widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wall'] = CSIMultipleChoiceField(label=_(u"Материал отделки стен"), required=False,
+                                                     widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['ceiling'] = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
+                                                        widget=CSICheckboxSelectMultiple, choices=choices)
 
     class Meta:
         abstract = True
@@ -296,3 +342,4 @@ class ChoicesForm(forms.ModelForm):
 
     class Meta:
         model = Choices
+        exclude = ['name']

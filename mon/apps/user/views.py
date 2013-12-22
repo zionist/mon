@@ -67,6 +67,7 @@ def get_users(request):
                   context_instance=RequestContext(request))
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def pre_delete_user(request, pk):
     context = {'title': _(u'Удаление пользователя')}
     user = CustomUser.objects.get(pk=pk)
@@ -75,6 +76,7 @@ def pre_delete_user(request, pk):
                               context_instance=RequestContext(request))
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def delete_user(request, pk):
     context = {'title': _(u'Удаление пользователя')}
     user = CustomUser.objects.get(pk=pk)
@@ -89,21 +91,38 @@ def delete_user(request, pk):
                               context_instance=RequestContext(request))
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def update_choices(request, pk):
     template = 'choices_updating.html'
     context = {'title': _(u'Добавление списка выбора')}
     choices = Choices.objects.get(pk=pk)
     form = ChoicesForm(instance=choices)
-    formset = inlineformset_factory(Choices, Choice, extra=3)
+    formset = inlineformset_factory(Choices, Choice, extra=15)
     if request.method == "POST":
         formset = formset(request.POST, instance=choices)
         form = ChoicesForm(request.POST, instance=choices)
         if formset.is_valid() and form.is_valid():
             form.save()
             formset.save()
+            return redirect('choices')
     else:
         formset = formset(instance=choices)
     context.update({'formset': formset, 'form': form, 'object': choices})
     return render_to_response(template, context,
                               context_instance=RequestContext(request))
 
+@user_passes_test(lambda u: u.is_superuser)
+def get_choices(request):
+    context = {'title': _(u'Список выбора')}
+    objects = Choices.objects.all()
+    page = request.GET.get('page', '1')
+    paginator = Paginator(objects, 50)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+    context.update({'choices_list': objects})
+    return render(request, 'choices.html', context,
+                  context_instance=RequestContext(request))
