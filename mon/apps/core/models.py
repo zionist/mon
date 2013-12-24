@@ -240,6 +240,8 @@ class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImproveme
     window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"), )
 
 
+
+
 class BaseDevices(models.Model):
 
     class Meta:

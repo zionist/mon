@@ -17,8 +17,9 @@ from apps.core.models import STOVE_CHOICES, SEPARATE_CHOICES
 
 def cmp_single(obj, cmp_obj):
     for field in obj.fields:
-        if getattr(obj.instance, field) != getattr(cmp_obj, field):
-            obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+        if hasattr(obj.instance, field) and hasattr(cmp_obj, field):
+            if getattr(obj.instance, field) != getattr(cmp_obj, field):
+                obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 def cmp_multi(obj, cmp_obj):
@@ -139,7 +140,7 @@ class KitchenForm(forms.ModelForm):
         self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
 
 
-class RoomShowForm(forms.ModelForm):
+class RoomShowForm(RoomForm):
 
     class Meta:
         model = Room
@@ -159,7 +160,7 @@ class RoomShowForm(forms.ModelForm):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
 
-class HallwayShowForm(forms.ModelForm):
+class HallwayShowForm(HallwayForm):
 
     class Meta:
         model = Hallway
@@ -176,7 +177,7 @@ class HallwayShowForm(forms.ModelForm):
                     self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
-class WCShowForm(forms.ModelForm):
+class WCShowForm(WCForm):
 
     class Meta:
         model = WC
@@ -193,7 +194,7 @@ class WCShowForm(forms.ModelForm):
                     self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
-class KitchenShowForm(forms.ModelForm):
+class KitchenShowForm(KitchenForm):
 
     class Meta:
         model = Kitchen
@@ -222,6 +223,7 @@ class BaseAuctionRoomForm(forms.ModelForm):
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['ceiling'] = CSIMultipleChoiceField(label=_(u"Материал отделки потолка"), required=False,
                                          widget=CSICheckboxSelectMultiple, choices=choices)
+
     class Meta:
         abstract = True
 

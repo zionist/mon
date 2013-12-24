@@ -45,23 +45,26 @@ class BuildingForm(GroundForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
 
 
-
 class BuildingSelectForm(forms.Form):
     state = forms.ChoiceField(label=_(u'Тип объекта'), required=True, choices=STATE_CHOICES, help_text=_(u"Тип объекта"), )
     developer = forms.ModelChoiceField(label=_(u'Выберите застройщика'),
         required=False, queryset=Developer.objects.all(),
         help_text=_(u"Выберите застройщика (будет предложено добавить нового при пустом значении)"), )
 
+
 class BuildingShowForm(BuildingForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract',
-                   'address', 'comment', 'complete_date', 'readiness', 'payment_perspective')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract', 'developer', 'offer', 'permission', 'approve_status',
+                   'area', 'address', 'comment', 'complete_date', 'readiness', 'payment_perspective', 'flats_amount')
 
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(BuildingShowForm, self).__init__(*args, **kwargs)
+
+        self.fields['address'].widget.attrs['hidden'] = 'hidden'
+        self.fields['comment'].widget.attrs['hidden'] = 'hidden'
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget')and not hasattr(self.fields[field].widget.attrs, 'hidden'):
