@@ -2,7 +2,7 @@
 {% load i18n staticfiles %}
 
 {% block content %}
-    <h2>{{title}}</h2>
+    <h3>{{title}}</h3>
     {% if user.is_staff %}
         <a class="btn btn-small" href="{% url 'create-result' %}">
             {% trans 'Добавить результаты выезда' %}</a>

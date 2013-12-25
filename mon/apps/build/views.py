@@ -79,6 +79,8 @@ def add_building(request, dev_pk=None, state=None):
                 form, text_area_form = split_form(form)
                 context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
                 return render_to_response(template, context, context_instance=RequestContext(request))
+        if not request.user.is_staff or not request.user.is_superuser:
+            form.fields.pop('approve_status')
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             building = form.save(commit=False)
             building.state = state_int
@@ -105,6 +107,8 @@ def add_building(request, dev_pk=None, state=None):
             context.update({'dev_form': dev_form})
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
+        if not request.user.is_staff or not request.user.is_superuser:
+            form.fields.pop('approve_status')
         context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix,
                         'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
