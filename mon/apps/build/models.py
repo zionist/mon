@@ -97,17 +97,17 @@ class Ground(BaseBuilding, BaseCompareData, BaseImage):
 
 
 class Building(BaseBuilding, BaseCompareData, BaseImage):
-
-    class Meta:
-        app_label = "build"
-        verbose_name = _(u"Строение")
-
-    def __unicode__(self):
-        return "%s" % self.address
-
     developer = models.ForeignKey(Developer, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
     offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
     permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
     flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
+
+    class Meta:
+        app_label = "build"
+        verbose_name = _(u"Строение")
+
+    def __unicode__(self):
+        address = ', '.join([self.address, str(self.flat_num)])
+        return "%s" % address

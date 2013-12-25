@@ -3,7 +3,7 @@
 
 {% block content %}
     <h4>{{title}}</h4>
-    {% if user.is_staff %}
+    {% if user.is_authenticated %}
         <a class="btn btn-small" href="{% url 'create-payment' %}">
             {% trans 'Добавить платеж' %}</a><br><br>
     {% endif %}

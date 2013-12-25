@@ -128,7 +128,6 @@ class BaseBuilding(models.Model):
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
-
 class BaseContract(BaseName, ):
 
     class Meta:
