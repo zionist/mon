@@ -206,11 +206,11 @@ class BaseSocialObjects(models.Model):
     class Meta:
         abstract = True
 
-    public_transport = models.IntegerField(help_text=_(u"Ближайшая остановка общественного транспорта"), null=True, verbose_name=_(u"Ближайшая остановка общественного транспорта"), blank=True, )
-    market = models.IntegerField(help_text=_(u"Магазин"), null=True, verbose_name=_(u"Магазин"), blank=True, )
-    kindergarden = models.IntegerField(help_text=_(u"Детский сад"), null=True, verbose_name=_(u"Детский сад"), blank=True, )
-    school = models.IntegerField(help_text=_(u"Школа"), null=True, verbose_name=_(u"Школа"), blank=True, )
-    clinic = models.IntegerField(help_text=_(u"Поликлиника"), null=True, verbose_name=_(u"Поликлиника"), blank=True, )
+    public_transport = models.IntegerField(help_text=_(u"Ближайшая остановка общественного транспорта отдаленность, м"), null=True, verbose_name=_(u"Ближайшая остановка общественного транспорта отдаленность, м"), blank=True, )
+    market = models.IntegerField(help_text=_(u"Магазин отдаленность, м"), null=True, verbose_name=_(u"Магазин отдаленность, м"), blank=True, )
+    kindergarden = models.IntegerField(help_text=_(u"Детский сад отдаленность, м"), null=True, verbose_name=_(u"Детский сад отдаленность, м"), blank=True, )
+    school = models.IntegerField(help_text=_(u"Школа отдаленность, м"), null=True, verbose_name=_(u"Школа отдаленность, м"), blank=True, )
+    clinic = models.IntegerField(help_text=_(u"Поликлиника отдаленность, м"), null=True, verbose_name=_(u"Поликлиника отдаленность, м"), blank=True, )
 
 
 class BaseTerritoryImprovement(models.Model):

@@ -13,10 +13,6 @@
             <form method="POST" action="{% url 'update-result' object.id %}"> {% csrf_token %}
                 {% for form in formsets %}
                 <br />
-                <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>
-                {% include "4_col_form.html" %}
-                {% endfor %}
-                <br />
                 <h4>{% trans ' Общие параметры' %}</h4>
                 {% if cmp_form %}
                     {% with form=cmp_form %}
@@ -29,6 +25,10 @@
                         {% include "2_col_form.html" %}
                     {% endwith %}
                 {% endif %}
+                <br />
+                <h4>{% cycle titles.0 titles.1 titles.2 titles.3 %}</h4>
+                {% include "4_col_form.html" %}
+                {% endfor %}
                 <br>
                 <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
             </form>
