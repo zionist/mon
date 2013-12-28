@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import template
 
+from django.forms import SelectMultiple
 from apps.core.forms import CSICheckboxSelectMultiple
 
 register = template.Library()
@@ -26,6 +27,10 @@ def get_choice_or_value(form, field_name):
                             continue
                         val += " %s " % choices.get(int(v))
                     return val
+                elif isinstance(form.fields[field_name].widget, SelectMultiple):
+                    print('SelectMultiple', dict(form.fields[field_name].choices))
+                    choices = list(form.fields[field_name].choices)
+                    return '; '.join([x[1] for x in choices])
                 else:
                     choices = dict(form.fields[field_name].choices)
                     return choices.get(form.initial[field_name])
