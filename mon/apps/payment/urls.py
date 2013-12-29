@@ -6,6 +6,7 @@ urlpatterns = patterns(
     'apps.payment.views',
 
     url(r'^payments/$', views.get_payments, name='payments'),
+    url(r'^payment/acc/$', views.get_accounting, name='accounting'),
     url(r'^payment/add/$', views.add_payment, name='create-payment'),
     url(r'^payment/(?P<pk>[0-9]+)/$', views.get_payment, name='change-payment'),
     url(r'^payment/update/(?P<pk>[0-9]+)/$', views.update_payment, name='update-payment'),
