@@ -20,8 +20,10 @@ from django.utils.encoding import smart_str
 
 from .models import Payment
 from .forms import PaymentForm, PaymentShowForm
+from apps.mo.models import MO
 
 
+@login_required
 def add_payment(request):
     template = 'payment_creation.html'
     context = {'title': _(u'Добавление платежа')}
@@ -42,10 +44,21 @@ def get_payments(request, pk=None):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
     if Payment.objects.all().exists():
-        objects = Payment.objects.all()
         if pk:
             payment_object = Payment.objects.get(pk=pk)
             context.update({'object': payment_object})
+
+        if not request.user.is_staff:
+            mo = request.user.customuser.mo
+            if mo:
+                agreements = mo.departamentagreement_set.all()
+                amount = sum([int(dep.subvention.amount) for dep in agreements])
+                spent = sum([int(contract.summa) for contract in mo.contract_set.all()])
+                accounting = {'spent': spent, 'saved': amount - spent, 'sub_amount': amount}
+                context.update({'accounting': accounting})
+                objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
+        else:
+            objects = Payment.objects.all()
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
@@ -58,6 +71,27 @@ def get_payments(request, pk=None):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
+def get_accounting(request):
+    template = 'payments.html'
+    context = {'title': _(u'Платежи')}
+    objects = []
+    mos = MO.objects.all()
+    for mo in mos:
+        agreements = mo.departamentagreement_set.all()
+        amount = sum([int(dep.subvention.amount) for dep in agreements])
+        spent = sum([int(contract.summa) for contract in mo.contract_set.all()])
+        payments = []
+        for dep in agreements:
+            payments = payments + (list(dep.subvention.payment_set.all()))
+        payment = sum([int(payment.amount) for payment in payments])
+        accounting = {'payment': payment, 'spent': spent, 'saved': amount - spent, 'sub_amount': amount}
+        objects.append({'mo': mo, 'accounting': accounting})
+    context.update({'accountings': objects})
+    return render(request, template, context, context_instance=RequestContext(request))
+
+
+@login_required
 def get_payment(request, pk, extra=None):
     context = {'title': _(u'Платежи')}
     payment = Payment.objects.get(pk=pk)
@@ -66,6 +100,7 @@ def get_payment(request, pk, extra=None):
     return render(request, 'payment.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_payment(request, pk, extra=None):
     context = {'title': _(u'Параметры платежа')}
     payment = Payment.objects.get(pk=pk)
@@ -85,6 +120,7 @@ def update_payment(request, pk, extra=None):
     return render(request, 'payment_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def pre_delete_payment(request, pk):
     context = {'title': _(u'Удаление платежа')}
     payment = Payment.objects.get(pk=pk)
@@ -92,6 +128,7 @@ def pre_delete_payment(request, pk):
     return render_to_response("payment_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_payment(request, pk):
     context = {'title': _(u'Удаление платежа')}
     payment = Payment.objects.get(pk=pk)
@@ -105,6 +142,7 @@ def delete_payment(request, pk):
     return render_to_response("payment_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def download_payment(request, name):
     response = HttpResponse(mimetype='application/force-download')
     response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(name)

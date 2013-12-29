@@ -5,14 +5,49 @@
     <h4>{{title}}</h4>
     {% if user.is_authenticated %}
         <a class="btn btn-small" href="{% url 'create-payment' %}">
-            {% trans 'Добавить платеж' %}</a><br><br>
+            {% trans 'Добавить платеж' %}</a>
     {% endif %}
+    {% if user.is_staff %}
+        <a class="btn btn-small" href="{% url 'accounting' %}">
+            {% trans 'Общая сводка' %}</a>
+    {% else %}
+        {% trans 'Потрачено: ' %} {{ accounting.spent }}
+        {% trans '; Осталось: ' %} {{ accounting.saved }}
+        {% trans '; Общая сумма субвенции: ' %} {{ accounting.sub_amount }}
+    {% endif %}
+    <br><br>
     {% if error %}
         <div class="error">{{ error }}</div><br>
     {% endif %}
     {% if errorlist %}
         <div class="error">{{ errorlist }}</div>
     {% else %}
+
+        {% if accountings %}
+            <div class="auction-table">
+            <table class="table table-condensed table-striped table-hover">
+                <tr>
+                    <th> {% trans 'Наименование МО' %}</th>
+                    <th> {% trans 'Потрачено' %}</th>
+                    <th> {% trans 'Подтверджено платежами' %}</th>
+                    <th> {% trans 'Осталось' %}</th>
+                    <th> {% trans 'Общая сумма субвенции' %}</th>
+
+                </tr>
+                {% for obj in accountings %}
+                    {% if obj.mo %}
+                        <tr>
+                            <td>{{obj.mo}}</td>
+                            <td>{{obj.accounting.spent}}</td>
+                            <td>{{obj.accounting.payment}}</td>
+                            <td>{{obj.accounting.saved}}</td>
+                            <td>{{obj.accounting.sub_amount}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            </div>
+        {% endif %}
 
         {% if payment_list %}
             <div class="auction-table">
