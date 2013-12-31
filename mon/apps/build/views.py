@@ -210,6 +210,9 @@ def get_building(request, pk, state=None, extra=None):
     else:
         build = Building.objects.get(pk=pk)
         form = BuildingForm(instance=build)
+    if not request.user.is_staff and not request.user.is_superuser:
+        if build.mo != request.user.customuser.mo:
+            return HttpResponseForbidden("Forbidden")
     if not request.user.is_staff or not request.user.is_superuser:
         form.fields.pop('approve_status')
         form.fields.pop('mo')
@@ -244,7 +247,7 @@ def update_building(request, pk, state=None, extra=None):
         build = Building.objects.get(pk=pk)
     if not request.user.is_staff and not request.user.is_superuser:
         if build.mo != request.user.customuser.mo:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden("Forbidden")
     prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     if request.method == "POST":
         if state and int(state) == 2:
@@ -341,7 +344,7 @@ def pre_delete_building(request, pk, state=None):
         build = Building.objects.get(pk=pk)
     if not request.user.is_staff and not request.user.is_superuser:
         if build.mo != request.user.customuser.pk:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden("Forbidden")
     context.update({'object': build})
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
 
@@ -354,7 +357,7 @@ def delete_building(request, pk, state=None):
         build = Building.objects.get(pk=pk)
     if not request.user.is_staff and not request.user.is_superuser:
         if build.mo != request.user.customuser.pk:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden("Forbidden")
     if build and 'delete' in request.POST:
         build.room.delete()
         build.hallway.delete()
