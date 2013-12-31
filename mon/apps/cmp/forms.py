@@ -27,11 +27,11 @@ class ContractForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContractForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
 
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
@@ -162,11 +162,11 @@ class CompareDataShowForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CompareDataShowForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices,  required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):

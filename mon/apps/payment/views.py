@@ -21,6 +21,7 @@ from django.utils.encoding import smart_str
 from .models import Payment
 from .forms import PaymentForm, PaymentShowForm
 from apps.mo.models import MO
+from apps.user.models import CustomUser
 
 
 @login_required

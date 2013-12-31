@@ -22,6 +22,3 @@ class Payment(BasePayment, BaseImage):
                                    verbose_name=_(u"Данные по расходуемой субвенции"),)
     pay_order = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Платежное поручение"),
                                   verbose_name=_(u"Платежное поручение"), )
-    owner = models.ForeignKey(CustomUser, null=True, blank=True,
-                              help_text=_(u"Владелец платежа"),
-                              verbose_name=_(u"Владелец платежа"))

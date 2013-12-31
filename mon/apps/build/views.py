@@ -80,14 +80,13 @@ def add_building(request, dev_pk=None, state=None):
                 return render_to_response(template, context, context_instance=RequestContext(request))
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
-            form.fields.pop('owner')
+            form.fields.pop('mo')
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             building = form.save(commit=False)
+            building.mo = request.user.customuser.mo
             building.state = state_int
             building.developer = dev
-            building.owner = CustomUser.objects.get(username=request.user.username)
             building.save()
-            # print building.state, building.developer, building.room
             building.room = room_f.save()
             building.hallway = hallway_f.save()
             building.wc = wc_f.save()
@@ -110,7 +109,7 @@ def add_building(request, dev_pk=None, state=None):
         form, text_area_form = split_form(form)
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
-            form.fields.pop('owner')
+            form.fields.pop('mo')
         context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix,
                         'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
@@ -174,13 +173,13 @@ def get_buildings(request, pk=None, strv=None, numv=None):
             if request.user.is_staff or request.user.is_superuser:
                 build_objects = Building.objects.all().order_by('state')
             else:
-                build_objects = Building.objects.filter(owner=request.user).order_by('state')
+                build_objects = Building.objects.filter(mo=request.user.customuser.mo).order_by('state')
             get = Building.objects.get
         if Ground.objects.all().exists():
             if request.user.is_staff or request.user.is_superuser:
                 ground_objects = Ground.objects.all().order_by('state')
             else:
-                ground_objects = Ground.objects.filter(owner=request.user).order_by('state')
+                ground_objects = Ground.objects.filter(mo=request.user.customuser.mo).order_by('state')
             get = Ground.objects.get
         objects = [x for x in build_objects] + [x for x in ground_objects]
         if pk or strv or numv:
@@ -213,7 +212,7 @@ def get_building(request, pk, state=None, extra=None):
         form = BuildingForm(instance=build)
     if not request.user.is_staff or not request.user.is_superuser:
         form.fields.pop('approve_status')
-        form.fields.pop('owner')
+        form.fields.pop('mo')
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
     context.update({'object': build, 'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
@@ -244,7 +243,7 @@ def update_building(request, pk, state=None, extra=None):
     else:
         build = Building.objects.get(pk=pk)
     if not request.user.is_staff and not request.user.is_superuser:
-        if build.owner_id != request.user.pk:
+        if build.mo != request.user.customuser.mo:
             return HttpResponseForbidden()
     prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     if request.method == "POST":
@@ -255,13 +254,14 @@ def update_building(request, pk, state=None, extra=None):
         # check access rules. Add approve_status from object to form
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
-            form.fields.pop('owner')
+            form.fields.pop('mo')
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             new_build = form.save()
             if not request.user.is_staff or not request.user.is_superuser:
                 new_build.approve_status = build.approve_status
-                new_build.owner = build.owner
+                new_build.mo = build.mo
+                new_build.save()
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('buildings')
@@ -284,7 +284,7 @@ def update_building(request, pk, state=None, extra=None):
         # remove approve_status field from view if not admin
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
-            form.fields.pop('owner')
+            form.fields.pop('mo')
         form, text_area_form = split_form(form)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build)
         context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
@@ -340,7 +340,7 @@ def pre_delete_building(request, pk, state=None):
     else:
         build = Building.objects.get(pk=pk)
     if not request.user.is_staff and not request.user.is_superuser:
-        if build.owner_id != request.user.pk:
+        if build.mo != request.user.customuser.pk:
             return HttpResponseForbidden()
     context.update({'object': build})
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
@@ -353,7 +353,7 @@ def delete_building(request, pk, state=None):
     else:
         build = Building.objects.get(pk=pk)
     if not request.user.is_staff and not request.user.is_superuser:
-        if build.owner_id != request.user.pk:
+        if build.mo != request.user.customuser.pk:
             return HttpResponseForbidden()
     if build and 'delete' in request.POST:
         build.room.delete()
