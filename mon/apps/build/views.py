@@ -8,7 +8,7 @@ from datetime import datetime
 from copy import deepcopy
 
 from django.http import HttpResponse, HttpResponseNotFound, \
-    HttpResponseBadRequest
+    HttpResponseBadRequest, HttpResponseRedirect, HttpResponseForbidden
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_list_or_404, \
@@ -18,7 +18,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
@@ -175,13 +174,13 @@ def get_buildings(request, pk=None, strv=None, numv=None):
             if request.user.is_staff or request.user.is_superuser:
                 build_objects = Building.objects.all().order_by('state')
             else:
-                build_objects = Building.objects.filter(owner=request.user.username).order_by('state')
+                build_objects = Building.objects.filter(owner=request.user).order_by('state')
             get = Building.objects.get
         if Ground.objects.all().exists():
             if request.user.is_staff or request.user.is_superuser:
                 ground_objects = Ground.objects.all().order_by('state')
             else:
-                ground_objects = Ground.objects.filter(owner=request.user.username).order_by('state')
+                ground_objects = Ground.objects.filter(owner=request.user).order_by('state')
             get = Ground.objects.get
         objects = [x for x in build_objects] + [x for x in ground_objects]
         if pk or strv or numv:
@@ -221,12 +220,15 @@ def get_building(request, pk, state=None, extra=None):
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
 
-def approve_building(request, pk):
+def approve_building(request, pk, state=None):
     """
     Send for approve (set approve status = 1)
     """
     if request.method == "GET":
-        build = Building.objects.get(pk=pk)
+        if state and int(state) == 2:
+            build = Ground.objects.get(pk=pk)
+        else:
+            build = Building.objects.get(pk=pk)
         user = CustomUser.objects.get(pk=request.user.pk)
         if user.mo == build.mo:
             build.approve_status = 1
@@ -241,6 +243,9 @@ def update_building(request, pk, state=None, extra=None):
         build = Ground.objects.get(pk=pk)
     else:
         build = Building.objects.get(pk=pk)
+    if not request.user.is_staff and not request.user.is_superuser:
+        if build.owner_id != request.user.pk:
+            return HttpResponseForbidden()
     prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     if request.method == "POST":
         if state and int(state) == 2:
@@ -249,14 +254,14 @@ def update_building(request, pk, state=None, extra=None):
             form = BuildingForm(request.POST, prefix=prefix, instance=build)
         # check access rules. Add approve_status from object to form
         if not request.user.is_staff or not request.user.is_superuser:
-            form.fields.update({'approve_status': forms.IntegerField()})
-            data = form.data.copy()
-            data['%s-approve_status' % form.prefix] = u'%s' % build.approve_status
-            data['%s-owner' % form.prefix] = u'%s' % build.owner
-            form.data = data
+            form.fields.pop('approve_status')
+            form.fields.pop('owner')
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
-            form.save()
+            new_build = form.save()
+            if not request.user.is_staff or not request.user.is_superuser:
+                new_build.approve_status = build.approve_status
+                new_build.owner = build.owner
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('buildings')
@@ -334,6 +339,9 @@ def pre_delete_building(request, pk, state=None):
         build = Ground.objects.get(pk=pk)
     else:
         build = Building.objects.get(pk=pk)
+    if not request.user.is_staff and not request.user.is_superuser:
+        if build.owner_id != request.user.pk:
+            return HttpResponseForbidden()
     context.update({'object': build})
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
 
@@ -344,6 +352,9 @@ def delete_building(request, pk, state=None):
         build = Ground.objects.get(pk=pk)
     else:
         build = Building.objects.get(pk=pk)
+    if not request.user.is_staff and not request.user.is_superuser:
+        if build.owner_id != request.user.pk:
+            return HttpResponseForbidden()
     if build and 'delete' in request.POST:
         build.room.delete()
         build.hallway.delete()
