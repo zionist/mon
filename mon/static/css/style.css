@@ -107,3 +107,15 @@ td ul.errorlist li {
     border: 1px solid red;
 }
 
+.form-fix-field {
+    display: table-cell;
+    vertical-align: bottom;
+    float: none;
+    padding-left: 20px;
+    max-width: 220px;
+}
+
+.form-fix-row {
+    display: table;
+    height: auto;
+}
