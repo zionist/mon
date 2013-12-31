@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, Developer
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseImage
+from apps.user.models import CustomUser
 
 
 class ContractDocuments(BaseDocumentModel, BaseImage):
@@ -94,6 +95,9 @@ class Ground(BaseBuilding, BaseCompareData, BaseImage):
     offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
     permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
     cad_passport = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
+    owner = models.ForeignKey(CustomUser, null=True, blank=True,
+                              help_text=_(u"Владелец объекта"),
+                              verbose_name=_(u"Владелец объекта"))
 
 
 class Building(BaseBuilding, BaseCompareData, BaseImage):
@@ -103,6 +107,9 @@ class Building(BaseBuilding, BaseCompareData, BaseImage):
     offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
     permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
     flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
+    owner = models.ForeignKey(CustomUser, null=True, blank=True,
+                              help_text=_(u"Владелец объекта"),
+                              verbose_name=_(u"Владелец объекта"))
 
     class Meta:
         app_label = "build"

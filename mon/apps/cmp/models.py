@@ -11,6 +11,7 @@ from apps.imgfile.models import File, Image, BaseImage
 from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground, Contract
 from apps.mo.models import MO
+from apps.user.models import CustomUser
 
 
 class Person(models.Model):

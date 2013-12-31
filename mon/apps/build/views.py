@@ -86,7 +86,7 @@ def add_building(request, dev_pk=None, state=None):
             building = form.save(commit=False)
             building.state = state_int
             building.developer = dev
-            building.owner = request.user.username
+            building.owner = CustomUser.objects.get(username=request.user.username)
             building.save()
             # print building.state, building.developer, building.room
             building.room = room_f.save()
@@ -172,10 +172,16 @@ def get_buildings(request, pk=None, strv=None, numv=None):
     if Building.objects.all().exists() or Ground.objects.all().exists():
         objects, build_objects, ground_objects = [], [], []
         if Building.objects.all().exists():
-            build_objects = Building.objects.all().order_by('state')
+            if request.user.is_staff or request.user.is_superuser:
+                build_objects = Building.objects.all().order_by('state')
+            else:
+                build_objects = Building.objects.filter(owner=request.user.username).order_by('state')
             get = Building.objects.get
         if Ground.objects.all().exists():
-            ground_objects = Ground.objects.all().order_by('state')
+            if request.user.is_staff or request.user.is_superuser:
+                ground_objects = Ground.objects.all().order_by('state')
+            else:
+                ground_objects = Ground.objects.filter(owner=request.user.username).order_by('state')
             get = Ground.objects.get
         objects = [x for x in build_objects] + [x for x in ground_objects]
         if pk or strv or numv:

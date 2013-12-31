@@ -65,16 +65,6 @@ class BaseDocumentModel(models.Model):
     creation_date = models.DateTimeField(auto_now=True, null=True, blank=True, )
 
 
-class BaseModel(models.Model):
-
-    class Meta:
-        abstract = True
-
-    owner = models.CharField(null=True, blank=True, max_length=2048,
-                             help_text=_(u"Владелец объекта"),
-                             verbose_name=_(u"Владелец объекта"))
-
-
 class BaseBudget(models.Model):
 
     class Meta:
@@ -124,7 +114,7 @@ class BaseOrphan(models.Model):
     is_privilege = models.NullBooleanField(blank=True, )
 
 
-class BaseBuilding(BaseModel):
+class BaseBuilding(models.Model):
 
     class Meta:
         abstract = True
@@ -138,7 +128,7 @@ class BaseBuilding(BaseModel):
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
-class BaseContract(BaseName, BaseModel):
+class BaseContract(BaseName):
 
     class Meta:
         abstract = True
@@ -147,7 +137,7 @@ class BaseContract(BaseName, BaseModel):
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 
-class BaseResult(BaseModel):
+class BaseResult(models.Model):
 
     class Meta:
         abstract = True
@@ -171,7 +161,7 @@ class BaseDeveloper(BaseName, ):
     boss_position = models.CharField(help_text=_(u"Ф.И.О. и должность руководителя"), max_length=2048, verbose_name=_(u"Ф.И.О. и должность руководителя"), )
 
 
-class BasePayment(BaseModel):
+class BasePayment(models.Model):
 
     class Meta:
         abstract = True
