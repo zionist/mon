@@ -57,12 +57,22 @@ class BaseName(models.Model):
     name = models.CharField(help_text=_(u"Наименование"), null=True, max_length=2048, verbose_name=_(u"Наименование"), blank=True, )
 
 
-class BaseModel(models.Model):
+class BaseDocumentModel(models.Model):
 
     class Meta:
         abstract = True
 
     creation_date = models.DateTimeField(auto_now=True, null=True, blank=True, )
+
+
+class BaseModel(models.Model):
+
+    class Meta:
+        abstract = True
+
+    owner = models.CharField(null=True, blank=True, max_length=2048,
+                             help_text=_(u"Владелец объекта"),
+                             verbose_name=_(u"Владелец объекта"))
 
 
 class BaseBudget(models.Model):
@@ -87,7 +97,7 @@ class BaseSubvention(models.Model):
                                  verbose_name=_(u"Общая сумма предоставляемой в текущем году субвенции"), blank=True, )
 
 
-class BaseDepartamentAgreement(BaseModel, ):
+class BaseDepartamentAgreement(BaseDocumentModel, ):
 
     class Meta:
         abstract = True
@@ -114,7 +124,7 @@ class BaseOrphan(models.Model):
     is_privilege = models.NullBooleanField(blank=True, )
 
 
-class BaseBuilding(models.Model):
+class BaseBuilding(BaseModel):
 
     class Meta:
         abstract = True
@@ -128,7 +138,7 @@ class BaseBuilding(models.Model):
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
-class BaseContract(BaseName, ):
+class BaseContract(BaseName, BaseModel):
 
     class Meta:
         abstract = True
@@ -137,7 +147,7 @@ class BaseContract(BaseName, ):
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 
-class BaseResult(models.Model):
+class BaseResult(BaseModel):
 
     class Meta:
         abstract = True
@@ -161,7 +171,7 @@ class BaseDeveloper(BaseName, ):
     boss_position = models.CharField(help_text=_(u"Ф.И.О. и должность руководителя"), max_length=2048, verbose_name=_(u"Ф.И.О. и должность руководителя"), )
 
 
-class BasePayment(models.Model):
+class BasePayment(BaseModel):
 
     class Meta:
         abstract = True

@@ -81,10 +81,12 @@ def add_building(request, dev_pk=None, state=None):
                 return render_to_response(template, context, context_instance=RequestContext(request))
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
+            form.fields.pop('owner')
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             building = form.save(commit=False)
             building.state = state_int
             building.developer = dev
+            building.owner = request.user.username
             building.save()
             # print building.state, building.developer, building.room
             building.room = room_f.save()
@@ -109,6 +111,7 @@ def add_building(request, dev_pk=None, state=None):
         form, text_area_form = split_form(form)
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
+            form.fields.pop('owner')
         context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix,
                         'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
@@ -205,6 +208,7 @@ def get_building(request, pk, state=None, extra=None):
         form = BuildingForm(instance=build)
     if not request.user.is_staff or not request.user.is_superuser:
         form.fields.pop('approve_status')
+        form.fields.pop('owner')
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
     context.update({'object': build, 'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
@@ -242,6 +246,7 @@ def update_building(request, pk, state=None, extra=None):
             form.fields.update({'approve_status': forms.IntegerField()})
             data = form.data.copy()
             data['%s-approve_status' % form.prefix] = u'%s' % build.approve_status
+            data['%s-owner' % form.prefix] = u'%s' % build.owner
             form.data = data
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
@@ -268,6 +273,7 @@ def update_building(request, pk, state=None, extra=None):
         # remove approve_status field from view if not admin
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
+            form.fields.pop('owner')
         form, text_area_form = split_form(form)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build)
         context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],

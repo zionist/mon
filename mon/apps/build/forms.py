@@ -12,6 +12,7 @@ from apps.core.models import STATE_CHOICES, \
     WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
 from apps.core.forms import cmp_single
 from apps.core.models import Choices
+from apps.user.models import CustomUser
 
 
 class GroundForm(forms.ModelForm):
@@ -42,8 +43,15 @@ class BuildingForm(GroundForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',)
 
+    def __init__(self, *args, **kwargs):
+        super(BuildingForm, self).__init__(*args, **kwargs)
+        # add owner field
+        choices = [(u.username, u.username) for u in CustomUser.objects.all()]
+        choices.insert(0, ("", u"----"))
+        self.fields['owner'] = forms.ChoiceField(label=u"Владелец документа",
+                                         choices=choices, required=False)
 
 class BuildingSelectForm(forms.Form):
     state = forms.ChoiceField(label=_(u'Тип объекта'), required=True, choices=STATE_CHOICES, help_text=_(u"Тип объекта"), )

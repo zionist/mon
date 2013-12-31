@@ -2,12 +2,12 @@
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContract, Developer
+from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, Developer
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseImage
 
 
-class ContractDocuments(BaseModel, BaseImage):
+class ContractDocuments(BaseDocumentModel, BaseImage):
 
     class Meta:
         app_label = "build"
@@ -109,5 +109,11 @@ class Building(BaseBuilding, BaseCompareData, BaseImage):
         verbose_name = _(u"Строение")
 
     def __unicode__(self):
-        address = ', '.join([self.address, str(self.flat_num)])
+        try:
+            num = str(self.flat_num)
+        except TypeError:
+            num = ""
+        if not self.address:
+            return ""
+        address = ', '.join([self.address, num])
         return "%s" % address

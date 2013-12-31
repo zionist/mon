@@ -4,7 +4,7 @@ from datetime import datetime
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
+from apps.core.models import BaseDocumentModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
 from apps.imgfile.models import File, Image, BaseImage
 
@@ -56,7 +56,7 @@ class Result(BaseResult, ):
     establish_pers = models.ManyToManyField(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
 
 
-class AuctionDocuments(BaseModel, BaseImage):
+class AuctionDocuments(BaseDocumentModel, BaseImage):
 
     class Meta:
         app_label = "cmp"
