@@ -3,6 +3,7 @@ from django import template
 
 from django.forms import SelectMultiple
 from apps.core.forms import CSICheckboxSelectMultiple
+from django.forms import DateInput
 
 register = template.Library()
 
@@ -62,3 +63,9 @@ def dict_val(d, key):
         return ''
     return d[key]
 
+@register.filter
+def add_date_mask_class(field):
+    if isinstance(field.field.widget, DateInput):
+        field.field.widget.attrs.update({'class': 'date_mask',
+                                         'placeholder': 'день.месяц.год'})
+    return field

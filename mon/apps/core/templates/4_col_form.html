@@ -9,7 +9,8 @@
         {{ field }}
         {% else %}
         {{ field.label_tag }}
-        <span class="text-error">{{ field.errors }} </span> {{ field }}
+        <span class="text-error">{{ field.errors }} </span>
+        {{ field|add_date_mask_class}}
         {% endif %}
     </div>
     {% if forloop.counter0|check_divison:"4" == "3" %}
