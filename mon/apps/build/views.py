@@ -83,7 +83,8 @@ def add_building(request, dev_pk=None, state=None):
             form.fields.pop('mo')
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             building = form.save(commit=False)
-            building.mo = request.user.customuser.mo
+            if not request.user.is_superuser:
+                building.mo = request.user.customuser.mo
             building.state = state_int
             building.developer = dev
             building.save()
@@ -143,6 +144,18 @@ def manage_developer(request, pk=None):
                 form = DeveloperForm(request.POST, instance=developer)
     context.update({'form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required()
+def delete_developer(request, pk):
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        developer = Developer.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    developer.delete()
+    return redirect("developers")
 
 
 @login_required

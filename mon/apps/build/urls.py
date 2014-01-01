@@ -15,6 +15,7 @@ urlpatterns = patterns(
     url(r'^building/pre_delete/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.pre_delete_building, name='pre-delete-building'),
     url(r'^building/delete/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.delete_building, name='delete-building'),
     url(r'^building/developer/(?P<pk>[0-9]*)/$', views.manage_developer, name='manage-developer'),
+    url(r'^building/developer/delete/(?P<pk>[0-9]*)/$', views.delete_developer, name='delete-developer'),
     url(r'^building/developer/add$', views.manage_developer, name='manage-developer'),
     url(r'^building/developers/$', views.get_developers, name='developers'),
 )

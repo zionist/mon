@@ -98,8 +98,8 @@ class Ground(BaseBuilding, BaseCompareData, BaseImage):
 
 
 class Building(BaseBuilding, BaseCompareData, BaseImage):
-    developer = models.ForeignKey(Developer, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
-    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
+    developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
+    mo = models.ForeignKey(MO, on_delete=models.SET_NULL, help_text=_(u"Муниципальное образование"), null=True, verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
     offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
     permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))

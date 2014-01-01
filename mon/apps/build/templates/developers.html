@@ -15,7 +15,7 @@
         {% if developer_list %}
             <table class="table table-condensed table-striped table-hover">
                 <tr><th> {% trans 'Наименование' %}</th><th> {% trans 'Контактный телефон' %}</th>
-                    <th> {% trans 'Физическое / Юридическое лицо' %}</th> <th> {% trans 'Фактический адрес' %}</th></tr>
+                    <th> {% trans 'Физическое / Юридическое лицо' %}</th> <th> {% trans 'Фактический адрес' %}</th><th> {% trans 'Удаление' %} </th></tr>
                 {% for obj in developer_list %}
                         <tr>
                             <td><a href="{% url 'manage-developer' obj.id %}">{{obj.name}}</a></td>
@@ -27,6 +27,7 @@
                             <td> Физическое лицо</td>
                             {% endif %}
                             <td>{{ obj.address }}</td>
+                            <td> <a class="btn btn-danger btn-small" href="{% url 'delete-developer' obj.id %}">{% trans "Удалить" %}</a> </td>
                         </tr>
                 {% endfor %}
             </table>
