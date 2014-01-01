@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 from django.forms import MultipleChoiceField
-from django.forms.widgets import CheckboxSelectMultiple
+from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 
 from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, \
     AuctionKitchen, Developer, Choices
@@ -37,7 +37,7 @@ def cmp_multi(obj, cmp_obj):
                     obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
-class CSICheckboxSelectMultiple(CheckboxSelectMultiple):
+class CSICheckboxSelectMultiple(SelectMultiple):
     def value_from_datadict(self, data, files, name):
         return ','.join(data.getlist(name))
 
