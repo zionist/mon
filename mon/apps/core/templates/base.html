@@ -23,11 +23,11 @@
                 <ul class="nav">
                     <!--<li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>-->
                     <li id="payments"><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
-                    <li id="building" class="dropdown">
+                    <li id="buildings" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Объекты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li id="buildings"><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
-                            <li id="developers"><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
+                            <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
+                            <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
                     {% if user.is_staff %}
