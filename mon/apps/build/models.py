@@ -2,12 +2,13 @@
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseModel, BaseBuilding, BaseCompareData, BaseContract, Developer
+from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, Developer
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseImage
+from apps.user.models import CustomUser
 
 
-class ContractDocuments(BaseModel, BaseImage):
+class ContractDocuments(BaseDocumentModel, BaseImage):
 
     class Meta:
         app_label = "build"
@@ -69,6 +70,7 @@ class Contract(BaseContract, BaseCompareData):
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), verbose_name=_(u"Застройщик"), null=True, blank=True, )
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
+    period_of_payment = models.DateField(help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
 
@@ -97,17 +99,23 @@ class Ground(BaseBuilding, BaseCompareData, BaseImage):
 
 
 class Building(BaseBuilding, BaseCompareData, BaseImage):
+    developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
+    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
+    contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
+    offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
+    permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
+    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
 
     class Meta:
         app_label = "build"
         verbose_name = _(u"Строение")
 
     def __unicode__(self):
-        return "%s" % self.address
-
-    developer = models.ForeignKey(Developer, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
-    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
-    contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
-    offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
-    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
+        try:
+            num = str(self.flat_num)
+        except TypeError:
+            num = ""
+        if not self.address:
+            return ""
+        address = ', '.join([self.address, num])
+        return "%s" % address

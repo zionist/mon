@@ -24,6 +24,19 @@ class CompareDataForm(forms.ModelForm):
 
 
 class ContractForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ContractForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, required=False)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
+
+    water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
+        widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
+    hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
+        widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
 
     class Meta:
         model = Contract
@@ -82,17 +95,6 @@ class PersonForm(forms.ModelForm):
 
 
 class AuctionShowForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(AuctionShowForm, self).__init__(*args, **kwargs)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
-                                                               widget=CSICheckboxSelectMultiple, choices=choices)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['entrance_door'] = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
-                                                              widget=CSICheckboxSelectMultiple, choices=choices)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
-                                                                     widget=CSICheckboxSelectMultiple, choices=choices)
     water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
                                               widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,
@@ -106,6 +108,16 @@ class AuctionShowForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(AuctionShowForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
+                                                               widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
+                                                              widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
+                                                                     widget=CSICheckboxSelectMultiple, choices=choices)
+
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
@@ -113,7 +125,8 @@ class AuctionShowForm(forms.ModelForm):
             cmp_multi(self, cmp_initial)
 
 
-class ContractShowForm(forms.ModelForm):
+class ContractShowForm(ContractForm):
+
     class Meta:
         model = Contract
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date',
@@ -123,6 +136,7 @@ class ContractShowForm(forms.ModelForm):
 
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ContractShowForm, self).__init__(*args, **kwargs)
+
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
@@ -136,18 +150,35 @@ class ContractShowForm(forms.ModelForm):
 
 
 class CompareDataShowForm(forms.ModelForm):
+    water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
+        widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
+    hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
+        widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
+
     class Meta:
         model = CompareData
         exclude = ('room', 'hallway', 'wc', 'kitchen')
 
     def __init__(self, *args, **kwargs):
         super(CompareDataShowForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices,  required=False)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
+
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
 
 class ResultShowForm(forms.ModelForm):
+    water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
+        widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
+    hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
+        widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
+
     class Meta:
         model = Result
         exclude = ('cmp_data', )
@@ -155,6 +186,13 @@ class ResultShowForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ResultShowForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
+
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'

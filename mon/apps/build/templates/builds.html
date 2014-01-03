@@ -20,11 +20,11 @@
                     <th>{% trans 'Количество жилых помещений' %}</th> <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr>
                     {% for state in objects_list %}
                             {% if state.grouper == 0 %}
-                                <tr class="blue"><th colspan="6"> {% trans 'Сданные объекты' %}</th></tr>
+                                <tr><th colspan="6"> <strong>{% trans 'Сданные объекты' %}</strong></th></tr>
                             {% elif state.grouper == 1 %}
-                                <tr class="blue"><th colspan="6"> {% trans 'Строящиеся объекты' %}</th></tr>
+                                <tr><th colspan="6"> <strong>{% trans 'Строящиеся объекты' %}</strong></th></tr>
                             {% elif state.grouper == 2 %}
-                                <tr class="blue"><th colspan="6"> {% trans 'Участки под строительство' %}</th></tr>
+                                <tr><th colspan="6"> <strong>{% trans 'Участки под строительство' %}</strong></th></tr>
                             {% endif %}
                             {% for item in state.list %}
                               <tr onclick="location.href = '{% url 'change-building' item.id item.state %}'">

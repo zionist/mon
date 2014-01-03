@@ -127,13 +127,15 @@ def get_mo_auctions(request, pk=None):
 def get_auction(request, pk, extra=None):
     context = {'title': _(u'Параметры аукциона')}
     auction = Auction.objects.get(pk=pk)
+    prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
         form = AuctionShowForm(request.POST, instance=auction)
         context.update({'form': form})
     else:
-        form = AuctionShowForm(instance=auction)
+        form = AuctionShowForm(prefix=prefix, instance=auction)
+        image_form = AuctionDocumentsForm(prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction, multi=True)
-        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+        context.update({'form': form, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': auction})
     return render(request, 'auction.html', context, context_instance=RequestContext(request))
 
@@ -141,18 +143,20 @@ def get_auction(request, pk, extra=None):
 def update_auction(request, pk, extra=None):
     context = {'title': _(u'Параметры аукциона')}
     auction = Auction.objects.get(pk=pk)
-    prefix = 'auction'
+    prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
         form = AuctionForm(request.POST, prefix=prefix, instance=auction)
+        image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, request=request, multi=True)
         context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
+            image_form.save()
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('auctions')
         else:
-            context.update({'object': auction, 'form': form, 'prefix': prefix,
+            context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                             'titles': [
                                 BaseRoom._meta.verbose_name,
@@ -162,9 +166,10 @@ def update_auction(request, pk, extra=None):
                                 ]})
             return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
     else:
+        image_form = AuctionDocumentsForm(instance=auction.docs, prefix=images_prefix)
         form = AuctionForm(instance=auction, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, multi=True)
-        context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
             'titles': [
                 BaseRoom._meta.verbose_name,
                 BaseHallway._meta.verbose_name,
@@ -256,13 +261,15 @@ def get_contracts(request, pk=None):
 def get_contract(request, pk, extra=None):
     context = {'title': _(u'Параметры контракта')}
     contract = Contract.objects.get(pk=pk)
+    images_prefix = 'contract_images'
     if request.method == "POST":
         form = ContractShowForm(request.POST, instance=contract)
         context.update({'form': form})
     else:
+        image_form = ContractDocumentsForm(prefix=images_prefix, instance=contract.docs)
         form = ContractShowForm(instance=contract)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
-        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f], 'images': image_form,
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,
@@ -277,18 +284,20 @@ def get_contract(request, pk, extra=None):
 def update_contract(request, pk, extra=None):
     context = {'title': _(u'Параметры контракта')}
     contract = Contract.objects.get(pk=pk)
-    prefix = 'contract'
+    prefix, images_prefix = 'contract', 'contract_images'
     if request.method == "POST":
         form = ContractForm(request.POST, prefix=prefix, instance=contract)
+        image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=contract.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract, request=request)
         context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            image_form.save()
             form.save()
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('contracts')
         else:
-            context.update({'object': contract, 'form': form, 'prefix': prefix,
+            context.update({'object': contract, 'form': form, 'prefix': prefix, 'images': image_form,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                             'titles': [
                                 BaseRoom._meta.verbose_name,
@@ -298,9 +307,10 @@ def update_contract(request, pk, extra=None):
                                 ]})
             return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
     else:
+        image_form = ContractDocumentsForm(instance=contract.docs, prefix=images_prefix)
         form = ContractForm(instance=contract, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
-        context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'object': contract, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,

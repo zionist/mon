@@ -57,7 +57,7 @@ class BaseName(models.Model):
     name = models.CharField(help_text=_(u"Наименование"), null=True, max_length=2048, verbose_name=_(u"Наименование"), blank=True, )
 
 
-class BaseModel(models.Model):
+class BaseDocumentModel(models.Model):
 
     class Meta:
         abstract = True
@@ -87,7 +87,7 @@ class BaseSubvention(models.Model):
                                  verbose_name=_(u"Общая сумма предоставляемой в текущем году субвенции"), blank=True, )
 
 
-class BaseDepartamentAgreement(BaseModel, ):
+class BaseDepartamentAgreement(BaseDocumentModel, ):
 
     class Meta:
         abstract = True
@@ -128,8 +128,7 @@ class BaseBuilding(models.Model):
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
 
-
-class BaseContract(BaseName, ):
+class BaseContract(BaseName):
 
     class Meta:
         abstract = True
@@ -167,6 +166,7 @@ class BasePayment(models.Model):
     class Meta:
         abstract = True
 
+    approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки платежа"), help_text=_(u"Статус проверки платежа"))
     num = models.CharField(max_length=2048, help_text=_(u"Номер платежа"), verbose_name=_(u"Номер платежа"),)
     date = models.DateField(auto_now=True, db_index=True, help_text=_(u"Дата совершения платежа"), verbose_name=_(u"Дата совершения платежа"),)
     amount = models.FloatField(null=True, blank=True, help_text=_(u"Сумма платежа"), verbose_name=_(u"Сумма платежа"),)
@@ -206,11 +206,11 @@ class BaseSocialObjects(models.Model):
     class Meta:
         abstract = True
 
-    public_transport = models.IntegerField(help_text=_(u"Ближайшая остановка общественного транспорта"), null=True, verbose_name=_(u"Ближайшая остановка общественного транспорта"), blank=True, )
-    market = models.IntegerField(help_text=_(u"Магазин"), null=True, verbose_name=_(u"Магазин"), blank=True, )
-    kindergarden = models.IntegerField(help_text=_(u"Детский сад"), null=True, verbose_name=_(u"Детский сад"), blank=True, )
-    school = models.IntegerField(help_text=_(u"Школа"), null=True, verbose_name=_(u"Школа"), blank=True, )
-    clinic = models.IntegerField(help_text=_(u"Поликлиника"), null=True, verbose_name=_(u"Поликлиника"), blank=True, )
+    public_transport = models.IntegerField(help_text=_(u"Ближайшая остановка общественного транспорта отдаленность, м"), null=True, verbose_name=_(u"Ближайшая остановка общественного транспорта отдаленность, м"), blank=True, )
+    market = models.IntegerField(help_text=_(u"Магазин отдаленность, м"), null=True, verbose_name=_(u"Магазин отдаленность, м"), blank=True, )
+    kindergarden = models.IntegerField(help_text=_(u"Детский сад отдаленность, м"), null=True, verbose_name=_(u"Детский сад отдаленность, м"), blank=True, )
+    school = models.IntegerField(help_text=_(u"Школа отдаленность, м"), null=True, verbose_name=_(u"Школа отдаленность, м"), blank=True, )
+    clinic = models.IntegerField(help_text=_(u"Поликлиника отдаленность, м"), null=True, verbose_name=_(u"Поликлиника отдаленность, м"), blank=True, )
 
 
 class BaseTerritoryImprovement(models.Model):
@@ -238,6 +238,8 @@ class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImproveme
     internal_doors = models.IntegerField(help_text=_(u"Материал межкомнатных дверей"), default=0, blank=True, verbose_name=_(u"Материал межкомнатных дверей"), )
     entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), default=0, blank=True, verbose_name=_(u"Материал входной двери"), )
     window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"), )
+
+
 
 
 class BaseDevices(models.Model):

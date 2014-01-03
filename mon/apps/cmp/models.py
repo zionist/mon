@@ -4,13 +4,14 @@ from datetime import datetime
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
+from apps.core.models import BaseDocumentModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
 from apps.imgfile.models import File, Image, BaseImage
 
 from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground, Contract
 from apps.mo.models import MO
+from apps.user.models import CustomUser
 
 
 class Person(models.Model):
@@ -52,11 +53,11 @@ class Result(BaseResult, ):
     building = models.ForeignKey(Building, null=True, blank=True, help_text=_(u"Осмотренное строение"), verbose_name=_(u"Осмотренное строение"))
     ground = models.ForeignKey(Ground, null=True, blank=True, help_text=_(u"Осмотренный земельный участок"), verbose_name=_(u"Осмотренный земельный участок"))
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
-    mo_pers = models.ForeignKey(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
-    establish_pers = models.ForeignKey(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
+    mo_pers = models.ManyToManyField(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
+    establish_pers = models.ManyToManyField(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
 
 
-class AuctionDocuments(BaseModel, BaseImage):
+class AuctionDocuments(BaseDocumentModel, BaseImage):
 
     class Meta:
         app_label = "cmp"

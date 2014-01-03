@@ -5,6 +5,7 @@ from apps.core.models import BasePayment
 from apps.imgfile.models import File, Image, BaseImage
 from apps.cmp.models import Contract
 from apps.mo.models import Subvention
+from apps.user.models import CustomUser
 
 
 class Payment(BasePayment, BaseImage):

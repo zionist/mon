@@ -2,13 +2,15 @@
 
 {% for field in form %}
 {% if forloop.counter0|check_divison:"4" == "0" %}
-<div class="row">
+<div class="row from-fix-row">
     {% endif %}
-    <div class="span3">
+    <div class="span3 form-fix-field">
         {% if field.is_hidden %}
         {{ field }}
         {% else %}
-        {{ field.label_tag }} <span class="text-error">{{ field.errors }} </span> {{ field }}
+        {{ field.label_tag }}
+        <span class="text-error">{{ field.errors }} </span>
+        {{ field|add_date_mask_class}}
         {% endif %}
     </div>
     {% if forloop.counter0|check_divison:"4" == "3" %}

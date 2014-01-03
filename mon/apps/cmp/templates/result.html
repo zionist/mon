@@ -3,56 +3,40 @@
 
 
 {% block content %}
-    <h2>{{ title }}</h2>
+    <h3>{{ title }}</h3>
     {% if errorlist %}
         <div class="error">
             {{ errorlist }}
         </div>
     {% else %}
         {% if form and object %}
-            <table>
-                <tr>
-                    <td><a class="btn btn-small" href="{% url 'update-result' object.id %}">
-                        {% trans 'Редактировать' %}</a></td>
-                    <td><a class="btn btn-small" href="{% url 'pre-delete-result' object.id %}">
-                        {% trans 'Удалить' %}</a></td>
-                    <td>{{object.check_date}}</td>
-                    <td><a class="btn btn-small" href="{% url 'cmp-result-contract' object.id %}">
-                        {% trans 'Сравнить с контрактом' %}</a></td>
-                    <td><a class="btn btn-small" href="{% url 'cmp-result-building' object.id %}">
-                        {% trans 'Сравнить с объектом' %}</a></td>
-                </tr>
-            <table>
+    <div class="span4"><a class="btn btn-info" href="{% url 'update-result' object.id %}">
+        {% trans 'редактировать' %}</a></div>
+    <div class="span5"><a class="btn btn-small" href="{% url 'cmp-result-contract' object.id %}">
+        {% trans 'Сравнить с контрактом' %}</a>
+        <a class="btn btn-small" href="{% url 'cmp-result-building' object.id %}">
+            {% trans 'Сравнить с объектом' %}</a></div>
+    <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-result' object.id %}">
+    {% trans 'Удалить' %}</a></div>
+    <br />
+    <br />
+    <br />
 
-            <h3>{% trans 'Параметры' %}</h3>
-            <form method="POST" action=""> {% csrf_token %}
-                {% cycle ' ' 0 1 2 3 as title %}
-                {% cycle ' ' 'Room' 'Hallway' 'WC' 'Kitchen' as str_title %}
-                {% for obj_form in formsets %}
-                    <br><br><h4>{% cycle str_title %}{{titles.title}}{{titles.0}}</h4>
-                    <table border="0">
-                    {% for field in obj_form %}
-                        {% if field.is_hidden %}
-                            {{ field }}
-                        {% else %}
-                            <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                        {% endif %}
-                    {% endfor %}
-                    </table>
-                {% endfor %}
+        <form method="POST" action=""> {% csrf_token %}
+        {% if form or formsets %}
+        {% if form %}
+            {% include "view_table.html" %}
+        {% endif %}
+        {% if formsets %}
+            {% for form in formsets %}
+                <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
+                {% include "view_table.html" %}
+            {% endfor %}
+        {% endif %}
+        {% endif %}
 
-                <br><h4>{% trans ' Общие параметры' %}</h4>
-                <table border="0">
-                    {% for field in cmp_form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
-
-                    {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
-                </table>
-                <br>
-            </form>
+        <br>
+        </form>
         {% endif %}
     {% endif %}
 {% endblock %}

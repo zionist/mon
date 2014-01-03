@@ -12,6 +12,7 @@ from apps.core.models import STATE_CHOICES, \
     WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
 from apps.core.forms import cmp_single
 from apps.core.models import Choices
+from apps.user.models import CustomUser
 
 
 class GroundForm(forms.ModelForm):
@@ -19,11 +20,11 @@ class GroundForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(GroundForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
 
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
@@ -42,9 +43,7 @@ class BuildingForm(GroundForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
-
-
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',)
 
 class BuildingSelectForm(forms.Form):
     state = forms.ChoiceField(label=_(u'Тип объекта'), required=True, choices=STATE_CHOICES, help_text=_(u"Тип объекта"), )
@@ -52,16 +51,20 @@ class BuildingSelectForm(forms.Form):
         required=False, queryset=Developer.objects.all(),
         help_text=_(u"Выберите застройщика (будет предложено добавить нового при пустом значении)"), )
 
+
 class BuildingShowForm(BuildingForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract',
-                   'address', 'comment', 'complete_date', 'readiness', 'payment_perspective')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract', 'developer', 'offer', 'permission', 'approve_status',
+                   'area', 'address', 'comment', 'complete_date', 'readiness', 'payment_perspective', 'flats_amount')
 
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(BuildingShowForm, self).__init__(*args, **kwargs)
+
+        self.fields['address'].widget.attrs['hidden'] = 'hidden'
+        self.fields['comment'].widget.attrs['hidden'] = 'hidden'
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget')and not hasattr(self.fields[field].widget.attrs, 'hidden'):

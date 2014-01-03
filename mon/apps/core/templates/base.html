@@ -50,10 +50,10 @@
                     <li id="creation" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Добавить' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
                             <li><a href="{% url 'create-building' %}">{% trans 'Добавить объект рынка жилья' %}</a></li>
                             <li><a href="{% url 'manage-developer' %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
                             {% if user.is_staff %}
+                            <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
                             <li><a href="{% url 'create-auction' %}">{% trans 'Добавить аукцион' %}</a></li>
                             <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li>
                             <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат выезда' %}</a></li>
@@ -126,8 +126,10 @@
     {% endblock %}
     {% block scripts %}
         <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}js/jquery.maskedinput.min.js"></script>
         <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
         <script src="{{ STATIC_URL }}js/tabs.js"></script>
+        <script src="{{ STATIC_URL }}js/masks.js"></script>
     {% endblock %}
     </body>
 {% endblock %}

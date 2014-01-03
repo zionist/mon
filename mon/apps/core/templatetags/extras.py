@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from django import template
 
+from django.forms import SelectMultiple
 from apps.core.forms import CSICheckboxSelectMultiple
+from django.forms import DateInput
 
 register = template.Library()
 
@@ -26,6 +28,10 @@ def get_choice_or_value(form, field_name):
                             continue
                         val += " %s " % choices.get(int(v))
                     return val
+                elif isinstance(form.fields[field_name].widget, SelectMultiple):
+                    print('SelectMultiple', dict(form.fields[field_name].choices))
+                    choices = list(form.fields[field_name].choices)
+                    return '; '.join([x[1] for x in choices])
                 else:
                     choices = dict(form.fields[field_name].choices)
                     return choices.get(form.initial[field_name])
@@ -57,3 +63,9 @@ def dict_val(d, key):
         return ''
     return d[key]
 
+@register.filter
+def add_date_mask_class(field):
+    if isinstance(field.field.widget, DateInput):
+        field.field.widget.attrs.update({'class': 'date_mask',
+                                         'placeholder': 'день.месяц.год'})
+    return field
