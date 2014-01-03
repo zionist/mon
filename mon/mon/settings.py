@@ -106,6 +106,7 @@ INSTALLED_APPS = (
     'webodt',
     'debug_toolbar',
     'south',
+    'autocomplete_light',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'

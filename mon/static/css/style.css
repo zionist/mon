@@ -119,3 +119,12 @@ td ul.errorlist li {
     display: table;
     height: auto;
 }
+
+.autocomplete-light-widget {
+    border: 0;
+    padding: 0;
+}
+
+.autocomplete-light-widget input, .autocomplete-light-widget input:focus {
+    width: 220px;
+}

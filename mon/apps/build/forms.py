@@ -6,16 +6,17 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
+import autocomplete_light
 
 from .models import Building, Ground
 from apps.core.models import STATE_CHOICES, \
     WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
 from apps.core.forms import cmp_single
 from apps.core.models import Choices
-from apps.user.models import CustomUser
 
 
-class GroundForm(forms.ModelForm):
+
+class GroundForm(autocomplete_light.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(GroundForm, self).__init__(*args, **kwargs)

@@ -4,6 +4,9 @@ from django.contrib import admin
 from django.conf import settings
 from django.views.generic import RedirectView
 
+import autocomplete_light
+autocomplete_light.autodiscover()
+
 from apps.core import views
 
 if 'django.contrib.admin' in settings.INSTALLED_APPS:
@@ -23,7 +26,8 @@ urlpatterns = patterns('',
         {"template_name": "login.html"},
         name="auth-login"),
     url(r"^logout/$", "django.contrib.auth.views.logout_then_login",
-        {"login_url": "/login"}, name="logout")
+        {"login_url": "/login"}, name="logout"),
+    url(r'^autocomplete/', include('autocomplete_light.urls')),
 
 )
 

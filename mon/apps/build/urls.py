@@ -1,4 +1,8 @@
 from django.conf.urls import patterns, include, url
+
+import autocomplete_light
+autocomplete_light.autodiscover()
+
 from apps.build import views
 
 

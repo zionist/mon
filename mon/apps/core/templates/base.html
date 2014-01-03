@@ -9,11 +9,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     {% endblock %}
     <title>{% block head_title %}{{ title }}{% endblock %}</title>
-    {% block links %}
-        <link media="screen" href="{{ STATIC_URL }}css/bootstrap.css" type="text/css" rel="stylesheet" />
-        <link media="screen" href="{{ STATIC_URL }}css/style.css" type="text/css" rel="stylesheet" />
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
-    {% endblock %}
 {% endblock %}
 </head>
 {% block body %}
@@ -124,13 +119,19 @@
         </div>
     </div>
     {% endblock %}
-    {% block scripts %}
-        <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
-        <script src="{{ STATIC_URL }}js/jquery.maskedinput.min.js"></script>
-        <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-        <script src="{{ STATIC_URL }}js/tabs.js"></script>
-        <script src="{{ STATIC_URL }}js/masks.js"></script>
-    {% endblock %}
+   {% block scripts %}
+       <script src="{{ STATIC_URL }}js/jquery.min.js"></script>
+       <script src="{{ STATIC_URL }}js/jquery.maskedinput.min.js"></script>
+       {% include 'autocomplete_light/static.html' %}
+       <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+       <script src="{{ STATIC_URL }}js/tabs.js"></script>
+       <script src="{{ STATIC_URL }}js/masks.js"></script>
+   {% endblock %}
+   {% block links %}
+       <link media="screen" href="{{ STATIC_URL }}css/bootstrap.css" type="text/css" rel="stylesheet" />
+       <link media="screen" href="{{ STATIC_URL }}css/style.css" type="text/css" rel="stylesheet" />
+       <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+   {% endblock %}
     </body>
 {% endblock %}
 {% block extra_body %} {% endblock %}
