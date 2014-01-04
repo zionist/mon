@@ -53,7 +53,7 @@ class Migration(SchemaMigration):
             ('wc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.WC'], null=True, blank=True)),
             ('hallway', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Hallway'], null=True, blank=True)),
             ('kitchen', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Kitchen'], null=True, blank=True)),
-            ('cmp_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2013, 12, 20, 0, 0), blank=True)),
+            ('cmp_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 1, 4, 0, 0), blank=True)),
         ))
         db.send_create_signal('cmp', ['CompareData'])
 
@@ -69,10 +69,26 @@ class Migration(SchemaMigration):
             ('building', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Building'], null=True, blank=True)),
             ('ground', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Ground'], null=True, blank=True)),
             ('cmp_data', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.CompareData'], null=True, blank=True)),
-            ('mo_pers', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='mo_pers', null=True, to=orm['cmp.Person'])),
-            ('establish_pers', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='establish_pers', null=True, to=orm['cmp.Person'])),
         ))
         db.send_create_signal('cmp', ['Result'])
+
+        # Adding M2M table for field mo_pers on 'Result'
+        m2m_table_name = db.shorten_name(u'cmp_result_mo_pers')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('result', models.ForeignKey(orm['cmp.result'], null=False)),
+            ('person', models.ForeignKey(orm['cmp.person'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['result_id', 'person_id'])
+
+        # Adding M2M table for field establish_pers on 'Result'
+        m2m_table_name = db.shorten_name(u'cmp_result_establish_pers')
+        db.create_table(m2m_table_name, (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('result', models.ForeignKey(orm['cmp.result'], null=False)),
+            ('person', models.ForeignKey(orm['cmp.person'], null=False))
+        ))
+        db.create_unique(m2m_table_name, ['result_id', 'person_id'])
 
         # Adding model 'AuctionDocuments'
         db.create_table(u'cmp_auctiondocuments', (
@@ -148,6 +164,12 @@ class Migration(SchemaMigration):
         # Deleting model 'Result'
         db.delete_table(u'cmp_result')
 
+        # Removing M2M table for field mo_pers on 'Result'
+        db.delete_table(db.shorten_name(u'cmp_result_mo_pers'))
+
+        # Removing M2M table for field establish_pers on 'Result'
+        db.delete_table(db.shorten_name(u'cmp_result_establish_pers'))
+
         # Deleting model 'AuctionDocuments'
         db.delete_table(u'cmp_auctiondocuments')
 
@@ -165,10 +187,11 @@ class Migration(SchemaMigration):
             'comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'complete_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
-            'developer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Developer']", 'null': 'True', 'blank': 'True'}),
+            'developer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['core.Developer']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'flat_num': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
@@ -197,7 +220,7 @@ class Migration(SchemaMigration):
             'readiness': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'room': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Room']", 'null': 'True', 'blank': 'True'}),
             'school': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'state': ('django.db.models.fields.IntegerField', [], {}),
+            'state': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'water_removal': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'water_settlement': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'wc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.WC']", 'null': 'True', 'blank': 'True'}),
@@ -236,6 +259,7 @@ class Migration(SchemaMigration):
             'mo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mo.MO']"}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
             'num': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
+            'period_of_payment': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'public_transport': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'room': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Room']", 'null': 'True', 'blank': 'True'}),
             'school': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -311,7 +335,7 @@ class Migration(SchemaMigration):
             'room': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Room']", 'null': 'True', 'blank': 'True'}),
             'school': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'start_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'state': ('django.db.models.fields.IntegerField', [], {}),
+            'state': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'water_removal': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'water_settlement': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'wc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.WC']", 'null': 'True', 'blank': 'True'}),
@@ -380,7 +404,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CompareData'},
             'area': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'cmp_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 12, 20, 0, 0)', 'blank': 'True'}),
+            'cmp_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 1, 4, 0, 0)', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
@@ -429,10 +453,10 @@ class Migration(SchemaMigration):
             'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
             'doc_files': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['imgfile.File']", 'null': 'True', 'blank': 'True'}),
             'doc_list': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
-            'establish_pers': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'establish_pers'", 'null': 'True', 'to': "orm['cmp.Person']"}),
+            'establish_pers': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'establish_pers'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['cmp.Person']"}),
             'ground': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Ground']", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'mo_pers': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'mo_pers'", 'null': 'True', 'to': "orm['cmp.Person']"}),
+            'mo_pers': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'mo_pers'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['cmp.Person']"}),
             'readiness': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'recommend': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'})
         },
@@ -514,7 +538,7 @@ class Migration(SchemaMigration):
         'core.developer': {
             'Meta': {'object_name': 'Developer'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
-            'boss_position': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
+            'boss_position': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
             'face_list': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),

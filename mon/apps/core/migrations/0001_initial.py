@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from south.utils import datetime_utils as datetime
+import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -8,6 +8,23 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Choices'
+        db.create_table(u'core_choices', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=2048, blank=True)),
+            ('verbose_name', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
+        ))
+        db.send_create_signal(u'core', ['Choices'])
+
+        # Adding model 'Choice'
+        db.create_table(u'core_choice', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('choices', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Choices'])),
+            ('num', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('value', self.gf('django.db.models.fields.CharField')(max_length=4096, null=True, blank=True)),
+        ))
+        db.send_create_signal(u'core', ['Choice'])
+
         # Adding model 'BaseRoom'
         db.create_table(u'core_baseroom', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -106,7 +123,7 @@ class Migration(SchemaMigration):
             ('phone', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
             ('face_list', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('address', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
-            ('boss_position', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
+            ('boss_position', self.gf('django.db.models.fields.CharField')(max_length=2048)),
         ))
         db.send_create_signal('core', ['Developer'])
 
@@ -150,6 +167,12 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Deleting model 'Choices'
+        db.delete_table(u'core_choices')
+
+        # Deleting model 'Choice'
+        db.delete_table(u'core_choice')
+
         # Deleting model 'BaseRoom'
         db.delete_table(u'core_baseroom')
 
@@ -266,10 +289,23 @@ class Migration(SchemaMigration):
             'sockets': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'switches': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'})
         },
+        u'core.choice': {
+            'Meta': {'object_name': 'Choice'},
+            'choices': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Choices']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'num': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.CharField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'})
+        },
+        u'core.choices': {
+            'Meta': {'object_name': 'Choices'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'}),
+            'verbose_name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'})
+        },
         'core.developer': {
             'Meta': {'object_name': 'Developer'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
-            'boss_position': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
+            'boss_position': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
             'face_list': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),

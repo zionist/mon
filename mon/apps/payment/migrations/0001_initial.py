@@ -11,6 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'Payment'
         db.create_table(u'payment_payment', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('approve_status', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('num', self.gf('django.db.models.fields.CharField')(max_length=2048)),
             ('date', self.gf('django.db.models.fields.DateField')(auto_now=True, db_index=True, blank=True)),
             ('amount', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
@@ -60,6 +61,7 @@ class Migration(SchemaMigration):
             'mo': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['mo.MO']"}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
             'num': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
+            'period_of_payment': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'public_transport': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'room': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Room']", 'null': 'True', 'blank': 'True'}),
             'school': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -138,7 +140,7 @@ class Migration(SchemaMigration):
         'core.developer': {
             'Meta': {'object_name': 'Developer'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
-            'boss_position': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
+            'boss_position': ('django.db.models.fields.CharField', [], {'max_length': '2048'}),
             'face_list': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
@@ -207,6 +209,7 @@ class Migration(SchemaMigration):
         'payment.payment': {
             'Meta': {'object_name': 'Payment'},
             'amount': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'approve_status': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']"}),
             'date': ('django.db.models.fields.DateField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
