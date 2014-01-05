@@ -34,7 +34,7 @@ def add_auction(request):
     prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
         image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
-        form = AuctionForm(request.POST, prefix=prefix)
+        form = AuctionForm(request.POST, request.FILES, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=True)
         if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             auction = form.save()
@@ -145,7 +145,7 @@ def update_auction(request, pk, extra=None):
     auction = Auction.objects.get(pk=pk)
     prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
-        form = AuctionForm(request.POST, prefix=prefix, instance=auction)
+        form = AuctionForm(request.POST, request.FILES, prefix=prefix, instance=auction)
         image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, request=request, multi=True)
         context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
@@ -208,8 +208,7 @@ def add_contract(request):
     context = {'title': _(u'Добавление контракта')}
     prefix, images_prefix = 'contract', 'contract_images'
     if request.method == "POST":
-        print "     FILES", request.FILES
-        form = ContractForm(request.POST, prefix=prefix)
+        form = ContractForm(request.POST, request.FILES, prefix=prefix)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
@@ -287,7 +286,7 @@ def update_contract(request, pk, extra=None):
     contract = Contract.objects.get(pk=pk)
     prefix, images_prefix = 'contract', 'contract_images'
     if request.method == "POST":
-        form = ContractForm(request.POST, prefix=prefix, instance=contract)
+        form = ContractForm(request.POST, request.FILES, prefix=prefix, instance=contract)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=contract.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract, request=request)
         context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})

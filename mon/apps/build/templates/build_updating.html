@@ -10,7 +10,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'update-building' object.id object.state %}"> {% csrf_token %}
+            <form method="POST" enctype="multipart/form-data" action="{% url 'update-building' object.id object.state %}"> {% csrf_token %}
                 <p class="blue">{% trans ' Общие параметры' %}</p>
                 {% include "4_col_form.html" %}
                 {% with form=text_area_fields %}

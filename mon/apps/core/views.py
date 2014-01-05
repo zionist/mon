@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_list_or_404, \
@@ -138,6 +138,6 @@ def download_file(request, name):
     if os.path.isfile(os.path.join(settings.MEDIA_ROOT, name)):
         name = os.path.join(settings.MEDIA_ROOT, name)
     wrapper = FileWrapper(file(name))
-    response = HttpResponse(wrapper, content_type='text/plain')
+    response = StreamingHttpResponse(wrapper, content_type='text/plain')
     response['Content-Length'] = os.path.getsize(name)
     return response
