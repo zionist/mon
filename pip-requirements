@@ -9,3 +9,4 @@ yolk==0.4.3
 django-webodt
 xlwt
 Pillow
+django-autocomplete-light>=2.0.0a1
