@@ -208,6 +208,7 @@ def add_contract(request):
     context = {'title': _(u'Добавление контракта')}
     prefix, images_prefix = 'contract', 'contract_images'
     if request.method == "POST":
+        print "     FILES", request.FILES
         form = ContractForm(request.POST, prefix=prefix)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)

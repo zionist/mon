@@ -30,7 +30,7 @@ def add_payment(request):
     context = {'title': _(u'Добавление платежа')}
     prefix = 'pay'
     if request.method == "POST":
-        form = PaymentForm(request.POST, prefix=prefix)
+        form = PaymentForm(request.POST, request.FILES, prefix=prefix)
         if form.is_valid():
             form.save()
             return redirect('payments')

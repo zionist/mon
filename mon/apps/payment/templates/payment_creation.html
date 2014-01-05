@@ -9,7 +9,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'create-payment' %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'create-payment' %}" enctype="multipart/form-data"> {% csrf_token %}
                 {% if form %}
                 <br>
                 <table border="0">

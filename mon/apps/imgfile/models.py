@@ -31,7 +31,7 @@ class Image(BaseImage, ):
 
 
 class File(BaseFile, ):
-    file = models.FileField(max_length=2048, null=True, blank=True, upload_to='files')
+    file = models.FileField(null=True, blank=True, upload_to='files')
 
     class Meta:
         app_label = "imgfile"
