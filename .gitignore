@@ -33,6 +33,7 @@ static/admin/
 media
 mon/js
 mon/coffee
+mon/autocomplete_light
 
 # Installer logs
 pip-log.txt
@@ -50,4 +51,5 @@ nosetests.xml
 .project
 .pydevproject
 .idea
+
 
