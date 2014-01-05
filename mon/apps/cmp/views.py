@@ -513,22 +513,41 @@ def cmp_contract(request, pk):
                'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Строительный объект')}
     contract = Contract.objects.get(pk=pk)
 
-    form = ContractShowForm(instance=contract)
+    contract_form = ContractShowForm(instance=contract)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
-    context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
 
     if contract.building_set.all().exists():
         cmp_obj = contract.building_set.all()[0]
-        cmp_form = BuildingShowForm(instance=cmp_obj, cmp_initial=contract)
+        obj_form = BuildingShowForm(instance=cmp_obj, cmp_initial=contract)
     elif contract.ground_set.all().exists():
         cmp_obj = contract.ground_set.all()[0]
-        cmp_form = GroundShowForm(instance=cmp_obj, cmp_initial=contract)
+        obj_form = GroundShowForm(instance=cmp_obj, cmp_initial=contract)
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
     room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract)
-    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+
+    # fields in forms should be equal
+    def set_fields_equal(form1, form2):
+        for name, field in form1.fields.items():
+            if name not in form2.fields:
+                form1.fields.pop(name)
+        for name, field in form2.fields.items():
+            if name not in form1.fields:
+                form2.fields.pop(name)
+        return form1, form2
+
+    obj_form, contract_form = set_fields_equal(obj_form, contract_form)
+    room_cf, room_f = set_fields_equal(room_cf, room_f)
+    hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
+    wc_cf, wc_f = set_fields_equal(wc_cf, wc_f)
+    kitchen_cf, kitchen_f = set_fields_equal(kitchen_cf, kitchen_f)
+
+    context.update({'cmp_form': obj_form, 'room_cf': room_cf, 'hallway_cf': hallway_cf,
+                    'wc_cf': wc_cf, 'kitchen_cf': kitchen_cf, })
+    context.update({'form': contract_form, 'room_f': room_f, 'hallway_f': hallway_f,
+                    'wc_f': wc_f, 'kitchen_f': kitchen_f, })
 
     context.update({'object': contract, 'cmp_object': cmp_obj,
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,

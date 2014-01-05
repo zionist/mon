@@ -1,6 +1,6 @@
 {% extends "base_site.html" %}
 {% load i18n %}
-
+{% load extras %}
 
 {% block content %}
     <h4>{{ title }}</h4>
@@ -9,81 +9,88 @@
             {{ errorlist }}
         </div>
     {% else %}
+    <table class="table table-hover table-striped table-condensed">
+        <tbody>
         {% if cmp_form and cmp_object %}
-            <div class="right-cmp-object">
-            <h4 class="blue">{{ cmp_object_title }}</h4>
-            <table>
-                <tr>
-                    <td><a class="btn btn-small btn-info" href="{% url 'update-building' cmp_object.id cmp_object.state %}">
-                        {% trans 'Редактировать' %}</a></td>
-                    <td><a class="btn btn-small btn-danger" href="{% url 'pre-delete-building' cmp_object.id cmp_object.state %}">
-                        {% trans 'Удалить' %}</a></td>
-                    <td>{{cmp_object.address}}</td>
-                </tr>
-            <table>
-
             <br />
-            <form method="POST" action=""> {% csrf_token %}
-                {% for obj_form in cmp_formsets %}
-                    <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
-                    <table border="0">
-                    {% for field in obj_form %}
-                        {% if field.is_hidden %}
-                            {{ field }}
-                        {% else %}
-                            <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                        {% endif %}
-                    {% endfor %}
-                    </table>
-                {% endfor %}
-
-                <p class="blue">{% trans ' Общие параметры' %}</p>
-                <table border="0">
-                    {% for field in cmp_form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
-                </table>
-                <br>
-            </form>
-            </div>
-        {% endif %}
-        {% if form and object %}
-            <h4 class="blue">{{ object_title }}</h4>
-            <table>
+            <tr>
+                <th width="33%"> <p class="text-info"> Название </p> </th>
+                <th width="33%"> <p class="text-info">{{ cmp_object_title }}</p> </th>
+                <th width="33%"> <p class="text-info">{{ object_title }}</p> </th>
+            </tr>
+            <tr>
+                <td> </td>
+                <td>
+                    <a class="btn btn-small btn-info" href="{% url 'update-building' cmp_object.id cmp_object.state %}">
+                        {% trans 'Редактировать' %}</a>
+                    <a class="btn btn-small btn-danger" href="{% url 'pre-delete-building' cmp_object.id cmp_object.state %}">
+                        {% trans 'Удалить' %}</a>
+                </td>
+                <td>
+                    <a class="btn btn-info btn-small" href="{% url 'update-contract' object.id %}">
+                        {% trans 'Редактировать' %}</a>
+                    <a class="btn btn-danger btn-small" href="{% url 'pre-delete-contract' object.id %}">
+                        {% trans 'Удалить' %}</a>
+                </td>
+            </tr>
+            {% for field in cmp_form %}
                 <tr>
-                    <td><a class="btn btn-info btn-small" href="{% url 'update-contract' object.id %}">
-                        {% trans 'Редактировать' %}</a></td>
-                    <td><a class="btn btn-danger btn-small" href="{% url 'pre-delete-contract' object.id %}">
-                        {% trans 'Удалить' %}</a></td>
+                    <td> {{ field.label }} </td>
+                    <td> {{ cmp_form|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                    <td> {{ form|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                 </tr>
-            <table>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="table table-hover table-striped table-condensed">
+        <tbody>
+            <tr> <th> <p class="text-info"> {{ titles|get_element_by_index:0 }}</th></p> </tr>
+            {% for field in room_cf %}
+            <tr>
+                <td width="33%"> {{ field.label }} </td>
+                <td width="33%"> {{ room_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ room_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="table table-hover table-striped table-condensed">
+        <tbody>
+            <tr> <th> <p class="text-info"> {{ titles|get_element_by_index:1 }}</th></p> </tr>
+            {% for field in room_cf %}
+            <tr>
+                <td width="33%"> {{ field.label }} </td>
+                <td width="33%"> {{ hallway_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ hallway_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="table table-hover table-striped table-condensed">
+        <tbody>
+            <tr> <th> <p class="text-info"> {{ titles|get_element_by_index:2 }}</th></p> </tr>
+            {% for field in wc_cf %}
+            <tr>
+                <td width="33%"> {{ field.label }} </td>
+                <td width="33%"> {{ wc_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ wc_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <table class="table table-hover table-striped table-condensed">
+        <tbody>
+            <tr> <th> <p class="text-info"> {{ titles|get_element_by_index:3 }}</th></p> </tr>
+            {% for field in kitchen_cf %}
+            <tr>
+                <td width="33%"> {{ field.label }} </td>
+                <td width="33%"> {{ kitchen_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ kitchen_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+            </tr>
+            {% endfor %}
 
-            <br />
-            <form method="POST" action=""> {% csrf_token %}
-
-                {% for obj_form in formsets %}
-                    <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
-                    <table border="0">
-                    {% for field in obj_form %}
-                        {% if field.is_hidden %}
-                            {{ field }}
-                        {% else %}
-                            <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                        {% endif %}
-                    {% endfor %}
-                    </table>
-                {% endfor %}
-
-                <p class="blue">{% trans ' Общие параметры' %}</p>
-                <table border="0">
-                    {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
-                </table>
-                <br>
-            </form>
         {% endif %}
-
-
+        </tbody>
+    </table>
     {% endif %}
 {% endblock %}

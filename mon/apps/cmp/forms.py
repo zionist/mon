@@ -135,7 +135,7 @@ class ContractShowForm(ContractForm):
 
     def __init__(self, *args, **kwargs):
 
-        cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
+        self.cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ContractShowForm, self).__init__(*args, **kwargs)
 
 
@@ -143,10 +143,10 @@ class ContractShowForm(ContractForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
-        if cmp_initial:
+        if self.cmp_initial:
             for field in self.fields:
-                if hasattr(self.instance, field) and hasattr(cmp_initial, field):
-                    if getattr(self.instance, field) != getattr(cmp_initial, field):
+                if hasattr(self.instance, field) and hasattr(self.cmp_initial, field):
+                    if getattr(self.instance, field) != getattr(self.cmp_initial, field):
                         self.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
