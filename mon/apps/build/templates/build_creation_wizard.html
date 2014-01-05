@@ -1,0 +1,42 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h4>{{ title }}</h4>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if wizard %}
+        <h3>{% trans 'Шаг' %} {{ wizard.steps.step1 }} {% trans 'из' %} {{ wizard.steps.count }}</h3>
+        <form action="" method="post"> {% csrf_token %}
+            <table>
+                {{ wizard.management_form }}
+                {% if wizard.form.forms %}
+                {{ wizard.form.management_form }}
+                {% for form in wizard.form.forms %}
+                {% for field in form %}
+                {% if field.is_hidden %}
+                {{ field }}
+                {% else %}
+                <tr><td>{{ field.errors }}{{ field }}</td></tr>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+                {% else %}
+                <p class="blue">{{wizard.form.verbose_name}}</p>
+                    {% with form=wizard.form %}
+                        {% include "2_col_form.html" %}
+                    {% endwith %}
+                {% endif %}
+            </table>
+            {% if wizard.steps.prev %}
+            <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "В начало" %}</button>
+            <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "Предыдущий шаг" %}</button>
+            {% endif %}
+            <input type="submit" value="{% trans 'Save' %}"/>
+        </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
