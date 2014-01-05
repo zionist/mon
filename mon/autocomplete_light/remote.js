@@ -1,1 +1,0 @@
-/usr/local/lib/python2.7/dist-packages/django_autocomplete_light-1.4.10-py2.7.egg/autocomplete_light/static/autocomplete_light/remote.js
