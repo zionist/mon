@@ -24,7 +24,7 @@ class CompareDataForm(forms.ModelForm):
 #        fields = ('cmp_date', )
 
 
-class ContractForm(forms.ModelForm):
+class ContractForm(autocomplete_light.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContractForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
