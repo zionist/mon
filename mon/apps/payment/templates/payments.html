@@ -11,9 +11,22 @@
         <a class="btn btn-small" href="{% url 'accounting' %}">
             {% trans 'Общая сводка' %}</a>
     {% else %}
-        {% trans 'Потрачено: ' %} {{ accounting.spent }}
-        {% trans '; Осталось: ' %} {{ accounting.saved }}
-        {% trans '; Общая сумма субвенции: ' %} {{ accounting.sub_amount }}
+        <br><div class="auction-table">
+            <table class="table table-condensed table-striped table-hover">
+                <tr>
+                    <th> {% trans 'Потрачено' %}</th>
+                    <th> {% trans 'Осталось' %}</th>
+                    <th> {% trans 'Общая сумма субвенции' %}</th>
+                    <th> {% trans 'Экономия' %}</th>
+                </tr>
+                <tr>
+                    <td>{{accounting.spent}}</td>
+                    <td>{{accounting.saved}}</td>
+                    <td>{{accounting.sub_amount}}</td>
+                    <td>{{accounting.economy}}</td>
+                </tr>
+            </table>
+        </div>
     {% endif %}
     <br><br>
     {% if error %}
@@ -29,9 +42,10 @@
                 <tr>
                     <th> {% trans 'Наименование МО' %}</th>
                     <th> {% trans 'Потрачено' %}</th>
-                    <th> {% trans 'Подтверджено платежами' %}</th>
+                    <th> {% trans 'Подтверждено платежами' %}</th>
                     <th> {% trans 'Осталось' %}</th>
                     <th> {% trans 'Общая сумма субвенции' %}</th>
+                    <th> {% trans 'Экономия' %}</th>
 
                 </tr>
                 {% for obj in accountings %}
@@ -42,6 +56,7 @@
                             <td>{{obj.accounting.payment}}</td>
                             <td>{{obj.accounting.saved}}</td>
                             <td>{{obj.accounting.sub_amount}}</td>
+                            <td>{{obj.accounting.economy}}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}

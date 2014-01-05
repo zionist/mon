@@ -53,8 +53,8 @@ def get_payments(request, pk=None):
             mo = request.user.customuser.mo
             if mo:
                 agreements = mo.departamentagreement_set.all()
-                amount = sum([int(dep.subvention.amount) for dep in agreements])
-                spent = sum([int(contract.summa) for contract in mo.contract_set.all()])
+                amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+                spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
                 accounting = {'spent': spent, 'saved': amount - spent, 'sub_amount': amount}
                 context.update({'accounting': accounting})
                 objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
@@ -77,11 +77,13 @@ def get_accounting(request):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
     objects = []
+    amount = None
+    spent = None
     mos = MO.objects.all()
     for mo in mos:
         agreements = mo.departamentagreement_set.all()
-        amount = sum([int(dep.subvention.amount) for dep in agreements])
-        spent = sum([int(contract.summa) for contract in mo.contract_set.all()])
+        amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+        spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
         payments = []
         for dep in agreements:
             payments = payments + (list(dep.subvention.payment_set.all()))
