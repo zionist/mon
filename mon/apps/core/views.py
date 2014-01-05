@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 from django.http import HttpResponse
 from django.views.generic import ListView
@@ -18,6 +19,9 @@ from django.forms import Form as CustomForm
 from django.forms.fields import CharField
 from django.forms.widgets import Textarea
 from django.http.request import QueryDict
+from django.conf import settings
+from django.contrib.auth.decorators import permission_required, login_required
+from django.core.servers.basehttp import FileWrapper
 
 from .forms import RoomForm, HallwayForm, WCForm, KitchenForm, \
     RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm, \
@@ -127,3 +131,13 @@ def split_form(form):
                 text_area_form.fields.update({k: form.fields.pop(k)})
         text_area_form.prefix = form.prefix
         return (form, text_area_form)
+
+
+@login_required
+def download_file(request, name):
+    if os.path.isfile(os.path.join(settings.MEDIA_ROOT, name)):
+        name = os.path.join(settings.MEDIA_ROOT, name)
+    wrapper = FileWrapper(file(name))
+    response = HttpResponse(wrapper, content_type='text/plain')
+    response['Content-Length'] = os.path.getsize(name)
+    return response

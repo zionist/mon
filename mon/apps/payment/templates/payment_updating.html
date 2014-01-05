@@ -11,7 +11,7 @@
     {% else %}
         {% if form or formsets %}
 
-            <form method="POST" action="{% url 'update-payment' object.id %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'update-payment' object.id %}" enctype="multipart/form-data"> {% csrf_token %}
                 <br>
                 <table border="0">
                     {% for field in form %}
