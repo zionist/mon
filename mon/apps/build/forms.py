@@ -52,6 +52,10 @@ class BuildingSelectForm(forms.Form):
         required=False, queryset=Developer.objects.all(),
         help_text=_(u"Выберите застройщика (будет предложено добавить нового при пустом значении)"), )
 
+    def __init__(self, *args, **kwargs):
+        super(BuildingSelectForm, self).__init__(*args, **kwargs)
+        self.verbose_name = _(u"Выбор типа объекта рынка жилья и застройщика(владельца)")
+
 
 class BuildingShowForm(BuildingForm):
 

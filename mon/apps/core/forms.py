@@ -72,6 +72,7 @@ class DeveloperForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DeveloperForm, self).__init__(*args, **kwargs)
+        self.verbose_name = _(u"Добавление застройщика(владельца)")
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') \
                 and not hasattr(self.fields[field].widget.attrs, 'hidden') \
@@ -87,6 +88,7 @@ class RoomForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(RoomForm, self).__init__(*args, **kwargs)
+        self.verbose_name = _(u"Комната")
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -102,6 +104,7 @@ class HallwayForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(HallwayForm, self).__init__(*args, **kwargs)
+        self.verbose_name = _(u"Коридор")
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -117,6 +120,7 @@ class WCForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(WCForm, self).__init__(*args, **kwargs)
+        self.verbose_name = _(u"Санузел")
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -132,6 +136,7 @@ class KitchenForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(KitchenForm, self).__init__(*args, **kwargs)
+        self.verbose_name = _(u"Кухня")
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
