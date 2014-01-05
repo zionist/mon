@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import webodt
 import mimetypes
 from copy import deepcopy
@@ -7,6 +8,7 @@ from webodt.converters import converter
 from datetime import datetime
 from copy import deepcopy
 
+from django import forms
 from django.http import HttpResponse, HttpResponseNotFound, \
     HttpResponseBadRequest, HttpResponseRedirect, HttpResponseForbidden
 from django.views.generic import ListView
@@ -24,13 +26,15 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.core.servers.basehttp import FileWrapper
 from django.template import Context
 from django.core.exceptions import ObjectDoesNotExist
-from django import forms
+from django.contrib.formtools.wizard.views import SessionWizardView
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 
 from apps.build.models import Building, Ground
 from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, GroundShowForm, BuildingSelectForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
-from apps.core.forms import DeveloperForm
+from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
 from apps.user.models import CustomUser
 
 
@@ -48,6 +52,72 @@ def select_building_state(request):
         form = BuildingSelectForm(prefix=prefix)
     context.update({'select_form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+def show_developer(wizard):
+    cd = wizard.get_cleaned_data_for_step('0') or {}
+    dev = False if cd.get('developer', False) else True
+    return dev
+
+
+def show_ground(wizard):
+    cd = wizard.get_cleaned_data_for_step('0') or {}
+    ground = True if int(cd.get('state', 0)) == 2 else False
+    return ground
+
+
+def show_building(wizard):
+    cd = wizard.get_cleaned_data_for_step('0') or {}
+    building = True if not int(cd.get('state', 0)) == 2 else False
+    return building
+
+
+def get_developer(wizard):
+    cd = wizard.get_cleaned_data_for_step('0') or {}
+    return cd.get('developer', False)
+
+
+def get_state(wizard):
+    cd = wizard.get_cleaned_data_for_step('0') or {}
+    return int(cd.get('state', 0))
+
+
+class BuildCreationWizard(SessionWizardView):
+
+    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'img_files'))
+
+    def get_template_names(self):
+        return ['build_creation_wizard.html']
+
+    def done(self, form_list, **kwargs):
+        developer = get_developer(self)
+        for form in form_list:
+            if isinstance(form, DeveloperForm):
+                if form.is_valid():
+                    developer = form.save()
+            elif isinstance(form, RoomForm):
+                if form.is_valid():
+                    room = form.save()
+            elif isinstance(form, KitchenForm):
+                if form.is_valid():
+                    kitchen = form.save()
+            elif isinstance(form, WCForm):
+                if form.is_valid():
+                    wc = form.save()
+            elif isinstance(form, HallwayForm):
+                if form.is_valid():
+                    hallway = form.save()
+            elif isinstance(form, BuildingForm) or isinstance(form, GroundForm):
+                if form.is_valid():
+                    building = form.save()
+                    building.state = get_state(self)
+                    building.developer = developer
+                    building.room = room
+                    building.kitchen = kitchen
+                    building.wc = wc
+                    building.hallway = hallway
+                    building.save(update_fields=['state', 'developer', 'room', 'kitchen', 'wc', 'hallway'])
+        return redirect('buildings')
 
 
 def add_building(request, dev_pk=None, state=None):
