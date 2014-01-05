@@ -2,36 +2,35 @@
 {% load i18n %}
 
 {% block content %}
-    <h4>{{ title }}</h4>
-    {% if errorlist %}
-        <div class="error">
-            {{ errorlist }}
-        </div>
-    {% else %}
-        {% if form or formsets %}
-            <form method="POST" action="{% url 'create-contract' %}" enctype="multipart/form-data"> {% csrf_token %}
-                {% for form in formsets %}
-                <br />
-                <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
-                {% include "4_col_form.html" %}
-                {% endfor %}
-                {% if form %}
-                <br />
-                <p class="blue">{% trans ' Общие параметры' %}</p>
-                {% include "4_col_form.html" %}
-                {% with form=text_area_fields %}
-                {% include "2_col_form.html" %}
-                {% endwith %}
-                {% endif %}
-                {% if images %}
-                <p class="blue">{% trans ' Документация' %}</p>
-                {% with form=images %}
-                    {% include "4_col_form.html" %}
-                {% endwith %}
-                {% endif %}
-                <br>
-                <button class="btn-info" type="submit" name={{prefix}}> {% trans ' Сохранить ' %} </button>
-            </form>
-        {% endif %}
+<h4>{{ title }}</h4>
+{% if errorlist %}
+<div class="error">
+    {{ errorlist }}
+</div>
+{% else %}
+{% if form or formsets %}
+<form method="POST" action="{% url 'create-contract' %}" enctype="multipart/form-data"> {% csrf_token %}
+    {% if form %}
+    <p class="blue">{% trans ' Общие параметры' %}</p>
+    {% include "4_col_form.html" %}
+    {% with form=text_area_fields %}
+    {% include "2_col_form.html" %}
+    {% endwith %}
     {% endif %}
+    {% if images %}
+    <p class="blue">{% trans ' Документация' %}</p>
+    {% with form=images %}
+    {% include "4_col_form.html" %}
+    {% endwith %}
+    {% endif %}
+    {% for form in formsets %}
+    <br />
+    <p class="blue"> {% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
+    {% include "4_col_form.html" %}
+    {% endfor %}
+    <br>
+    <button class="btn-info" type="submit" name={{prefix}}> {% trans ' Сохранить ' %} </button>
+</form>
+{% endif %}
+{% endif %}
 {% endblock %}

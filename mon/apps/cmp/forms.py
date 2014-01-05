@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
+import autocomplete_light
 
 
 from .models import CompareData, Result, Auction, Person, AuctionDocuments
@@ -23,7 +24,7 @@ class CompareDataForm(forms.ModelForm):
 #        fields = ('cmp_date', )
 
 
-class ContractForm(forms.ModelForm):
+class ContractForm(autocomplete_light.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContractForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -63,7 +64,7 @@ class ContractDocumentsForm(forms.ModelForm):
         model = ContractDocuments
 
 
-class AuctionForm(forms.ModelForm):
+class AuctionForm(autocomplete_light.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AuctionForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
