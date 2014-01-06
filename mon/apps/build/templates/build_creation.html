@@ -9,7 +9,7 @@
         </div>
     {% else %}
         {% if select_form %}
-        <form method="POST" action="{% url 'create-building' %}"> {% csrf_token %}
+        <form method="POST" enctype="multipart/form-data" action="{% url 'create-building' %}"> {% csrf_token %}
             {% with form=select_form %}
             {% include "2_col_form.html" %}
             {% endwith %}

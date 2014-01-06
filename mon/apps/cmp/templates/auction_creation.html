@@ -11,7 +11,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'create-auction' %}"> {% csrf_token %}
+            <form method="POST" enctype="multipart/form-data" action="{% url 'create-auction' %}"> {% csrf_token %}
                 {% if form %}
                 <br />
                 <p class="blue">{% trans ' Общие параметры' %}</p>

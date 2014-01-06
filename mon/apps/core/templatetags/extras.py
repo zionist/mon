@@ -69,3 +69,48 @@ def add_date_mask_class(field):
         field.field.widget.attrs.update({'class': 'date_mask',
                                          'placeholder': 'день.месяц.год'})
     return field
+
+
+@register.filter
+def get_field_for_cmp(form, field_name):
+    if hasattr(form.fields[field_name], "choices"):
+        if form.initial.get(field_name):
+            # get multichoice from form
+            if isinstance(form.fields[field_name].widget, CSICheckboxSelectMultiple):
+                choices = dict(form.fields[field_name].choices)
+                val = ""
+                for v in form.initial[field_name].split(","):
+                    # skip "Not set"
+                    if int(v) == 0:
+                        continue
+                    val += " %s " % choices.get(int(v))
+                # set error style for text
+                field = form.fields[field_name]
+                if field.widget.attrs.get("style"):
+                    if "background-color: red;" in field.widget.attrs.get("style"):
+                        return '<span class="text-error"> %s </span>' % val
+                return val
+            elif isinstance(form.fields[field_name].widget, SelectMultiple):
+                choices = list(form.fields[field_name].choices)
+                val = '; '.join([x[1] for x in choices])
+                # set error style for text
+                field = form.fields[field_name]
+                if field.widget.attrs.get("style"):
+                    if "background-color: red;" in field.widget.attrs.get("style"):
+                        return '<span class="text-error"> %s </span>' % val
+                return val
+            else:
+                choices = dict(form.fields[field_name].choices)
+
+                field = form.fields[field_name]
+                val = choices.get(form.initial[field_name])
+                if field.widget.attrs.get("style"):
+                    if "background-color: red;" in field.widget.attrs.get("style"):
+                        return '<span class="text-error"> %s </span>' % val
+                return val
+    else:
+        return form.initial.get(field_name)
+
+@register.filter
+def get_element_by_index(l, index):
+    return l[int(index)]

@@ -67,10 +67,10 @@ def add_building(request, dev_pk=None, state=None):
     if request.method == "POST" and 'build' in request.POST:
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if select and int(select) == 2:
-            form = GroundForm(request.POST, prefix=prefix)
+            form = GroundForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(request.POST, prefix=prefix)
+            form = BuildingForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
@@ -260,9 +260,9 @@ def update_building(request, pk, state=None, extra=None):
     prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     if request.method == "POST":
         if state and int(state) == 2:
-            form = GroundForm(request.POST, prefix=prefix, instance=build)
+            form = GroundForm(request.POST, request.FILES, prefix=prefix, instance=build)
         else:
-            form = BuildingForm(request.POST, prefix=prefix, instance=build)
+            form = BuildingForm(request.POST, request.FILES, prefix=prefix, instance=build)
         # check access rules. Add approve_status from object to form
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')

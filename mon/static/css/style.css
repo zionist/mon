@@ -48,6 +48,10 @@ input {
     float: right;
 }
 
+.cell-align-right {
+    text-align: right!important;
+}
+
 .left_padding_fix {
     padding-left: 20px;
 }
