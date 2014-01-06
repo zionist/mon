@@ -35,7 +35,6 @@ def main(request):
 def get_fk_forms(parent=None, request=None, multi=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     forms = [RoomForm, HallwayForm, WCForm, KitchenForm] if not multi else [AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm]
-    print('    multi', multi, forms)
     if not parent:
         if request and request.method == "POST":
             room_f = forms[0](request.POST, request.FILES, prefix=room_p)

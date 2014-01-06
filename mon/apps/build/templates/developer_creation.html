@@ -9,7 +9,7 @@
         </div>
     {% else %}
         {% if form %}
-            <form method="POST" action="{% url 'manage-developer' object.id %} "> {% csrf_token %}
+            <form method="POST" action="{% url 'manage-developer' object.id state %} "> {% csrf_token %}
                 <br />
                 {% for field in form %}
                     {% if field.is_hidden %}

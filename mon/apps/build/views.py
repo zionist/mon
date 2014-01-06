@@ -46,78 +46,14 @@ def select_building_state(request):
         select_form = BuildingSelectForm(request.POST, prefix=prefix)
         if select_form.is_valid():
             cd = select_form.cleaned_data
-            dev_pk = cd.get('developer').pk if cd.get('developer') else None
-            return add_building(request, dev_pk, cd.get('state'))
+            if not cd.get('developer'):
+                return redirect('add-building-developer', state=int(cd.get('state')))
+            dev_pk = cd.get('developer').pk
+            return redirect('add-building', cd.get('state'), dev_pk)
     else:
         form = BuildingSelectForm(prefix=prefix)
     context.update({'select_form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
-
-
-def show_developer(wizard):
-    cd = wizard.get_cleaned_data_for_step('0') or {}
-    dev = False if cd.get('developer', False) else True
-    return dev
-
-
-def show_ground(wizard):
-    cd = wizard.get_cleaned_data_for_step('0') or {}
-    ground = True if int(cd.get('state', 0)) == 2 else False
-    return ground
-
-
-def show_building(wizard):
-    cd = wizard.get_cleaned_data_for_step('0') or {}
-    building = True if not int(cd.get('state', 0)) == 2 else False
-    return building
-
-
-def get_developer(wizard):
-    cd = wizard.get_cleaned_data_for_step('0') or {}
-    return cd.get('developer', False)
-
-
-def get_state(wizard):
-    cd = wizard.get_cleaned_data_for_step('0') or {}
-    return int(cd.get('state', 0))
-
-
-class BuildCreationWizard(SessionWizardView):
-
-    file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'img_files'))
-
-    def get_template_names(self):
-        return ['build_creation_wizard.html']
-
-    def done(self, form_list, **kwargs):
-        developer = get_developer(self)
-        for form in form_list:
-            if isinstance(form, DeveloperForm):
-                if form.is_valid():
-                    developer = form.save()
-            elif isinstance(form, RoomForm):
-                if form.is_valid():
-                    room = form.save()
-            elif isinstance(form, KitchenForm):
-                if form.is_valid():
-                    kitchen = form.save()
-            elif isinstance(form, WCForm):
-                if form.is_valid():
-                    wc = form.save()
-            elif isinstance(form, HallwayForm):
-                if form.is_valid():
-                    hallway = form.save()
-            elif isinstance(form, BuildingForm) or isinstance(form, GroundForm):
-                if form.is_valid():
-                    building = form.save()
-                    building.state = get_state(self)
-                    building.developer = developer
-                    building.room = room
-                    building.kitchen = kitchen
-                    building.wc = wc
-                    building.hallway = hallway
-                    building.save(update_fields=['state', 'developer', 'room', 'kitchen', 'wc', 'hallway'])
-        return redirect('buildings')
 
 
 def add_building(request, dev_pk=None, state=None):
@@ -127,10 +63,7 @@ def add_building(request, dev_pk=None, state=None):
     context.update({'state': state})
     select = state
     form = None
-    dev=None
-    if dev_pk:
-        context.update({'dev': dev_pk})
-        dev = Developer.objects.get(pk=dev_pk)
+    dev = Developer.objects.get(pk=dev_pk)
     if request.method == "POST" and 'build' in request.POST:
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if select and int(select) == 2:
@@ -139,21 +72,13 @@ def add_building(request, dev_pk=None, state=None):
         elif select and int(select) in [0, 1]:
             form = BuildingForm(request.POST, prefix=prefix)
             state_int = int(select)
-        if not dev:
-            dev_form = DeveloperForm(request.POST, prefix=dev_prefix)
-            context.update({'dev_form': dev_form})
-            if dev_form.is_valid():
-                dev = dev_form.save()
-            else:
-                form, text_area_form = split_form(form)
-                context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-                return render_to_response(template, context, context_instance=RequestContext(request))
         if not request.user.is_staff or not request.user.is_superuser:
             form.fields.pop('approve_status')
             form.fields.pop('mo')
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             building = form.save(commit=False)
             if not request.user.is_superuser:
+                #TODO logic error, if request.user.is_staff then what?
                 building.mo = request.user.customuser.mo
             building.state = state_int
             building.developer = dev
@@ -173,9 +98,6 @@ def add_building(request, dev_pk=None, state=None):
             form = GroundForm(request.POST, prefix=prefix)
         elif select and int(select) in [0, 1]:
             form = BuildingForm(request.POST, prefix=prefix)
-        if not dev:
-            dev_form = DeveloperForm(prefix=dev_prefix)
-            context.update({'dev_form': dev_form})
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
         if not request.user.is_staff or not request.user.is_superuser:
@@ -193,13 +115,17 @@ def add_building(request, dev_pk=None, state=None):
 
 
 @login_required
-def manage_developer(request, pk=None):
+def manage_developer(request, pk=None, state=None):
     template = 'developer_creation.html'
     context = {'title': _(u'Добавление застройщика(владельца) объекта')}
+    if state:
+        context.update({'state': int(state)})
     if not pk:
         form = DeveloperForm(request.POST or {})
         if form.is_valid() and 'dev' in request.POST:
-            form.save()
+            dev = form.save()
+            if state:
+                return redirect('add-building', state, dev.id)
             return redirect('buildings')
     else:
         developer = Developer.objects.get(pk=pk)
@@ -231,7 +157,7 @@ def delete_developer(request, pk):
 @login_required
 def get_developers(request):
     template = 'developers.html'
-    context = {'title': _(u'Застройщики(владельца) объекта')}
+    context = {'title': _(u'Застройщики(владельцы) объекта')}
     if Developer.objects.all().exists():
         developers = Developer.objects.all()
         page = request.GET.get('page', '1')

@@ -3,7 +3,7 @@
 
 {% block content %}
     <h4>{{title}}</h4>
-    <a class="btn btn-small" href="{% url 'manage-developer' %}">
+    <a class="btn btn-small" href="{% url 'manage-developer' obj.id state %}">
         {% trans 'Добавить застройщика(владельца) объекта' %}</a>
 <br /> <br />
     {% if error %}
@@ -18,7 +18,7 @@
                     <th> {% trans 'Физическое / Юридическое лицо' %}</th> <th> {% trans 'Фактический адрес' %}</th><th> {% trans 'Удаление' %} </th></tr>
                 {% for obj in developer_list %}
                         <tr>
-                            <td><a href="{% url 'manage-developer' obj.id %}">{{obj.name}}</a></td>
+                            <td><a href="{% url 'manage-developer' obj.id state %}">{{obj.name}}</a></td>
                             <td>{{ obj.phone }}</td>
                             {% if obj.face_list == 0 %}
                             <td> Юридическое лицо</td>
