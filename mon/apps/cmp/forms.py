@@ -21,7 +21,6 @@ class CompareDataForm(forms.ModelForm):
     class Meta:
         model = CompareData
         exclude = ('room', 'hallway', 'wc', 'kitchen')
-#        fields = ('cmp_date', )
 
 
 class ContractForm(autocomplete_light.ModelForm):

@@ -16,15 +16,15 @@
             <tr>
                 <th width="33%"> <p class="text-info"> Название </p> </th>
                 <th width="33%"> <p class="text-info">{{ object_title }}  </p>
-                    <a class="btn btn-info btn-small" href="{% url 'update-contract' object.id %}">
+                    <a class="btn btn-small btn-info" href="{{ object_update_url }}">
                         {% trans 'Редактировать' %}</a>
-                    <a class="btn btn-danger btn-small" href="{% url 'pre-delete-contract' object.id %}">
+                    <a class="btn btn-small btn-danger" href="{{ object_pre_delete_url }}">
                         {% trans 'Удалить' %}</a>
                 </th>
                 <th width="33%"> <p class="text-info">{{ cmp_object_title }}</p>
-                    <a class="btn btn-small btn-info" href="{% url 'update-building' cmp_object.id cmp_object.state %}">
+                    <a class="btn btn-small btn-info" href="{{ cmp_obj_update_url }}">
                         {% trans 'Редактировать' %}</a>
-                    <a class="btn btn-small btn-danger" href="{% url 'pre-delete-building' cmp_object.id cmp_object.state %}">
+                    <a class="btn btn-small btn-danger" href="{{ cmp_obj_pre_delete_url }}">
                         {% trans 'Удалить' %}</a>
                 </th>
             </tr>

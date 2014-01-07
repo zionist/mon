@@ -20,16 +20,20 @@ def cmp_single(obj, cmp_obj):
         if hasattr(obj.instance, field) and hasattr(cmp_obj, field):
             if getattr(obj.instance, field) != getattr(cmp_obj, field):
                 obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+        elif hasattr(obj.instance, field) and not hasattr(cmp_obj, field):
+            obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
 
 def cmp_multi(obj, cmp_obj):
     for field in obj.fields:
         if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
-
             if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
                 if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
                     obj.fields[field].widget.attrs['style'] = 'background-color: red;'
-                    obj.fields[field].label = _("ERROR ") + obj.fields[field].label
+                    #if field == "water_settlement":
+                    #    print "%s in %s" % (str(getattr(cmp_obj, field)), getattr(obj.instance, field))
+                else:
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
             elif hasattr(obj.instance, field) and hasattr(cmp_obj, field)\
                  and not isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple) and not isinstance(getattr(obj.instance, field), CommaSeparatedIntegerField):

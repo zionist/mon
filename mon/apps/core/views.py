@@ -124,12 +124,27 @@ def split_form(form):
         return (form, text_area_form)
     else:
         text_area_form = CustomForm()
-        text_area_form = CustomForm()
         for k, v in form.fields.iteritems():
             if isinstance(v, CharField) and isinstance(v.widget, Textarea):
                 text_area_form.fields.update({k: form.fields.pop(k)})
         text_area_form.prefix = form.prefix
         return (form, text_area_form)
+
+
+def set_fields_equal(form1, form2):
+    """
+    Leave only common fields in both forms
+    :param form1:
+    :param form2:
+    :return: form1, form2
+    """
+    for name, field in form1.fields.items():
+        if name not in form2.fields:
+            form1.fields.pop(name)
+    for name, field in form2.fields.items():
+        if name not in form1.fields:
+            form2.fields.pop(name)
+    return form1, form2
 
 
 @login_required

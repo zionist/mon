@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from django import template
+from django.utils.translation import ugettext_lazy as _
 
 from django.forms import SelectMultiple
-from apps.core.forms import CSICheckboxSelectMultiple
 from django.forms import DateInput
+
+from apps.core.forms import CSICheckboxSelectMultiple
 
 register = template.Library()
 
@@ -17,19 +19,21 @@ def divide(value, arg):
 def get_choice_or_value(form, field_name):
     if form.initial:
         if hasattr(form.fields[field_name], "choices"):
-            if form.initial.get(field_name):
+            if form.initial.get(field_name) is not None:
                 # get multichoice from form
                 if isinstance(form.fields[field_name].widget, CSICheckboxSelectMultiple):
                     choices = dict(form.fields[field_name].choices)
                     val = ""
                     for v in form.initial[field_name].split(","):
                         # skip "Not set"
-                        if int(v) == 0:
-                            continue
+                        try:
+                            if int(v) == 0:
+                                continue
+                        except ValueError:
+                            return None
                         val += " %s " % choices.get(int(v))
                     return val
                 elif isinstance(form.fields[field_name].widget, SelectMultiple):
-                    print('SelectMultiple', dict(form.fields[field_name].choices))
                     choices = list(form.fields[field_name].choices)
                     return '; '.join([x[1] for x in choices])
                 else:
@@ -74,15 +78,18 @@ def add_date_mask_class(field):
 @register.filter
 def get_field_for_cmp(form, field_name):
     if hasattr(form.fields[field_name], "choices"):
-        if form.initial.get(field_name):
+        if form.initial.get(field_name) is not None:
             # get multichoice from form
             if isinstance(form.fields[field_name].widget, CSICheckboxSelectMultiple):
                 choices = dict(form.fields[field_name].choices)
                 val = ""
                 for v in form.initial[field_name].split(","):
                     # skip "Not set"
-                    if int(v) == 0:
-                        continue
+                    try:
+                        if int(v) == 0:
+                            continue
+                    except ValueError:
+                        return None
                     val += " %s " % choices.get(int(v))
                 # set error style for text
                 field = form.fields[field_name]
@@ -108,7 +115,15 @@ def get_field_for_cmp(form, field_name):
                         return '<span class="text-error"> %s </span>' % val
                 return val
     else:
-        return form.initial.get(field_name)
+        val = form.initial.get(field_name)
+        field = form.fields[field_name]
+        if field.widget.attrs.get("style"):
+            if "background-color: red;" in field.widget.attrs.get("style"):
+                if val is not None:
+                    return '<span class="text-error"> %s </span>' % val
+                else:
+                    return '<span class="text-error"> %s </span>' % u"Не указано"
+        return val
 
 @register.filter
 def get_element_by_index(l, index):

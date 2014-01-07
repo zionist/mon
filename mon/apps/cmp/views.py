@@ -20,7 +20,7 @@ from .models import Result, AuctionDocuments, Auction, Person, CompareData
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
-from apps.core.views import split_form
+from apps.core.views import split_form, set_fields_equal
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen
 from apps.build.models import Contract, ContractDocuments
 from apps.build.forms import BuildingShowForm, GroundShowForm
@@ -526,17 +526,16 @@ def cmp_contract(request, pk):
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
-    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract)
+    object_update_url = reverse('update-contract', args=[contract.id, ])
+    object_pre_delete_url = reverse('pre-delete-contract', args=[contract.id, ])
+    cmp_obj_update_url = reverse('update-building', args=[cmp_obj.id, cmp_obj.state, ])
+    cmp_obj_pre_delete_url = reverse('pre-delete-building', args=[cmp_obj.id, cmp_obj.state, ])
+    context.update({'cmp_obj_update_url': cmp_obj_update_url,
+                    'cmp_obj_pre_delete_url': cmp_obj_pre_delete_url})
+    context.update({'object_update_url': object_update_url,
+                    'object_pre_delete_url': object_pre_delete_url})
 
-    # fields in forms should be equal
-    def set_fields_equal(form1, form2):
-        for name, field in form1.fields.items():
-            if name not in form2.fields:
-                form1.fields.pop(name)
-        for name, field in form2.fields.items():
-            if name not in form1.fields:
-                form2.fields.pop(name)
-        return form1, form2
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract)
 
     obj_form, contract_form = set_fields_equal(obj_form, contract_form)
     room_cf, room_f = set_fields_equal(room_cf, room_f)
@@ -560,23 +559,40 @@ def cmp_contract_auction(request, pk):
                'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Аукцион')}
     contract = Contract.objects.get(pk=pk)
 
-    form = ContractShowForm(instance=contract)
+    contract_form = ContractShowForm(instance=contract)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
-    context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
 
     if contract.auction_set.all().exists():
         cmp_obj = contract.auction_set.all()[0]
-        cmp_form = AuctionShowForm(instance=cmp_obj, cmp_initial=contract)
+        auction_form = AuctionShowForm(instance=cmp_obj, cmp_initial=contract)
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
     room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract, multi=True)
-    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+    auction_form, contract_form = set_fields_equal(auction_form, contract_form)
+    room_cf, room_f = set_fields_equal(room_cf, room_f)
+    hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
+    wc_cf, wc_f = set_fields_equal(wc_cf, wc_f)
+    kitchen_cf, kitchen_f = set_fields_equal(kitchen_cf, kitchen_f)
+
+    object_update_url = reverse('update-contract', args=[contract.id, ])
+    object_pre_delete_url = reverse('pre-delete-contract', args=[contract.id, ])
+    cmp_obj_update_url = reverse('update-auction', args=[cmp_obj.id, ])
+    cmp_obj_pre_delete_url = reverse('pre-delete-auction', args=[cmp_obj.id, ])
+    context.update({'cmp_obj_update_url': cmp_obj_update_url,
+                    'cmp_obj_pre_delete_url': cmp_obj_pre_delete_url})
+    context.update({'object_update_url': object_update_url,
+                    'object_pre_delete_url': object_pre_delete_url})
+
+    context.update({'cmp_form': auction_form, 'room_cf': room_cf, 'hallway_cf': hallway_cf,
+                    'wc_cf': wc_cf, 'kitchen_cf': kitchen_cf, })
+    context.update({'form': contract_form, 'room_f': room_f, 'hallway_f': hallway_f,
+                    'wc_f': wc_f, 'kitchen_f': kitchen_f, })
 
     context.update({'object': contract, 'cmp_object': cmp_obj,
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
-                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+                               BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
