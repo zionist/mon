@@ -15,29 +15,24 @@
             <br />
             <tr>
                 <th width="33%"> <p class="text-info"> Название </p> </th>
-                <th width="33%"> <p class="text-info">{{ cmp_object_title }}</p> </th>
-                <th width="33%"> <p class="text-info">{{ object_title }}</p> </th>
-            </tr>
-            <tr>
-                <td> </td>
-                <td>
-                    <a class="btn btn-small btn-info" href="{% url 'update-building' cmp_object.id cmp_object.state %}">
-                        {% trans 'Редактировать' %}</a>
-                    <a class="btn btn-small btn-danger" href="{% url 'pre-delete-building' cmp_object.id cmp_object.state %}">
-                        {% trans 'Удалить' %}</a>
-                </td>
-                <td>
+                <th width="33%"> <p class="text-info">{{ object_title }}  </p>
                     <a class="btn btn-info btn-small" href="{% url 'update-contract' object.id %}">
                         {% trans 'Редактировать' %}</a>
                     <a class="btn btn-danger btn-small" href="{% url 'pre-delete-contract' object.id %}">
                         {% trans 'Удалить' %}</a>
-                </td>
+                </th>
+                <th width="33%"> <p class="text-info">{{ cmp_object_title }}</p>
+                    <a class="btn btn-small btn-info" href="{% url 'update-building' cmp_object.id cmp_object.state %}">
+                        {% trans 'Редактировать' %}</a>
+                    <a class="btn btn-small btn-danger" href="{% url 'pre-delete-building' cmp_object.id cmp_object.state %}">
+                        {% trans 'Удалить' %}</a>
+                </th>
             </tr>
             {% for field in cmp_form %}
                 <tr>
                     <td> {{ field.label }} </td>
-                    <td> {{ cmp_form|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                     <td> {{ form|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                    <td> {{ cmp_form|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -48,8 +43,8 @@
             {% for field in room_cf %}
             <tr>
                 <td width="33%"> {{ field.label }} </td>
-                <td width="33%"> {{ room_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                 <td width="33%"> {{ room_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ room_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -60,8 +55,8 @@
             {% for field in room_cf %}
             <tr>
                 <td width="33%"> {{ field.label }} </td>
-                <td width="33%"> {{ hallway_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                 <td width="33%"> {{ hallway_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ hallway_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -72,8 +67,8 @@
             {% for field in wc_cf %}
             <tr>
                 <td width="33%"> {{ field.label }} </td>
-                <td width="33%"> {{ wc_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                 <td width="33%"> {{ wc_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ wc_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -84,8 +79,8 @@
             {% for field in kitchen_cf %}
             <tr>
                 <td width="33%"> {{ field.label }} </td>
-                <td width="33%"> {{ kitchen_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
                 <td width="33%"> {{ kitchen_f|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
+                <td width="33%"> {{ kitchen_cf|get_field_for_cmp:field.name|default_if_none:"Не указано"|yes_no_rus|safe }} </td>
             </tr>
             {% endfor %}
 
