@@ -189,7 +189,7 @@ class BaseEngineerNetworks(models.Model):
 
     water_removal = models.IntegerField(help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), choices=WATER_REMOVAL_CHOICES , )
     electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
-    gas_supply = models.NullBooleanField(help_text=_(u"Газоснабжение"), blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
+    gas_supply = models.IntegerField(help_text=_(u"Газоснабжение"), null=True, blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
 
 
 class BaseWaterSupply(BaseEngineerNetworks):

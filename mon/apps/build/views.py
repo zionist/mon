@@ -269,6 +269,8 @@ def update_building(request, pk, state=None, extra=None):
             form.fields.pop('mo')
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            print "# valid"
+            print form.cleaned_data
             new_build = form.save()
             if not request.user.is_staff or not request.user.is_superuser:
                 new_build.approve_status = build.approve_status

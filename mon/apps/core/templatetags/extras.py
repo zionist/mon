@@ -101,7 +101,6 @@ def get_field_for_cmp(form, field_name):
                 return val
             else:
                 choices = dict(form.fields[field_name].choices)
-
                 field = form.fields[field_name]
                 val = choices.get(form.initial[field_name])
                 if field.widget.attrs.get("style"):
