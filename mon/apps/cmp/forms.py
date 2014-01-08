@@ -43,7 +43,7 @@ class ContractForm(autocomplete_light.ModelForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
 
 
-class ResultForm(forms.ModelForm):
+class ResultForm(autocomplete_light.ModelForm):
 
     class Meta:
         model = Result
@@ -63,7 +63,7 @@ class ContractDocumentsForm(forms.ModelForm):
         model = ContractDocuments
 
 
-class AuctionForm(autocomplete_light.ModelForm):
+class AuctionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AuctionForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -173,7 +173,7 @@ class CompareDataShowForm(forms.ModelForm):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
 
-class ResultShowForm(forms.ModelForm):
+class ResultShowForm(autocomplete_light.ModelForm):
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
