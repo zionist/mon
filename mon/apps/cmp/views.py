@@ -615,12 +615,32 @@ def cmp_result_building(request, pk):
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    object_update_url = reverse('update-result', args=[res.id, ])
+    object_pre_delete_url = reverse('pre-delete-result', args=[res.id, ])
+    cmp_obj_update_url = reverse('update-building', args=[cmp_obj.id, cmp_obj.state, ])
+    cmp_obj_pre_delete_url = reverse('pre-delete-building', args=[cmp_obj.id, cmp_obj.state, ])
+    context.update({'cmp_obj_update_url': cmp_obj_update_url,
+                    'cmp_obj_pre_delete_url': cmp_obj_pre_delete_url})
+    context.update({'object_update_url': object_update_url,
+                    'object_pre_delete_url': object_pre_delete_url})
+
+
     room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=result)
-    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+    cmp_form, form = set_fields_equal(cmp_form, form)
+    room_cf, room_f = set_fields_equal(room_cf, room_f)
+    hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
+    wc_cf, wc_f = set_fields_equal(wc_cf, wc_f)
+    kitchen_cf, kitchen_f = set_fields_equal(kitchen_cf, kitchen_f)
+
+    context.update({'cmp_form': cmp_form, 'room_cf': room_cf, 'hallway_cf': hallway_cf,
+                    'wc_cf': wc_cf, 'kitchen_cf': kitchen_cf, })
+    context.update({'form': form, 'room_f': room_f, 'hallway_f': hallway_f,
+                    'wc_f': wc_f, 'kitchen_f': kitchen_f, })
 
     context.update({'object': result, 'cmp_object': cmp_obj,
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
-                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+                               BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
@@ -641,10 +661,29 @@ def cmp_result_contract(request, pk):
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    object_update_url = reverse('update-result', args=[res.id, ])
+    object_pre_delete_url = reverse('pre-delete-result', args=[res.id, ])
+    cmp_obj_update_url = reverse('update-contract', args=[cmp_obj.id, ])
+    cmp_obj_pre_delete_url = reverse('pre-delete-contract', args=[cmp_obj.id, ])
+    context.update({'cmp_obj_update_url': cmp_obj_update_url,
+                    'cmp_obj_pre_delete_url': cmp_obj_pre_delete_url})
+    context.update({'object_update_url': object_update_url,
+                    'object_pre_delete_url': object_pre_delete_url})
+
     room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=result)
-    context.update({'cmp_form': cmp_form, 'cmp_formsets': [room_cf, hallway_cf, wc_cf, kitchen_cf]})
+    cmp_form, form = set_fields_equal(cmp_form, form)
+    room_cf, room_f = set_fields_equal(room_cf, room_f)
+    hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
+    wc_cf, wc_f = set_fields_equal(wc_cf, wc_f)
+    kitchen_cf, kitchen_f = set_fields_equal(kitchen_cf, kitchen_f)
+
+    context.update({'cmp_form': cmp_form, 'room_cf': room_cf, 'hallway_cf': hallway_cf,
+                    'wc_cf': wc_cf, 'kitchen_cf': kitchen_cf, })
+    context.update({'form': form, 'room_f': room_f, 'hallway_f': hallway_f,
+                    'wc_f': wc_f, 'kitchen_f': kitchen_f, })
 
     context.update({'object': result, 'cmp_object': cmp_obj,
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
-                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+                               BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))

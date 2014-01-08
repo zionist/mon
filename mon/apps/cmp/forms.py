@@ -150,7 +150,7 @@ class ContractShowForm(ContractForm):
 
 
 class CompareDataShowForm(forms.ModelForm):
-    water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
+    water_settlement = forms.ChoiceField(label=_(u"Водоподведение111"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
         widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
