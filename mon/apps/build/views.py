@@ -49,7 +49,7 @@ def select_building_state(request):
             if not cd.get('developer'):
                 return redirect('add-building-developer', state=int(cd.get('state')))
             dev_pk = cd.get('developer').pk
-            return redirect('add-building', cd.get('state'), dev_pk)
+            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk)
     else:
         form = BuildingSelectForm(prefix=prefix)
     context.update({'select_form': form})
@@ -64,6 +64,7 @@ def add_building(request, dev_pk=None, state=None):
     select = state
     form = None
     dev = Developer.objects.get(pk=dev_pk)
+    context.update({'state': select, 'dev': dev_pk})
     if request.method == "POST" and 'build' in request.POST:
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if select and int(select) == 2:

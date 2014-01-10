@@ -18,20 +18,13 @@
         </form>
         {% endif %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'add-building' state dev %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'add-building' state dev %}" enctype="multipart/form-data" > {% csrf_token %}
             {% if form %}
                 <br />
                 <p class="blue">{% trans ' Общие параметры' %}</p>
                 {% include "4_col_form.html" %}
                 {% with form=text_area_fields %}
                     {% include "2_col_form.html" %}
-                {% endwith %}
-            {% endif %}
-            {% if dev_form %}
-                <br />
-                <p class="blue">{% trans ' Данные застройщика' %}</p>
-                {% with form=dev_form %}
-                {% include "2_col_form.html" %}
                 {% endwith %}
             {% endif %}
             {% for form in formsets %}
