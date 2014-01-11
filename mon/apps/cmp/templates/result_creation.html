@@ -10,7 +10,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'create-result' %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'create-result' %}" enctype="multipart/form-data"> {% csrf_token %}
                 <br />
                 <h4>{% trans ' Общие параметры' %}</h4>
                 {% if cmp_form %}

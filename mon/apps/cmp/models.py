@@ -37,7 +37,6 @@ class CompareData(BaseCompareData, ):
     def __unicode__(self):
         return '%s' % self.id
 
-    # result = models.ForeignKey(Result, help_text=_(u"Результат осмотра"), null=True, verbose_name=_(u"Результат осмотра"), blank=True, )
     cmp_date = models.DateTimeField(help_text=_(u"Дата последней проверки"), verbose_name=_(u"Дата последней проверки"), blank=True, default=datetime.now())
 
 
@@ -55,6 +54,7 @@ class Result(BaseResult, ):
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
     mo_pers = models.ManyToManyField(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
     establish_pers = models.ManyToManyField(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
+    doc_files = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Предоставленные документы"), verbose_name=_(u"Предоставленные документы"))
 
 
 class AuctionDocuments(BaseDocumentModel, BaseImage):

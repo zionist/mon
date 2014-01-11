@@ -172,12 +172,8 @@ def update_auction(request, pk, extra=None):
         form = AuctionForm(instance=auction, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, multi=True)
         context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-            'titles': [
-                BaseRoom._meta.verbose_name,
-                BaseHallway._meta.verbose_name,
-                BaseWC._meta.verbose_name,
-                BaseKitchen._meta.verbose_name,
-                ]})
+                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                                   BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
 
 
@@ -351,7 +347,7 @@ def add_result(request):
     context = {'title': _(u'Добавление результатов выезда в МО')}
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
-        form = ResultForm(request.POST, prefix=prefix)
+        form = ResultForm(request.POST, request.FILES, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, prefix=cmp_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
@@ -374,12 +370,8 @@ def add_result(request):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
         context.update({'form': form, 'cmp_form': cmp_form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [
-                                            BaseRoom._meta.verbose_name,
-                                            BaseHallway._meta.verbose_name,
-                                            BaseWC._meta.verbose_name,
-                                            BaseKitchen._meta.verbose_name,
-                                        ]})
+                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                                   BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
         return render_to_response(template, context, context_instance=RequestContext(request))
 
 
@@ -426,7 +418,7 @@ def update_result(request, pk, extra=None):
     result = Result.objects.get(pk=pk)
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
-        form = ResultForm(request.POST, instance=result, prefix=prefix)
+        form = ResultForm(request.POST, request.FILES, instance=result, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data, request=request)
         context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
@@ -438,27 +430,20 @@ def update_result(request, pk, extra=None):
             return redirect('results')
         else:
             form, text_area_form = split_form(form)
-            context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form, 'prefix': prefix,
-                            'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                           'titles': [
-                                            BaseRoom._meta.verbose_name,
-                                            BaseHallway._meta.verbose_name,
-                                            BaseWC._meta.verbose_name,
-                                            BaseKitchen._meta.verbose_name,
-                                        ]})
+            context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form,
+                            'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                            'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                                       BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
             return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
     else:
         form = ResultForm(instance=result, prefix=prefix)
         form, text_area_form = split_form(form)
         cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data)
-        context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-               'titles': [
-                                    BaseRoom._meta.verbose_name,
-                                    BaseHallway._meta.verbose_name,
-                                    BaseWC._meta.verbose_name,
-                                    BaseKitchen._meta.verbose_name,
-                                ]})
+        context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form,
+                        'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                                   BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
         return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
 
 
@@ -552,7 +537,7 @@ def cmp_contract(request, pk):
 
     context.update({'object': contract, 'cmp_object': cmp_obj,
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
-                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+                               BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 

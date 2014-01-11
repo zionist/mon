@@ -142,7 +142,6 @@ class BaseResult(models.Model):
     class Meta:
         abstract = True
 
-    doc_files = models.ForeignKey(File, help_text=_(u"Предоставленные документы"), null=True, verbose_name=_(u"Предоставленные документы"), blank=True, )
     check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
     doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )

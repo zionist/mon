@@ -48,7 +48,8 @@ class ResultForm(autocomplete_light.ModelForm):
     class Meta:
         model = Result
         exclude = ('cmp_data', )
-    recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), widget=forms.Textarea(attrs={'rows': 4 }))
+    recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), required=False,
+                                widget=forms.Textarea(attrs={'rows': 4 }))
 
 
 class AuctionDocumentsForm(forms.ModelForm):

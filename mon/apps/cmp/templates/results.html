@@ -26,7 +26,17 @@
                     {% if obj.id %}
                         <tr>
                             <td><a href="{% url 'change-result' obj.id %}">{{obj.cmp_data.cmp_date}}</a></td>
-                            <td>{{obj.building.mo.name}}</td><td>{{obj.recommend}}</td><td>{{obj.check_date}}</td>
+                            <td>{{obj.building.mo.name}}</td>
+                            <td>
+                                {% with obj.recommend as recommend %}
+                                    {% if recommend and recommend != ' ' and recommend != 'Нет' and recommend != 'нет' %}
+                                        {% trans 'Да' %}
+                                    {% else %}
+                                        {% trans 'Нет' %}
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>{{obj.check_date}}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
