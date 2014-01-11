@@ -53,7 +53,10 @@ def get_payments(request, pk=None):
                 agreements = mo.departamentagreement_set.all()
                 amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
                 spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-                accounting = {'spent': spent, 'saved': amount - spent, 'sub_amount': amount}
+                percent = round(((float(spent)/amount) * 100), 3)
+                economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+                accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
+                              'sub_amount': amount, 'economy': economy}
                 context.update({'accounting': accounting})
                 objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
         else:
@@ -75,18 +78,19 @@ def get_accounting(request):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
     objects = []
-    amount = None
-    spent = None
     mos = MO.objects.all()
     for mo in mos:
         agreements = mo.departamentagreement_set.all()
         amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
         spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+        percent = round(((float(spent)/amount) * 100), 3)
+        economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
         payments = []
         for dep in agreements:
             payments = payments + (list(dep.subvention.payment_set.all()))
         payment = sum([int(payment.amount) for payment in payments])
-        accounting = {'payment': payment, 'spent': spent, 'saved': amount - spent, 'sub_amount': amount}
+        accounting = {'payment': payment, 'spent': spent, 'saved': amount - spent,
+                      'percent': percent, 'sub_amount': amount, 'economy': economy}
         objects.append({'mo': mo, 'accounting': accounting})
     context.update({'accountings': objects})
     return render(request, template, context, context_instance=RequestContext(request))

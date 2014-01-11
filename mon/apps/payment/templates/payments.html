@@ -12,17 +12,19 @@
             {% trans 'Общая сводка' %}</a>
     {% else %}
         <br><div class="auction-table">
-            <table class="table table-condensed table-striped table-hover">
+            <br><table class="table table-condensed table-striped table-hover">
                 <tr>
+                    <th> {% trans 'Общая сумма субвенции' %}</th>
                     <th> {% trans 'Потрачено' %}</th>
                     <th> {% trans 'Осталось' %}</th>
-                    <th> {% trans 'Общая сумма субвенции' %}</th>
-                    <th> {% trans 'Экономия' %}</th>
+                    <th> {% trans '% освоения субвенции' %}</th>
+                    <th> {% trans 'Экономия по результатам торгов' %}</th>
                 </tr>
                 <tr>
+                    <td>{{accounting.sub_amount}}</td>
                     <td>{{accounting.spent}}</td>
                     <td>{{accounting.saved}}</td>
-                    <td>{{accounting.sub_amount}}</td>
+                    <td>{{accounting.percent}}</td>
                     <td>{{accounting.economy}}</td>
                 </tr>
             </table>
@@ -39,26 +41,27 @@
         {% if accountings %}
             <div class="auction-table">
             <table class="table table-condensed table-striped table-hover">
+                {% regroup accountings by mo as accounting_list %}
                 <tr>
-                    <th> {% trans 'Наименование МО' %}</th>
-                    <th> {% trans 'Потрачено' %}</th>
-                    <th> {% trans 'Подтверждено платежами' %}</th>
-                    <th> {% trans 'Осталось' %}</th>
                     <th> {% trans 'Общая сумма субвенции' %}</th>
-                    <th> {% trans 'Экономия' %}</th>
-
+                    <th> {% trans 'Осталось' %}</th>
+                    <th> {% trans 'Потрачено' %}</th>
+                    <th> {% trans 'Подтверждено платежными поручениями' %}</th>
+                    <th> {% trans '% освоения субвенции' %}</th>
+                    <th> {% trans 'Экономия по результатам торгов' %}</th>
                 </tr>
-                {% for obj in accountings %}
-                    {% if obj.mo %}
+                {% for mo in accounting_list %}
+                    <tr><th colspan="6"> <strong>{{mo.grouper}}</strong></th></tr>
+                    {% for obj in mo.list %}
                         <tr>
-                            <td>{{obj.mo}}</td>
+                            <td>{{obj.accounting.sub_amount}}</td>
+                            <td>{{obj.accounting.saved}}</td>
                             <td>{{obj.accounting.spent}}</td>
                             <td>{{obj.accounting.payment}}</td>
-                            <td>{{obj.accounting.saved}}</td>
-                            <td>{{obj.accounting.sub_amount}}</td>
+                            <td>{{obj.accounting.percent}}</td>
                             <td>{{obj.accounting.economy}}</td>
                         </tr>
-                    {% endif %}
+                    {% endfor %}
                 {% endfor %}
             </table>
             </div>
