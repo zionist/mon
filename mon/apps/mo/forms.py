@@ -12,7 +12,7 @@ from .models import MO, RegionalBudget, FederalBudget, Subvention, DepartamentAg
 class MOForm(forms.ModelForm):
     class Meta:
         model = MO
-        fields = ('name', 'creation_form',)
+        fields = ('name', 'creation_form', 'has_trouble')
 
 
 class RegionalBudgetForm(forms.ModelForm):
