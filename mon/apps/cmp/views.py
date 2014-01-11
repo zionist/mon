@@ -135,7 +135,9 @@ def get_auction(request, pk, extra=None):
         form = AuctionShowForm(prefix=prefix, instance=auction)
         image_form = AuctionDocumentsForm(prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction, multi=True)
-        context.update({'form': form, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+        context.update({'form': form, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                                   BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name,]})
     context.update({'object': auction})
     return render(request, 'auction.html', context, context_instance=RequestContext(request))
 
