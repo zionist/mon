@@ -201,36 +201,36 @@ def get_filter(request, num, extra=None):
         # 6 Фильтр всех муниципальных образований, которые заключили контракты с возможностью просмотра подробных сведений по каждому контракту (4.7)
         objects = MO.objects.filter(contract__summa__gt=0)
         template = '../../mo/templates/mos.html'
-        context.update({'mo_list': objects})
+        context.update({'mo_list': objects, 'mo_contracts': True})
     elif num == 7:
         # 7 Фильтр муниципальных образований, размещение заказа которых находится на этапе подачи заявок (4.7)
         objects = Auction.objects.filter(stage=0)
-        template = '../../cmp/templates/auctions.html'
+        template = '../../cmp/templates/mo_auctions.html'
         context.update({'auction_list': objects})
     elif num == 8:
         # 8 Фильтр муниципальных образований, размещение заказа которых находится на этапе работы комиссии (4.7)
         objects = Auction.objects.filter(stage=1)
-        template = '../../cmp/templates/auctions.html'
+        template = '../../cmp/templates/mo_auctions.html'
         context.update({'auction_list': objects})
     elif num == 9:
         # 9 Фильтр муниципальных образований, размещение заказа которых завершено по причине отсутствия участников (4.7)
         objects = Auction.objects.filter(stage=3)
-        template = '../../cmp/templates/auctions.html'
+        template = '../../cmp/templates/mo_auctions.html'
         context.update({'auction_list': objects})
     elif num == 10:
         # 10 Фильтр муниципальных образований, размещение заказа которых завершено, подана одна заявка (4.7)
         objects = Auction.objects.filter(proposal_count=1)
-        template = '../../cmp/templates/auctions.html'
+        template = '../../cmp/templates/mo_auctions.html'
         context.update({'auction_list': objects})
     elif num == 11:
         # 11 Фильтр муниципальных образований, размещение заказа которых завершено, не допущена ни одна заявка (4.7)
         objects = Auction.objects.filter(stage=2)
-        template = '../../cmp/templates/auctions.html'
+        template = '../../cmp/templates/mo_auctions.html'
         context.update({'auction_list': objects})
     elif num == 12:
         # 12 Фильтр муниципальных образований, размещение заказа которых отменено (4.7)
         objects = Auction.objects.filter(stage=5)
-        template = '../../cmp/templates/auctions.html'
+        template = '../../cmp/templates/mo_auctions.html'
         context.update({'auction_list': objects})
     elif num == 16:
         # 16 Фильтр муниципальных образований, к которым есть замечания

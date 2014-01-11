@@ -15,20 +15,22 @@
     {% else %}
 
         {% if objects_list %}
-            <table class="table table-striped table-condensed table-hover">
+            <table class="table table-condensed table-bordered">
 
-                <tr><th>{% trans 'Наменование МО: ' %}</th><th>{% trans 'Способ формирования спец жил фонда' %}</th>
-                    <th>{% trans 'Количество квартир по соглашению' %}</th>
-                    <th>{% trans 'Количество квартир по аукционам на этапе подачи заявок' %}</th>
-                    <th>{% trans 'Количество квартир по аукционам на этапе работы комиссии' %}</th>
-                    <th>{% trans 'Количество квартир по аукционам, размещение которых завершено (не подана ни одна заявка)' %}</th>
-                    <th>{% trans 'Количество квартир по аукционам, по результатам которых заключены контракты' %}</th>
+                <tr><th rowspan="2">{% trans 'Наменование МО / ' %}{% trans 'Способ формирования спец жил фонда' %}</th>
+                    <th rowspan="2">{% trans 'Количество квартир по соглашению' %}</th>
+                    <th colspan="4">{% trans 'Количество квартир по аукционам' %}</th>
+                </tr><tr>
+                    <th>{% trans 'на этапе подачи заявок' %}</th>
+                    <th>{% trans 'на этапе работы комиссии' %}</th>
+                    <th>{% trans 'размещение которых завершено (не подана ни одна заявка)' %}</th>
+                    <th>{% trans 'по результатам которых заключены контракты' %}</th>
                 </tr>
                 {% for object in objects_list %}
                 <tr onclick="location.href = '{% url 'mo-auctions' object.id %}'">
-                    <td> <a href="{% url 'mo-auctions' object.id %}"> {{ object.name }} </a> </td>
-                    <td>{% with object.creation_form as form %}
-                            {% if form == 0 %}П{% elif form == 1%}ДС{% elif form == 2 %}С{% endif %}
+                    <td> <a href="{% url 'mo-auctions' object.id %}"> {{ object.name }}</a> /
+                    {% with object.creation_form as creation_form %}
+                            {% if creation_form == 0 %}П{% elif creation_form == 1%}ДС{% elif creation_form == 2 %}С{% endif %}
                         {% endwith %}
                     </td>
                     <td>{{ object.amount_0 }}</td>

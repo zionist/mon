@@ -17,16 +17,23 @@
         {% if mo_list %}
             <div class="auction-table">
             <table class="table table-condensed table-striped table-hover">
-                <tr><th> {% trans 'Наименование' %}</th>
-                    <th> {% trans 'Форма создания спец. жил фонда' %}</th>
+                <tr><th> {% trans 'Наименование' %} / {% trans 'Форма создания спец. жил. фонда' %}</th>
                     <th> {% trans 'Показатель результативности предоставления субвенции' %}</th>
                     <th> {% trans 'Общая сумма выделенной субвенции' %}</th>
-                    <th> {% trans 'Количество жилых помещений по заключенным контрактам' %}</th></tr>
+                    <th> {% trans 'Количество жилых помещений по заключенным контрактам' %}</th>
+                </tr>
                 {% for obj in mo_list %}
                     {% if obj.id %}
                         <tr>
-                            <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a></td>
-                            <td>{% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС{% elif obj.creation_form == 2%}С{% endif %}</td>
+                            <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a> /
+                                {% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС{% elif obj.creation_form == 2%}С{% endif %}
+                            {% if mo_contracts %}
+                                <br><br><strong>{% trans 'Контракты: ' %} </strong>
+                                {% for contract in obj.contract_set.all %}
+                                    <a href="{% url 'change-contract' contract.id %}">{{contract.num}}; </a>
+                                {% endfor %}
+                            {% endif %}
+                            </td>
                             <td>{{obj.departamentagreement_set.all.0.subvention_performance}}</td>
                             <td>{{obj.departamentagreement_set.all.0.subvention.amount}}</td>
                             <td>{{obj.contract_set.all.count}}</td>

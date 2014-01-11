@@ -79,7 +79,7 @@ def get_auctions(request, pk=None):
     context = {'title': _(u'Аукционы')}
     if MO.objects.all().exists():
         mos = MO.objects.all().order_by('name')
-        objects = [{'id': mo.id, 'name': mo.name, 'auctions': mo.auction_set,
+        objects = [{'id': mo.id, 'name': mo.name, 'creation_form': mo.creation_form, 'auctions': mo.auction_set,
                     'amount_0': mo.departamentagreement_set.all()[0].subvention_performance,
                     'amount_1': mo.auction_set.filter(stage=0).count(),
                     'amount_2': mo.auction_set.filter(stage=1).count(),
