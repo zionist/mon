@@ -21,13 +21,14 @@ from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, Perso
     ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form, set_fields_equal
-from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen
+from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
 from apps.build.models import Contract, ContractDocuments
 from apps.build.forms import BuildingShowForm, GroundShowForm
 from apps.imgfile.models import Image
 from apps.mo.models import MO
 
 
+@login_required
 def add_auction(request):
     template = 'auction_creation.html'
     context = {'title': _(u'Добавление аукциона')}
@@ -124,6 +125,7 @@ def get_mo_auctions(request, pk=None):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def get_auction(request, pk, extra=None):
     context = {'title': _(u'Параметры аукциона')}
     auction = Auction.objects.get(pk=pk)
@@ -142,6 +144,7 @@ def get_auction(request, pk, extra=None):
     return render(request, 'auction.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_auction(request, pk, extra=None):
     context = {'title': _(u'Параметры аукциона')}
     auction = Auction.objects.get(pk=pk)
@@ -177,6 +180,7 @@ def update_auction(request, pk, extra=None):
     return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def pre_delete_auction(request, pk):
     context = {'title': _(u'Удаление заказа')}
     auction = Auction.objects.get(pk=pk)
@@ -184,6 +188,7 @@ def pre_delete_auction(request, pk):
     return render_to_response("auction_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_auction(request, pk):
     context = {'title': _(u'Удаление заказа')}
     auction = Auction.objects.get(pk=pk)
@@ -201,6 +206,7 @@ def delete_auction(request, pk):
     return render_to_response("auction_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def add_contract(request):
     template = 'contract_creation.html'
     context = {'title': _(u'Добавление контракта')}
@@ -236,6 +242,54 @@ def add_contract(request):
 
 
 @login_required
+def add_contract_from_auction(request, pk):
+    template = 'contract_creation.html'
+    context = {'title': _(u'Добавление контракта по параметрам аукциона')}
+    prefix, images_prefix = 'contract', 'contract_images'
+    auction = Auction.objects.get(pk=pk)
+    kwargs = auction.to_dict()
+    contract_kwargs = {}
+    for k, v in kwargs.iteritems():
+        if not 'id' in k and type(v) in ['str', 'unicode', 'int']:
+            contract_kwargs.update({k: v})
+    #if contract_kwargs:
+    contract = Contract.objects.create(**contract_kwargs)
+    room_kwargs, hallway_kwargs, wc_kwargs, kitchen_kwargs = auction.room.to_dict(), auction.hallway.to_dict(), auction.wc.to_dict(), auction.kitchen.to_dict(),
+    room, hallway, wc, kitchen = Room.objects.create(**room_kwargs), Hallway.objects.create(**room_kwargs), WC.objects.create(**wc_kwargs), Kitchen.objects.create(**kitchen_kwargs),
+    parent = {'room': room, 'kitchen': kitchen, 'wc': wc, 'hallway': hallway}
+    if request.method == "POST":
+        form = ContractForm(request.POST, request.FILES, prefix=prefix, instance=contract)
+        image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, parent=parent)
+        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            contract = form.save()
+            contract.docs = image_form.save()
+            contract.room = room_f.save()
+            contract.hallway = hallway_f.save()
+            contract.wc = wc_f.save()
+            contract.kitchen = kitchen_f.save()
+            contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
+            auction.contract = contract
+            auction.save(update_fields=['contract'])
+            return redirect('contracts')
+        else:
+            context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            return render_to_response(template, context, context_instance=RequestContext(request))
+    else:
+        image_form = ContractDocumentsForm(prefix=images_prefix)
+        form = ContractForm(prefix=prefix, instance=contract)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=parent)
+        context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [
+                            BaseRoom._meta.verbose_name,
+                            BaseHallway._meta.verbose_name,
+                            BaseWC._meta.verbose_name,
+                            BaseKitchen._meta.verbose_name,
+                            ]})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
 def get_contracts(request, pk=None):
     template = 'contracts.html'
     context = {'title': _(u'Контракты')}
@@ -256,6 +310,7 @@ def get_contracts(request, pk=None):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def get_contract(request, pk, extra=None):
     context = {'title': _(u'Параметры контракта')}
     contract = Contract.objects.get(pk=pk)
@@ -279,6 +334,7 @@ def get_contract(request, pk, extra=None):
     return render(request, 'contract.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_contract(request, pk, extra=None):
     context = {'title': _(u'Параметры контракта')}
     contract = Contract.objects.get(pk=pk)
@@ -318,6 +374,7 @@ def update_contract(request, pk, extra=None):
     return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def pre_delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
     contract = Contract.objects.get(pk=pk)
@@ -325,6 +382,7 @@ def pre_delete_contract(request, pk):
     return render_to_response("contract_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
     contract = Contract.objects.get(pk=pk)
@@ -342,6 +400,7 @@ def delete_contract(request, pk):
     return render_to_response("contract_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def add_result(request):
     template = 'result_creation.html'
     context = {'title': _(u'Добавление результатов выезда в МО')}
@@ -396,6 +455,7 @@ def get_results(request, pk=None):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def get_result(request, pk, extra=None):
     context = {'title': _(u'Параметры выезда')}
     result = Result.objects.get(pk=pk)
@@ -413,6 +473,7 @@ def get_result(request, pk, extra=None):
     return render(request, 'result.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_result(request, pk, extra=None):
     context = {'title': _(u'Параметры выезда')}
     result = Result.objects.get(pk=pk)
@@ -447,6 +508,7 @@ def update_result(request, pk, extra=None):
         return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def pre_delete_result(request, pk):
     context = {'title': _(u'Удаление выезда')}
     result = Result.objects.get(pk=pk)
@@ -454,6 +516,7 @@ def pre_delete_result(request, pk):
     return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_result(request, pk):
     context = {'title': _(u'Удаление выезда')}
     result = Result.objects.get(pk=pk)
@@ -472,6 +535,7 @@ def delete_result(request, pk):
     return render_to_response("result_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def manage_person(request, pk=None):
     template = 'person_creation.html'
     context = {'title': _(u'Добавление участника осмотров')}
@@ -495,6 +559,7 @@ def manage_person(request, pk=None):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def cmp_contract(request, pk):
     context = {'title': _(u'Сравнение параметров'),
                'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Строительный объект')}
@@ -541,6 +606,7 @@ def cmp_contract(request, pk):
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def cmp_contract_auction(request, pk):
     context = {'title': _(u'Сравнение параметров'),
                'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Аукцион')}
@@ -583,6 +649,7 @@ def cmp_contract_auction(request, pk):
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def cmp_result_building(request, pk):
     context = {'title': _(u'Сравнение параметров'),
                'object_title': _(u'Результат'), 'cmp_object_title': _(u'Строительный объект')}
@@ -631,6 +698,7 @@ def cmp_result_building(request, pk):
     return render(request, 'cmp.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def cmp_result_contract(request, pk):
     context = {'title': _(u'Сравнение параметров'),
                'object_title': _(u'Результат'), 'cmp_object_title': _(u'Контракт')}

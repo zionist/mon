@@ -82,13 +82,21 @@ class AuctionDocuments(BaseDocumentModel, BaseImage):
 
 
 class Auction(BaseContract, BaseAuctionData,):
+    contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"), null=True, verbose_name=_(u"Данные по заключенному контракту"), blank=True, )
+    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
+    docs = models.ForeignKey(AuctionDocuments, help_text=_(u"Аукционная документация"), verbose_name=_(u"Аукционная документация"), null=True, blank=True, )
 
     class Meta:
         app_label = "cmp"
         verbose_name = "Auction"
+
     def __unicode__(self):
         return '%s' % self.id
 
-    contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"), null=True, verbose_name=_(u"Данные по заключенному контракту"), blank=True, )
-    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    docs = models.ForeignKey(AuctionDocuments, help_text=_(u"Аукционная документация"), verbose_name=_(u"Аукционная документация"), null=True, blank=True, )
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d

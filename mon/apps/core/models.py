@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import time
+from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.imgfile.models import File, Image
@@ -180,6 +180,14 @@ class BaseMaterials(models.Model):
     wall = models.IntegerField(help_text=_(u"Материал отделки стен"), default=0, blank=True, verbose_name=_(u"Материал отделки стен") )
     ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка"), )
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseMaterials, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class BaseEngineerNetworks(models.Model):
 
@@ -190,6 +198,14 @@ class BaseEngineerNetworks(models.Model):
     electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
     gas_supply = models.IntegerField(help_text=_(u"Газоснабжение"), null=True, blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseEngineerNetworks, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class BaseWaterSupply(BaseEngineerNetworks):
 
@@ -198,6 +214,14 @@ class BaseWaterSupply(BaseEngineerNetworks):
 
     water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), default=0, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
     hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), default=0, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseWaterSupply, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class BaseSocialObjects(models.Model):
@@ -211,6 +235,14 @@ class BaseSocialObjects(models.Model):
     school = models.IntegerField(help_text=_(u"Школа отдаленность, м"), null=True, verbose_name=_(u"Школа отдаленность, м"), blank=True, )
     clinic = models.IntegerField(help_text=_(u"Поликлиника отдаленность, м"), null=True, verbose_name=_(u"Поликлиника отдаленность, м"), blank=True, )
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseSocialObjects, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class BaseTerritoryImprovement(models.Model):
 
@@ -222,6 +254,14 @@ class BaseTerritoryImprovement(models.Model):
     is_clother_drying = models.NullBooleanField(help_text=_(u"Площадка для сушки белья"), verbose_name=_(u"Площадка для сушки белья"), blank=True, )
     is_parking = models.NullBooleanField(help_text=_(u"Парковка"), verbose_name=_(u"Парковка"), blank=True, )
     is_dustbin_area = models.NullBooleanField(help_text=_(u"Площадка для мусорных контейнеров"), verbose_name=_(u"Площадка для мусорных контейнеров"), blank=True, )
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseTerritoryImprovement, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImprovement, ):
@@ -238,7 +278,13 @@ class BaseCommonChars(BaseWaterSupply, BaseSocialObjects, BaseTerritoryImproveme
     entrance_door = models.IntegerField(help_text=_(u"Материал входной двери"), default=0, blank=True, verbose_name=_(u"Материал входной двери"), )
     window_constructions = models.IntegerField(help_text=_(u"Материал оконных конструкций"), default=0, blank=True, verbose_name=_(u"Материал оконных конструкций"), )
 
-
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseCommonChars, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class BaseDevices(models.Model):
@@ -252,7 +298,14 @@ class BaseDevices(models.Model):
     ceiling_hook = models.NullBooleanField(help_text=_(u"Потолочный крюк"), verbose_name=_(u"Потолочный крюк"), blank=True, )
     heaters = models.NullBooleanField(help_text=_(u"Отопительные приборы"), verbose_name=_(u"Отопительные приборы"), blank=True, )
     smoke_filter = models.NullBooleanField(help_text=_(u"Дымоулавливатель"), verbose_name=_(u"Дымоулавливатель"), blank=True, )
-    #not_given = models.NullBooleanField(help_text=_(u"Не указано"), verbose_name=_(u"Не указано"), blank=True, )
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseDevices, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 # common classes
@@ -261,33 +314,58 @@ class BaseRoom(BaseDevices):
     class Meta:
         app_label = "core"
         verbose_name = "Комната"
+
     def __unicode__(self):
         return '%s' % self.id
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseRoom, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class BaseKitchen(BaseDevices):
+    sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
 
     class Meta:
         app_label = "core"
         verbose_name = "Кухня"
+
     def __unicode__(self):
         return '%s' % self.id
 
-    sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseKitchen, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class BaseWC(BaseDevices, ):
-
-    class Meta:
-        app_label = "core"
-        verbose_name = "Санузел"
-    def __unicode__(self):
-        return '%s' % self.id
-
     is_tower_dryer = models.NullBooleanField(help_text=_(u"Полотенцесушитель"), verbose_name=_(u"Полотенцесушитель"), blank=True, )
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.NullBooleanField(help_text=_(u"Ванна со смесителем"), verbose_name=_(u"Ванна со смесителем"), blank=True, )
     sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
+
+    class Meta:
+        app_label = "core"
+        verbose_name = "Санузел"
+
+    def __unicode__(self):
+        return '%s' % self.id
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseWC, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class BaseHallway(BaseDevices, ):
@@ -295,30 +373,73 @@ class BaseHallway(BaseDevices, ):
     class Meta:
         app_label = "core"
         verbose_name = u"Прихожая"
+
     def __unicode__(self):
         return '%s' % self.id
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseHallway, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class Room(BaseMaterials, BaseRoom):
     class Meta:
         verbose_name = u"Комната"
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(Room, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class Kitchen(BaseMaterials, BaseKitchen):
     stove = models.IntegerField(default=0, blank=True, help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"), choices=STOVE_CHOICES)
+
     class Meta:
         verbose_name = u"Кухня"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(Kitchen, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class WC(BaseMaterials, BaseWC, ):
     separate = models.IntegerField(default=0, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES)
+
     class Meta:
         verbose_name = u"Санузел"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(WC, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class Hallway(BaseMaterials, BaseHallway, ):
     class Meta:
         verbose_name = u"Прихожая"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(Hallway, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class Developer(BaseDeveloper, ):
@@ -326,6 +447,7 @@ class Developer(BaseDeveloper, ):
     class Meta:
         app_label = "core"
         verbose_name = "Developer"
+
     def __unicode__(self):
         name = self.name if self.name else self.address
         return '%s' % name
@@ -345,6 +467,14 @@ class BaseCompareData(BaseCommonChars, ):
     hallway = models.ForeignKey(Hallway, null=True, blank=True, )
     kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseCompareData, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class BaseMultiMaterials(models.Model):
 
@@ -355,6 +485,14 @@ class BaseMultiMaterials(models.Model):
     wall = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки стен"), default=0, blank=True, verbose_name=_(u"Материал отделки стен"))
     ceiling = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки потолка"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка"))
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseMultiMaterials, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class BaseMultiWaterSupply(BaseEngineerNetworks):
 
@@ -364,21 +502,57 @@ class BaseMultiWaterSupply(BaseEngineerNetworks):
     water_settlement = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), )
     hot_water_supply = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), )
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseMultiWaterSupply, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class AuctionRoom(BaseMultiMaterials, BaseRoom):
-    pass
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(AuctionRoom, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class AuctionKitchen(BaseMultiMaterials, BaseKitchen):
     stove = models.CommaSeparatedIntegerField(max_length=16, null=True, blank=True, help_text=_(u"Кухонная плита"), verbose_name=_(u"Кухонная плита"))
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(AuctionKitchen, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class AuctionWC(BaseMultiMaterials, BaseWC):
     separate = models.CommaSeparatedIntegerField(max_length=16, null=True, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"))
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(AuctionWC, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
 
 class AuctionHallway(BaseMultiMaterials, BaseHallway):
-    pass
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(AuctionHallway, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
 
 
 class BaseAuctionData(BaseMultiWaterSupply, BaseSocialObjects, BaseTerritoryImprovement, ):
@@ -413,3 +587,11 @@ class BaseAuctionData(BaseMultiWaterSupply, BaseSocialObjects, BaseTerritoryImpr
     wc = models.ForeignKey(AuctionWC, null=True, blank=True, )
     hallway = models.ForeignKey(AuctionHallway, null=True, blank=True, )
     kitchen = models.ForeignKey(AuctionKitchen, null=True, blank=True, )
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseAuctionData, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d

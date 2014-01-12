@@ -6,7 +6,12 @@
     <h4>{{ title }}</h4>
         <div class="row">
             <div class="span5"><a class="btn btn-info" href="{% url 'update-auction' object.id %}">
-                {% trans 'редактировать' %}</a></div>
+                {% trans 'Редактировать' %}</a></div>
+            {{ object.stage }}
+            {% if object.stage == 4 %}
+                <div class="span5"><a class="btn btn-small" href="{% url 'add-auction-contract' object.id %}">
+                            {% trans 'Заполнить контракт' %}</a></div>
+            {% endif %}
             <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-auction' object.id %}">
                 {% trans 'Удалить' %}</a></div>
         </div><br />
