@@ -77,15 +77,6 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-if DEBUG:
-    MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)
-    MIDDLEWARE_CLASSES.insert(0, 'mon.middleware.DisableCSRF')
-    
-
-#if DEBUG:
-#    MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)
-#    MIDDLEWARE_CLASSES.remove('django.middleware.csrf.CsrfViewMiddleware')
-
 ROOT_URLCONF = 'mon.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
@@ -162,6 +153,9 @@ if DEBUG:
         'HIDE_DJANGO_SQL': False,
         'ENABLE_STACKTRACES' : True,
     }
+#    MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)
+#    MIDDLEWARE_CLASSES.insert(0, 'mon.middleware.DisableCSRF')
+
 
 WEBODT_CONVERTER = 'webodt.converters.abiword.AbiwordODFConverter'
 # WEBODT_CONVERTER = 'webodt.converters.openoffice.OpenOfficeODFConverter'
