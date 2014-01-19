@@ -26,10 +26,6 @@ def cmp_single(obj, cmp_obj):
 
 def cmp_multi(obj, cmp_obj):
     for field in obj.fields:
-        if "floor" in field:
-            print field
-            print obj.fields[field].widget
-            print "%s in %s" % (str(getattr(cmp_obj, field)), getattr(obj.instance, field))
         if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
             if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
                 if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):

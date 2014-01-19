@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import re
+
 from django import template
 from django.utils.translation import ugettext_lazy as _
 
 from django.forms import SelectMultiple
 from django.forms import DateInput, DateTimeInput
+from django.utils.safestring import SafeText
 
 from apps.core.forms import CSICheckboxSelectMultiple
 
@@ -52,6 +55,13 @@ def get_choice_or_value(form, field_name):
 
 @register.filter
 def yes_no_rus(value):
+    if isinstance(value, SafeText) or isinstance(value, str):
+        m = re.search('<span\s*class="text-error">(.*?)</span>', value)
+        if m:
+            if "True" in m.group(1):
+                return re.sub("True", u"Да", value)
+            if "False" in m.group(1):
+                return re.sub("False", u"Нет", value)
     if value == True:
         return u"Да"
     elif value == False:
