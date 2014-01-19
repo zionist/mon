@@ -294,7 +294,7 @@ class BaseDevices(models.Model):
 
     switches = models.NullBooleanField(help_text=_(u"Выключатели"), verbose_name=_(u"Выключатели"), blank=True, )
     sockets = models.NullBooleanField(help_text=_(u"Розетки"), verbose_name=_(u"Розетки"), blank=True, )
-    lamp = models.NullBooleanField(help_text=_(u"Электрическая лампа"), verbose_name=_(u"Электрическая лампа"), blank=True, )
+    lamp = models.NullBooleanField(help_text=_(u"Электропатрон"), verbose_name=_(u"Электропатрон"), blank=True, )
     ceiling_hook = models.NullBooleanField(help_text=_(u"Потолочный крюк"), verbose_name=_(u"Потолочный крюк"), blank=True, )
     heaters = models.NullBooleanField(help_text=_(u"Отопительные приборы"), verbose_name=_(u"Отопительные приборы"), blank=True, )
     smoke_filter = models.NullBooleanField(help_text=_(u"Дымоулавливатель"), verbose_name=_(u"Дымоулавливатель"), blank=True, )
