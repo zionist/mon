@@ -26,13 +26,13 @@ def cmp_single(obj, cmp_obj):
 
 def cmp_multi(obj, cmp_obj):
     for field in obj.fields:
+        if "floor" in field:
+            print field
+            print obj.fields[field].widget
+            print "%s in %s" % (str(getattr(cmp_obj, field)), getattr(obj.instance, field))
         if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
             if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
                 if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
-                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
-                    #if field == "water_settlement":
-                    #    print "%s in %s" % (str(getattr(cmp_obj, field)), getattr(obj.instance, field))
-                else:
                     obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
             elif hasattr(obj.instance, field) and hasattr(cmp_obj, field)\
@@ -297,7 +297,7 @@ class AuctionRoomShowForm(BaseAuctionRoomShowForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
-            cmp_single(self, cmp_initial)
+            cmp_multi(self, cmp_initial)
 
 
 class AuctionHallwayShowForm(BaseAuctionRoomShowForm):
@@ -312,7 +312,7 @@ class AuctionHallwayShowForm(BaseAuctionRoomShowForm):
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
         if cmp_initial:
-            cmp_single(self, cmp_initial)
+            cmp_multi(self, cmp_initial)
 
 
 class AuctionWCShowForm(BaseAuctionRoomShowForm):
