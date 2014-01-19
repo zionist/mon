@@ -3,7 +3,7 @@ from django import template
 from django.utils.translation import ugettext_lazy as _
 
 from django.forms import SelectMultiple
-from django.forms import DateInput
+from django.forms import DateInput, DateTimeInput
 
 from apps.core.forms import CSICheckboxSelectMultiple
 
@@ -72,6 +72,9 @@ def add_date_mask_class(field):
     if isinstance(field.field.widget, DateInput):
         field.field.widget.attrs.update({'class': 'date_mask',
                                          'placeholder': 'день.месяц.год'})
+    if isinstance(field.field.widget, DateTimeInput):
+        field.field.widget.attrs.update({'class': 'date_time_mask',
+                                         'placeholder': 'день.месяц.год час:минута'})
     return field
 
 
