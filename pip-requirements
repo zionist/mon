@@ -10,3 +10,5 @@ django-webodt
 xlwt
 Pillow
 django-autocomplete-light>=2.0.0a1
+funkload
+tcpwatch

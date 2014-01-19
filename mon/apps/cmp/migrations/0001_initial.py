@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -24,7 +24,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('water_removal', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('electric_supply', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('gas_supply', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+            ('gas_supply', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('water_settlement', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
             ('hot_water_supply', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True)),
             ('public_transport', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
@@ -53,14 +53,13 @@ class Migration(SchemaMigration):
             ('wc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.WC'], null=True, blank=True)),
             ('hallway', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Hallway'], null=True, blank=True)),
             ('kitchen', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Kitchen'], null=True, blank=True)),
-            ('cmp_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 1, 4, 0, 0), blank=True)),
+            ('cmp_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 1, 19, 0, 0), blank=True)),
         ))
         db.send_create_signal('cmp', ['CompareData'])
 
         # Adding model 'Result'
         db.create_table(u'cmp_result', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('doc_files', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['imgfile.File'], null=True, blank=True)),
             ('check_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('doc_list', self.gf('django.db.models.fields.CharField')(max_length=2048, null=True, blank=True)),
             ('readiness', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
@@ -69,6 +68,7 @@ class Migration(SchemaMigration):
             ('building', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Building'], null=True, blank=True)),
             ('ground', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['build.Ground'], null=True, blank=True)),
             ('cmp_data', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['cmp.CompareData'], null=True, blank=True)),
+            ('doc_files', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
         ))
         db.send_create_signal('cmp', ['Result'])
 
@@ -113,7 +113,7 @@ class Migration(SchemaMigration):
             ('has_trouble_docs', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
             ('water_removal', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('electric_supply', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('gas_supply', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+            ('gas_supply', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('public_transport', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('market', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('kindergarden', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
@@ -194,7 +194,7 @@ class Migration(SchemaMigration):
             'flat_num': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'gas_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Hallway']", 'null': 'True', 'blank': 'True'}),
             'hot_water_supply': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -237,7 +237,7 @@ class Migration(SchemaMigration):
             'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'gas_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Hallway']", 'null': 'True', 'blank': 'True'}),
             'has_trouble_docs': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'hot_water_supply': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
@@ -308,7 +308,7 @@ class Migration(SchemaMigration):
             'finish_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'gas_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Hallway']", 'null': 'True', 'blank': 'True'}),
             'hot_water_supply': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -352,7 +352,7 @@ class Migration(SchemaMigration):
             'entrance_door': ('django.db.models.fields.CommaSeparatedIntegerField', [], {'default': '0', 'max_length': '256', 'blank': 'True'}),
             'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'gas_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.AuctionHallway']", 'null': 'True', 'blank': 'True'}),
             'has_trouble_docs': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'hot_water_supply': ('django.db.models.fields.CommaSeparatedIntegerField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
@@ -404,13 +404,13 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CompareData'},
             'area': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'clinic': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'cmp_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 1, 4, 0, 0)', 'blank': 'True'}),
+            'cmp_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 1, 19, 0, 0)', 'blank': 'True'}),
             'driveways': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'electric_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'entrance_door': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'flats_amount': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'floors': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'gas_supply': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'gas_supply': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'hallway': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['core.Hallway']", 'null': 'True', 'blank': 'True'}),
             'hot_water_supply': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -451,7 +451,7 @@ class Migration(SchemaMigration):
             'check_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'cmp_data': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cmp.CompareData']", 'null': 'True', 'blank': 'True'}),
             'contract': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Contract']", 'null': 'True', 'blank': 'True'}),
-            'doc_files': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['imgfile.File']", 'null': 'True', 'blank': 'True'}),
+            'doc_files': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'doc_list': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
             'establish_pers': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'establish_pers'", 'null': 'True', 'symmetrical': 'False', 'to': "orm['cmp.Person']"}),
             'ground': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['build.Ground']", 'null': 'True', 'blank': 'True'}),
@@ -574,13 +574,12 @@ class Migration(SchemaMigration):
             'separate': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
             'wall': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'})
         },
-        'imgfile.file': {
-            'Meta': {'object_name': 'File'},
-            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '2048', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
         'mo.mo': {
             'Meta': {'object_name': 'MO'},
+            'common_amount': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'common_economy': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'common_percentage': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'common_spent': ('django.db.models.fields.FloatField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'creation_form': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'has_trouble': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'home_orphans': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
