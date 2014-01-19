@@ -7,7 +7,6 @@
         <div class="row">
             <div class="span5"><a class="btn btn-info" href="{% url 'update-auction' object.id %}">
                 {% trans 'Редактировать' %}</a></div>
-            {{ object.stage }}
             {% if object.stage == 4 %}
                 <div class="span5"><a class="btn btn-small" href="{% url 'add-auction-contract' object.id %}">
                             {% trans 'Заполнить контракт' %}</a></div>

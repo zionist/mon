@@ -22,6 +22,15 @@ class CompareDataForm(forms.ModelForm):
         model = CompareData
         exclude = ('room', 'hallway', 'wc', 'kitchen')
 
+    def __init__(self, *args, **kwargs):
+        super(CompareDataForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
+
 
 class ContractForm(autocomplete_light.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -48,6 +57,7 @@ class ResultForm(autocomplete_light.ModelForm):
     class Meta:
         model = Result
         exclude = ('cmp_data', )
+
     recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), required=False,
                                 widget=forms.Textarea(attrs={'rows': 4 }))
 
@@ -175,10 +185,6 @@ class CompareDataShowForm(forms.ModelForm):
 
 
 class ResultShowForm(autocomplete_light.ModelForm):
-    water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
-        widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
-    hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
-        widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
 
     class Meta:
         model = Result
@@ -187,12 +193,6 @@ class ResultShowForm(autocomplete_light.ModelForm):
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ResultShowForm, self).__init__(*args, **kwargs)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, )
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, )
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):

@@ -1,0 +1,330 @@
+[
+{
+    "pk": 3, 
+    "model": "core.basekitchen", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": true, 
+        "sink_with_mixer": true, 
+        "switches": null, 
+        "lamp": null, 
+        "smoke_filter": null, 
+        "sockets": true
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.basehallway", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": null, 
+        "switches": true, 
+        "lamp": null, 
+        "smoke_filter": null, 
+        "sockets": null
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.basewc", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": null, 
+        "is_tower_dryer": true, 
+        "sink_with_mixer": null, 
+        "switches": null, 
+        "is_toilet": null, 
+        "lamp": null, 
+        "bath_with_mixer": null, 
+        "smoke_filter": null, 
+        "sockets": true
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.baseroom", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": true, 
+        "switches": false, 
+        "lamp": true, 
+        "smoke_filter": null, 
+        "sockets": null
+    }
+},
+{
+    "pk": 1, 
+    "model": "build.contractdocuments", 
+    "fields": {
+        "facility_permission": "", 
+        "mo_notice_to_citizen": "", 
+        "tec_passport_tec_plan": "", 
+        "cost_infos": "", 
+        "approval_citizen_statement": "", 
+        "mun_act_to_fond": "", 
+        "hiring_contract": "", 
+        "mo_certificate": "", 
+        "mun_contracts": "", 
+        "photos": "", 
+        "land_right_stating": "", 
+        "creation_date": "2014-01-19T12:39:32.699Z", 
+        "acceptance_acts": "", 
+        "transmission_acts": "", 
+        "protocols": "", 
+        "building_permissions": ""
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.kitchen", 
+    "fields": {
+        "wall": 2, 
+        "ceiling": 0, 
+        "stove": 0, 
+        "floor": 0
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.hallway", 
+    "fields": {
+        "wall": 2, 
+        "ceiling": 1, 
+        "floor": 2
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.wc", 
+    "fields": {
+        "wall": 0, 
+        "ceiling": 2, 
+        "separate": 0, 
+        "floor": 0
+    }
+},
+{
+    "pk": 3, 
+    "model": "core.room", 
+    "fields": {
+        "wall": 2, 
+        "ceiling": 1, 
+        "floor": 2
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.basekitchen", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": null, 
+        "sink_with_mixer": null, 
+        "switches": null, 
+        "lamp": null, 
+        "smoke_filter": null, 
+        "sockets": null
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.basehallway", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": null, 
+        "switches": null, 
+        "lamp": null, 
+        "smoke_filter": null, 
+        "sockets": null
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.basewc", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": null, 
+        "is_tower_dryer": null, 
+        "sink_with_mixer": null, 
+        "switches": null, 
+        "is_toilet": null, 
+        "lamp": null, 
+        "bath_with_mixer": null, 
+        "smoke_filter": null, 
+        "sockets": null
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.baseroom", 
+    "fields": {
+        "heaters": null, 
+        "ceiling_hook": null, 
+        "switches": null, 
+        "lamp": null, 
+        "smoke_filter": null, 
+        "sockets": null
+    }
+},
+{
+    "pk": 1, 
+    "model": "cmp.auctiondocuments", 
+    "fields": {
+        "notice": "", 
+        "notice_rec": "", 
+        "mun_contract_project": "", 
+        "technical_specification_rec": "", 
+        "max_price_substantiation_rec": "", 
+        "creation_date": "2014-01-19T13:06:57.123Z", 
+        "max_price_substantiation": "", 
+        "technical_specification": "", 
+        "mun_contract_project_rec": ""
+    }
+},
+{
+    "pk": 1, 
+    "model": "mo.mo", 
+    "fields": {
+        "name": "\u0410\u043d\u0430\u043f\u0430", 
+        "common_percentage": 0.0, 
+        "common_amount": 0.0, 
+        "creation_form": 0, 
+        "has_trouble": false, 
+        "common_economy": 0.0, 
+        "common_spent": 0.0, 
+        "home_orphans": 0
+    }
+},
+{
+    "pk": 1, 
+    "model": "build.contract", 
+    "fields": {
+        "internal_doors": 0, 
+        "is_routes": null, 
+        "water_removal": null, 
+        "hot_water_supply": 1, 
+        "area": null, 
+        "clinic": null, 
+        "num": "123", 
+        "entrance_door": 0, 
+        "market": null, 
+        "is_intercom": false, 
+        "gas_supply": 0, 
+        "is_parking": null, 
+        "is_heat_boiler": true, 
+        "flats_amount": null, 
+        "electric_supply": 0, 
+        "developer": null, 
+        "window_constructions": 1, 
+        "kindergarden": null, 
+        "hallway": 3, 
+        "wc": 3, 
+        "period_of_payment": null, 
+        "docs": 1, 
+        "kitchen": 3, 
+        "is_dustbin_area": null, 
+        "is_playground": null, 
+        "room": 3, 
+        "water_settlement": 1, 
+        "school": null, 
+        "sign_date": null, 
+        "name": "\u0422\u0435\u0441\u0442\u043e\u0432\u044b\u0439 \u043a\u043e\u043d\u0442\u0440\u0430\u043a\u0442", 
+        "summa": null, 
+        "mo": 1, 
+        "is_balcony": null, 
+        "driveways": null, 
+        "floors": 2, 
+        "public_transport": null, 
+        "has_trouble_docs": null, 
+        "is_clother_drying": null, 
+        "is_loggia": false, 
+        "is_water_boiler": true
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.auctionkitchen", 
+    "fields": {
+        "wall": "1", 
+        "ceiling": "2", 
+        "stove": "1", 
+        "floor": "1"
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.auctionhallway", 
+    "fields": {
+        "wall": "1,2,3", 
+        "ceiling": "1", 
+        "floor": "1,2,3"
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.auctionwc", 
+    "fields": {
+        "wall": "2", 
+        "ceiling": "", 
+        "separate": "1", 
+        "floor": "1"
+    }
+},
+{
+    "pk": 4, 
+    "model": "core.auctionroom", 
+    "fields": {
+        "wall": "1,2", 
+        "ceiling": "", 
+        "floor": "1,2"
+    }
+},
+{
+    "pk": 1, 
+    "model": "cmp.auction", 
+    "fields": {
+        "flats_amount": null, 
+        "is_routes": true, 
+        "water_removal": null, 
+        "hot_water_supply": "1,2", 
+        "clinic": null, 
+        "num": "1234", 
+        "entrance_door": "1,2", 
+        "market": 321, 
+        "is_intercom": null, 
+        "start_price": null, 
+        "gas_supply": null, 
+        "is_parking": null, 
+        "is_heat_boiler": null, 
+        "is_balcony": null, 
+        "public_date": null, 
+        "electric_supply": null, 
+        "open_date": null, 
+        "window_constructions": "1,2", 
+        "kindergarden": null, 
+        "hallway": 4, 
+        "internal_doors": "1", 
+        "wc": 4, 
+        "docs": 1, 
+        "kitchen": 4, 
+        "proposal_count": 0, 
+        "is_dustbin_area": null, 
+        "is_playground": null, 
+        "stage": null, 
+        "water_settlement": "1", 
+        "school": 3232, 
+        "name": "\u0422\u0435\u0441\u0442\u043e\u0432\u044b\u0439 \u0430\u0443\u043a\u0446\u0438\u043e\u043d", 
+        "room": 4, 
+        "mo": 1, 
+        "area": null, 
+        "driveways": null, 
+        "contract": 1, 
+        "floors": null, 
+        "public_transport": null, 
+        "has_trouble_docs": false, 
+        "is_clother_drying": null, 
+        "is_loggia": null, 
+        "is_water_boiler": null
+    }
+}
+]
+
