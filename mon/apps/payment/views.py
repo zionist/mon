@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+from datetime import datetime, date
 from django.http import HttpResponse
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
@@ -39,7 +39,7 @@ def add_payment(request):
 
 
 @login_required
-def get_payments(request, pk=None):
+def get_payments(request, pk=None, select=None):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
     if Payment.objects.all().exists():
@@ -74,16 +74,29 @@ def get_payments(request, pk=None):
 
 
 @login_required
-def get_accounting(request):
+def get_accounting(request, select=None):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
     objects = []
     mos = MO.objects.all()
+    kwargs = {}
+    if select and int(select) in [1,2,3, 4]:
+        state, dt = int(select), datetime.now()
+        if state == 4:
+            dt = dt.replace(year=dt.year-1)
+            prev = prev = dt.replace(year=dt.year-1)
+        elif state == 3:
+            prev = dt.replace(year=dt.year-1)
+        elif state == 2:
+            prev = dt.replace(month=dt.month-1) if dt.month > 1 else dt.replace(month=dt.month+11)
+        elif state == 1:
+            prev = dt.replace(day=dt.day-1)
+        kwargs.update({'date__lt':dt, 'date__gt':prev})
     for mo in mos:
-        agreements = mo.departamentagreement_set.all()
+        agreements = mo.departamentagreement_set.filter(**kwargs)
         amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
         spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-        percent = round(((float(spent)/amount) * 100), 3)
+        percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
         economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
         payments = []
         for dep in agreements:

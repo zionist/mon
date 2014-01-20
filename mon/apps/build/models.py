@@ -58,6 +58,14 @@ class ContractDocuments(BaseDocumentModel, BaseImage):
         l = [getattr(self, k[:-3]) for k in attrs if k and '_id' in k and getattr(self, k[:-3])]
         return l
 
+    def has_at_least_one_doc(self):
+        attrs = deepcopy(self.__dict__)
+        for k in attrs:
+            if k and not '_id' in k and getattr(self, k) and \
+               isinstance(getattr(self, k), models.fields.files.ImageFieldFile):
+                return True
+        return False
+
 
 class Contract(BaseContract, BaseCompareData):
 

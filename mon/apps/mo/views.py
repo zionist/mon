@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
     RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, RegionalBudgetShowForm
-from apps.build.models import Building, Ground
+from apps.build.models import Building, Ground, ContractDocuments
 from apps.cmp.models import Auction
 
 
@@ -244,7 +244,9 @@ def get_filter(request, num, extra=None):
         context.update({'mo_list': objects})
     elif num == 18:
         # 18 Фильтр муниципальных образований, у которых отсутствуют документы по заключенным контрактам
-        objects = MO.objects.filter(contract__docs__count=0)
+        docs = ContractDocuments.objects.all()
+        undocs = [x for x in docs if not x.has_at_least_one_doc()]
+        objects = MO.objects.filter(contract__docs__in=undocs)
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
     elif num == 19:
