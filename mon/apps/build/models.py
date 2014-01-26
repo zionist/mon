@@ -4,11 +4,11 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, Developer
 from apps.mo.models import MO
-from apps.imgfile.models import File, BaseImage
+from apps.imgfile.models import File, BaseFile, BaseFile
 from apps.user.models import CustomUser
 
 
-class ContractDocuments(BaseDocumentModel, BaseImage):
+class ContractDocuments(BaseDocumentModel, BaseFile):
 
     class Meta:
         app_label = "build"
@@ -16,40 +16,40 @@ class ContractDocuments(BaseDocumentModel, BaseImage):
     def __unicode__(self):
         return '%s' % self.id
 
-    protocols = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Протоколы о подведении итогов торгов"),
+    protocols = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Протоколы о подведении итогов торгов"),
         verbose_name=_(u"Протоколы о подведении итогов торгов"), )
-    mun_contracts = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Муниципальные контракты с приложениями"),
+    mun_contracts = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Муниципальные контракты с приложениями"),
         verbose_name=_(u"Муниципальные контракты с приложениями."), )
-    transmission_acts = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Акты приема-передачи жилых помещений"),
+    transmission_acts = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Акты приема-передачи жилых помещений"),
         verbose_name=_(u"Акты приема-передачи жилых помещений"), )
-    facility_permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешения на ввод объекта в эксплуатацию."),
+    facility_permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешения на ввод объекта в эксплуатацию."),
         verbose_name=_(u"Разрешения на ввод объекта в эксплуатацию"), )
-    land_right_stating = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Правоустанавливающие документы на земельные участки"),
+    land_right_stating = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Правоустанавливающие документы на земельные участки"),
         verbose_name=_(u"Правоустанавливающие документы на земельные участки"), )
-    building_permissions = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешения на строительство"),
+    building_permissions = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешения на строительство"),
         verbose_name=_(u"Разрешения на строительство"), )
-    acceptance_acts = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Акты о приемке выполненных работ (форма № КС-2)"),
+    acceptance_acts = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Акты о приемке выполненных работ (форма № КС-2)"),
         verbose_name=_(u"Акты о приемке выполненных работ (форма № КС-2)"), )
-    cost_infos = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Справки о стоимости выполненных работ и затрат (форма № КС-3)"),
+    cost_infos = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Справки о стоимости выполненных работ и затрат (форма № КС-3)"),
         verbose_name=_(u"Справки о стоимости выполненных работ и затрат (форма № КС-3)"), )
-    mo_certificate = models.ImageField(null=True, blank=True, upload_to='img_files',
+    mo_certificate = models.FileField(null=True, blank=True, upload_to='img_files',
                                        help_text=_(u"Свидетельство о регистрации права собственности муниципального образования на жилое помещение"),
                                        verbose_name=_(u"Свидетельство о регистрации права собственности МО на жилое помещение"), )
-    mun_act_to_fond = models.ImageField(null=True, blank=True, upload_to='img_files',
+    mun_act_to_fond = models.FileField(null=True, blank=True, upload_to='img_files',
                                         help_text=_(u"Муниципальный акт о включении приобретенного/построенного жилья в специализированный жилищный фонд для детей-сирот."),
                                         verbose_name=_(u"Муниципальный акт о включении жилья в спец. жил. фонд."), )
-    tec_passport_tec_plan = models.ImageField(null=True, blank=True, upload_to='img_files',
+    tec_passport_tec_plan = models.FileField(null=True, blank=True, upload_to='img_files',
                                               help_text=_(u"Технический паспорт, технический план."),
                                               verbose_name=_(u"Технический паспорт, технический план."), )
-    photos = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Фотографии приобретенных жилых помещений."),
+    photos = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Фотографии приобретенных жилых помещений."),
                                verbose_name=_(u"Фотографии приобретенных жилых помещений."), )
-    mo_notice_to_citizen = models.ImageField(null=True, blank=True, upload_to='img_files',
+    mo_notice_to_citizen = models.FileField(null=True, blank=True, upload_to='img_files',
                                              help_text=_(u"Извещение от муниципального образования в адрес гражданина о предоставлении последнему жилого помещения."),
                                              verbose_name=_(u"Извещение от МО о предоставлении жилого помещения."), )
-    approval_citizen_statement = models.ImageField(null=True, blank=True, upload_to='img_files',
+    approval_citizen_statement = models.FileField(null=True, blank=True, upload_to='img_files',
                                                    help_text=_(u"Заявление от гражданина о согласии в предоставлении жилого помещения."),
                                                    verbose_name=_(u"Заявление от гражданина о согласии в предоставлении жилого помещения."), )
-    hiring_contract = models.ImageField(null=True, blank=True, upload_to='img_files',
+    hiring_contract = models.FileField(null=True, blank=True, upload_to='img_files',
                                         help_text=_(u"Договор найма специализированного жилого помещения на каждого гражданина."),
                                         verbose_name=_(u"Договор найма специализированного жилого помещения на каждого гражданина."), )
 
@@ -62,7 +62,7 @@ class ContractDocuments(BaseDocumentModel, BaseImage):
         attrs = deepcopy(self.__dict__)
         for k in attrs:
             if k and not '_id' in k and getattr(self, k) and \
-               isinstance(getattr(self, k), models.fields.files.ImageFieldFile):
+               isinstance(getattr(self, k), models.fields.files.FileFieldFile):
                 return True
         return False
 
@@ -83,7 +83,7 @@ class Contract(BaseContract, BaseCompareData):
     docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
 
 
-class Ground(BaseBuilding, BaseCompareData, BaseImage):
+class Ground(BaseBuilding, BaseCompareData, BaseFile):
 
     class Meta:
         app_label = "build"
@@ -101,17 +101,17 @@ class Ground(BaseBuilding, BaseCompareData, BaseImage):
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
-    offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
-    cad_passport = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
+    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
+    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
+    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
 
 
-class Building(BaseBuilding, BaseCompareData, BaseImage):
+class Building(BaseBuilding, BaseCompareData, BaseFile):
     developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
-    offer = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
+    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
+    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
     flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
 
     class Meta:
