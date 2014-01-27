@@ -2,7 +2,6 @@
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.imgfile.models import File, Image
 
 FACE_LIST_CHOICES = ((0, _(u'Юридическое лицо')),  (1, _(u'Физическое лицо')),)
 STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))

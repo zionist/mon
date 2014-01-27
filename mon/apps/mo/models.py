@@ -3,7 +3,6 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseName, BaseBudget, BaseSubvention, BaseDepartamentAgreement, BaseOrphan, \
     CREATION_FORM_CHOICES
-from apps.imgfile.models import File, Image
 
 
 class RegionalBudget(BaseBudget, ):

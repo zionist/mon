@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseDocumentModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
     Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
-from apps.imgfile.models import File, Image, BaseImage
+from apps.imgfile.models import File, Image, BaseFile
 
 from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground, Contract
@@ -54,10 +54,10 @@ class Result(BaseResult, ):
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
     mo_pers = models.ManyToManyField(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
     establish_pers = models.ManyToManyField(Person, help_text=_(u"Участники комиссии от учреждения"), null=True, verbose_name=_(u"Участники комиссии от учреждения"), blank=True, related_name='establish_pers')
-    doc_files = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Предоставленные документы"), verbose_name=_(u"Предоставленные документы"))
+    doc_files = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Предоставленные документы"), verbose_name=_(u"Предоставленные документы"))
 
 
-class AuctionDocuments(BaseDocumentModel, BaseImage):
+class AuctionDocuments(BaseDocumentModel, BaseFile):
 
     class Meta:
         app_label = "cmp"
@@ -65,14 +65,14 @@ class AuctionDocuments(BaseDocumentModel, BaseImage):
     def __unicode__(self):
         return '%s' % self.id
 
-    notice = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение"), verbose_name=_(u"Извещение"), )
-    mun_contract_project = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта"), verbose_name=_(u"Проект муниципального контракта"), )
-    technical_specification = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание"), verbose_name=_(u"Техническое задание"), )
-    max_price_substantiation = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта"), verbose_name=_(u"Обоснование начальной максимальной цены контракта"), )
-    notice_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение с комментариями и рекомендациями"), verbose_name=_(u"Извещение с комментариями и рекомендациями"), )
-    mun_contract_project_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта с комментариями и рекомендациями"), verbose_name=_(u"Проект муниципального контракта с комментариями и рекомендациями"), )
-    technical_specification_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание с комментариями и рекомендациями"), verbose_name=_(u"Техническое задание с комментариями и рекомендациями"), )
-    max_price_substantiation_rec = models.ImageField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"),
+    notice = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение"), verbose_name=_(u"Извещение"), )
+    mun_contract_project = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта"), verbose_name=_(u"Проект муниципального контракта"), )
+    technical_specification = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание"), verbose_name=_(u"Техническое задание"), )
+    max_price_substantiation = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта"), verbose_name=_(u"Обоснование начальной максимальной цены контракта"), )
+    notice_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение с комментариями и рекомендациями"), verbose_name=_(u"Извещение с комментариями и рекомендациями"), )
+    mun_contract_project_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта с комментариями и рекомендациями"), verbose_name=_(u"Проект муниципального контракта с комментариями и рекомендациями"), )
+    technical_specification_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание с комментариями и рекомендациями"), verbose_name=_(u"Техническое задание с комментариями и рекомендациями"), )
+    max_price_substantiation_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"),
         verbose_name=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"), )
 
     def to_list(self):
