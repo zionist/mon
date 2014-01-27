@@ -9,6 +9,8 @@
             {{ errorlist }}
         </div>
     {% else %}
+        <div class="span5"><a class="btn btn-info" href="{% url 'add-agreement-mo' object.id %}">
+            {% trans 'Добавить соглашение с министерством' %}</a></div><br>
         {% if form or formsets %}
             <form method="POST" action="{% url 'update-mo' object.id %}"> {% csrf_token %}
                 <br>
@@ -17,23 +19,25 @@
                     <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
                     {% endfor %}
                 </table>
-                <table border="0">
-                    <h4>{% trans ' Реквизиты соглашения с министерством' %}</h4>
-                    {% for field in dep_form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
+                {% for set in forms %}
+                    <table border="0">
+                        <h4>{% trans ' Реквизиты соглашения с министерством' %}</h4>
+                        {% for field in set.dep_form %}
+                        <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                        {% endfor %}
 
-                    {% for field in sub_form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                        {% for field in set.sub_form %}
+                        <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                        {% endfor %}
+                    </table>
+                    {% for form in set.formsets %}
+                    <table>
+                        <h4>{% cycle titles.0 titles.1%}</h4>
+                        {% for field in form %}
+                        <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                        {% endfor %}
+                    </table>
                     {% endfor %}
-                </table>
-                {% for form in formsets %}
-                <table>
-                    <h4>{% cycle titles.0 titles.1%}</h4>
-                    {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
-                </table>
                 {% endfor %}
                 <br>
                 <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>

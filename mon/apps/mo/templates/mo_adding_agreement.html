@@ -1,0 +1,45 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form or formsets %}
+            <form method="POST" action="{% url 'add-agreement-mo' object.id %}"> {% csrf_token %}
+
+                {% if form %}
+                <br>
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                <table border="0">
+                    <h4>{% trans ' Реквизиты соглашения с министерством' %}</h4>
+                    {% for field in dep_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+
+                    {% for field in sub_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+                {% for form in formsets %}
+                <table>
+                    <h4>{% cycle titles.0 titles.1%}</h4>
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% endfor %}
+                <br>
+                <button type="submit" name = "mo"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}

@@ -3,11 +3,12 @@
 
 {% block content %}
     <h4>{{title}}</h4>
-    {% if user.is_authenticated %}
-        <a class="btn btn-small" href="{% url 'create-payment' %}">
-            {% trans 'Добавить платеж' %}</a>
-    {% endif %}
+
+
+
     {% if user.is_staff %}
+        <div>
+        <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
         <!--<a class="btn btn-small" href="{% url 'accounting' 0 %}">-->
             <!--{% trans 'Общая сводка' %}</a>-->
         <!--<a class="btn btn-small" href="{% url 'accounting' 1 %}">-->
@@ -18,20 +19,20 @@
             <!--{% trans 'Общая сводка за текущий год' %}</a>-->
         <!--<a class="btn btn-small" href="{% url 'accounting' 4 %}">-->
             <!--{% trans 'Общая сводка за предыдущий год' %}</a>-->
-        <li id="accounting" class="dropdown">
-            <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Общая сводка' %}<b class="caret"></b></a>
+        <li id="accounting" class="dropdown" style="list-style: none;">
+            <a class="btn btn-small" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
+                <b class="caret"></b></a>
             <ul class="dropdown-menu" role="menu" >
-                <li><a class="btn btn-small" href="{% url 'accounting' 1 %}">
-                    {% trans 'За день' %}</a></li>
-                <li><a class="btn btn-small" href="{% url 'accounting' 2 %}">
-                    {% trans 'За месяц' %}</a></li>
-                <li><a class="btn btn-small" href="{% url 'accounting' 3 %}">
-                    {% trans 'За текущий год' %}</a></li>
-                <li><a class="btn btn-small" href="{% url 'accounting' 4 %}">
-                    {% trans 'За предыдущий год' %}</a></li>
+                <li><a href="{% url 'accounting' 1 %}"> {% trans 'За день' %}</a></li>
+                <li><a href="{% url 'accounting' 2 %}"> {% trans 'За месяц' %}</a></li>
+                <li><a href="{% url 'accounting' 3 %}"> {% trans 'За текущий год' %}</a></li>
+                <li><a href="{% url 'accounting' 4 %}"> {% trans 'За предыдущий год' %}</a></li>
             </ul>
         </li>
+    </div>
+
     {% else %}
+    <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
         <br><div class="auction-table">
             <br><table class="table table-condensed table-striped table-hover">
                 <tr>
