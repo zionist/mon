@@ -24,3 +24,9 @@ class PaymentShowForm(forms.ModelForm):
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class DateForm(forms.Form):
+    prev = forms.DateField(label=_(u'Начиная с'))
+    dt = forms.DateField(label=_(u'по'))
+

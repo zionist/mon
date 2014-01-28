@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
 from .models import Payment
-from .forms import PaymentForm, PaymentShowForm
+from .forms import PaymentForm, PaymentShowForm, DateForm
 from apps.mo.models import MO
 from apps.user.models import CustomUser
 
@@ -42,6 +42,7 @@ def add_payment(request):
 def get_payments(request, pk=None, select=None):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
+    prefix = 'acc_date'
     if Payment.objects.all().exists():
         if pk:
             payment_object = Payment.objects.get(pk=pk)
@@ -61,6 +62,8 @@ def get_payments(request, pk=None, select=None):
                 objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
         else:
             objects = Payment.objects.all()
+        form = DateForm(prefix=prefix)
+        context.update({'date_form': form})
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
@@ -78,9 +81,12 @@ def get_accounting(request, select=None):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
     objects = []
+    prefix = 'acc_date'
     mos = MO.objects.all()
     kwargs = {}
-    if select and int(select) in [1,2,3, 4]:
+    form = DateForm(prefix=prefix)
+    context.update({'date_form': form})
+    if select and int(select) in [1,2,3,4]:
         state, dt = int(select), datetime.now()
         if state == 4:
             dt = dt.replace(year=dt.year-1)
@@ -92,6 +98,12 @@ def get_accounting(request, select=None):
         elif state == 1:
             prev = dt.replace(day=dt.day-1)
         kwargs.update({'date__lt':dt, 'date__gt':prev})
+    elif request.method == 'POST' and 'date_select' in request.POST:
+        form = DateForm(request.POST, prefix=prefix)
+        if form.is_valid():
+            kwargs.update({'date__lt':form.cleaned_data.get('dt'), 'date__gt':form.cleaned_data.get('prev')})
+        else:
+            context.update({'date_form': form})
     for mo in mos:
         agreements = mo.departamentagreement_set.filter(**kwargs)
         amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])

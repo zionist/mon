@@ -7,7 +7,7 @@
 
 
     {% if user.is_staff %}
-        <div>
+        <div class="row">
         <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
         <!--<a class="btn btn-small" href="{% url 'accounting' 0 %}">-->
             <!--{% trans 'Общая сводка' %}</a>-->
@@ -19,7 +19,7 @@
             <!--{% trans 'Общая сводка за текущий год' %}</a>-->
         <!--<a class="btn btn-small" href="{% url 'accounting' 4 %}">-->
             <!--{% trans 'Общая сводка за предыдущий год' %}</a>-->
-        <li id="accounting" class="dropdown" style="list-style: none;">
+        <div class='span8'><li id="accounting" class="dropdown" style="list-style: none;">
             <a class="btn btn-small" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
                 <b class="caret"></b></a>
             <ul class="dropdown-menu" role="menu" >
@@ -29,6 +29,18 @@
                 <li><a href="{% url 'accounting' 4 %}"> {% trans 'За предыдущий год' %}</a></li>
             </ul>
         </li>
+            {% if date_form %}
+            <form class='inline' method="POST" action="{% url 'date-accounting' %}"> {% csrf_token %}
+                <!--<br>-->
+                <!--<table border="0" width="40%"><tr>-->
+                    {% for field in date_form %}
+                    <td width="50%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td>
+                    {% endfor %}
+                    <td width="25%"><button type="submit" name="date_select"> {% trans ' Составить ' %} </button></td></tr>
+                <!--</table>-->
+            </form>
+            {% endif %}
+        </div>
     </div>
 
     {% else %}

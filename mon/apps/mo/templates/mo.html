@@ -12,20 +12,22 @@
         {% if form and object %}
             <div class="row">
                 <div class="span5"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">
-                    {% trans 'редактировать' %}</a></div>
+                    {% trans 'Редактировать' %}</a></div>
                 <div class="span5"><a class="btn btn-info" href="{% url 'add-agreement-mo' object.id %}">
                     {% trans 'Добавить соглашение с министерством' %}</a></div>
                 <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-mo' object.id %}">
                     {% trans 'Удалить' %}</a></div>
             </div><br />
-            <p class="blue">{% trans 'Общие параметры' %}</p>
+            <p class="blue"><b>{% trans 'Общие параметры' %}</b></p>
             {% include "view_table.html" %}
-            <p class="blue">{% trans ' Реквизиты соглашения с министерством' %}</p>
             {% for set in forms %}
+                <p class="blue"><b>{% trans ' Реквизиты соглашения с министерством № ' %}
+                    {{set.dep_num}} {% trans 'от' %} {{set.dep_date}}</b>
+                </p>
                 {% with set.dep_form as form %}
                     {% include "view_table.html" %}
                 {% endwith %}
-                {% with set.dep_form as form %}
+                {% with set.sub_form as form %}
                     {% include "view_table.html" %}
                 {% endwith %}
                 {% for form in set.formsets %}
