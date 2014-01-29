@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound, \
+    HttpResponseForbidden
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_list_or_404,\
@@ -22,6 +23,7 @@ from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, Subventio
     RegionalBudgetShowForm, MOPerformanceForm
 from apps.build.models import Building, Ground, ContractDocuments
 from apps.cmp.models import Auction
+from apps.user.models import CustomUser
 
 
 def add_mo(request):
@@ -94,8 +96,9 @@ def add_agreement(request, pk, state=None):
 
 @login_required
 def get_mos(request, pk=None):
+    title = _(u'Муниципальные образования')
     template = 'mos.html'
-    context = {'title': _(u'Муниципальные образования')}
+    context = {'title': title}
     if MO.objects.all().exists():
         objects = MO.objects.all()
         if pk:
@@ -113,6 +116,53 @@ def get_mos(request, pk=None):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
+def mos_select(request, pk=None, ):
+    if not request.user.is_staff:
+        return HttpResponseForbidden('Forbidden')
+    if request.user.is_superuser:
+        return HttpResponse(u'Реализация выбора МО ' \
+                            u'для суперпользователя не предусмотрена')
+    title = _(u'Выбор муниципального образования')
+    template = 'mos_select.html'
+    context = {'title': title}
+    if MO.objects.all().exists():
+        objects = MO.objects.all()
+        if pk:
+            mo_object = MO.objects.get(pk=pk)
+            context.update({'object': mo_object})
+        page = request.GET.get('page', '1')
+        paginator = Paginator(objects, 50)
+        try:
+            objects = paginator.page(page)
+        except PageNotAnInteger:
+            objects = paginator.page(1)
+        except EmptyPage:
+            objects = paginator.page(paginator.num_pages)
+        user = CustomUser.objects.get(pk=request.user.pk)
+        obj_list = []
+        for mo in objects:
+            if user.mo == mo:
+                setattr(mo, 'selected', True)
+            else:
+                setattr(mo, 'selected', False)
+            obj_list.append(mo)
+        context.update({'mo_list': obj_list})
+    return render(request, template, context, context_instance=RequestContext(request))
+
+def select_mo(request, pk=None):
+    if not request.user.is_staff:
+        return HttpResponseForbidden('Forbidden')
+    user = CustomUser.objects.get(pk=request.user.pk)
+    mo = MO.objects.get(pk=pk)
+    user.mo = mo
+    user.save()
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    return redirect('select-mos')
+
+
+@login_required
 def get_mo(request, pk, extra=None):
     context = {'title': _(u'Муниципальное образование')}
     mo = MO.objects.get(pk=pk)
@@ -134,6 +184,7 @@ def get_mo(request, pk, extra=None):
     return render(request, 'mo.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_mo(request, pk, extra=None):
     context = {'title': _(u'Параметры мниципального образования')}
     mo = MO.objects.get(pk=pk)
@@ -188,6 +239,7 @@ def update_mo(request, pk, extra=None):
     return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def pre_delete_mo(request, pk):
     context = {'title': _(u'Удаление муниципального образования')}
     mo = MO.objects.get(pk=pk)
@@ -195,6 +247,7 @@ def pre_delete_mo(request, pk):
     return render_to_response("mo_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_mo(request, pk):
     context = {'title': _(u'Удаление муниципального образования')}
     mo = MO.objects.get(pk=pk)
@@ -216,6 +269,7 @@ def delete_mo(request, pk):
     return render_to_response("mo_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def get_filter(request, num, extra=None):
     context = {'title': _(u'Результат выборки')}
     template = 'filter.html'

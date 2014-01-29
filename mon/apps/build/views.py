@@ -174,16 +174,25 @@ def get_developers(request):
                   context_instance=RequestContext(request))
 
 @login_required
-def get_buildings(request, pk=None, strv=None, numv=None):
+def get_buildings(request, pk=None, strv=None, numv=None, mo=None):
     template = 'builds.html'
-    context = {'title': _(u'Объекты рынка жилья')}
+    if mo:
+        context = {'title': _(u'Объекты рынка жилья %s' %
+                              request.user.customuser.mo)}
+    else:
+        context = {'title': _(u'Все объекты рынка жилья')}
     if Building.objects.all().exists() or Ground.objects.all().exists():
         objects, build_objects, ground_objects = [], [], []
         if Building.objects.all().exists():
-            if request.user.is_staff or request.user.is_superuser:
-                build_objects = Building.objects.all().order_by('state')
-            else:
+            if not request.user.is_staff and not request.user.is_superuser:
                 build_objects = Building.objects.filter(mo=request.user.customuser.mo).order_by('state')
+            elif request.user.is_superuser:
+                build_objects = Building.objects.all().order_by('state')
+            elif request.user.is_staff:
+                if mo:
+                    build_objects = Building.objects.filter(mo=request.user.customuser.mo).order_by('state')
+                else:
+                    build_objects = Building.objects.all().order_by('state')
             get = Building.objects.get
         if Ground.objects.all().exists():
             if request.user.is_staff or request.user.is_superuser:

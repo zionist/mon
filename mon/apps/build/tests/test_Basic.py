@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 
-class BasicNavigation(TestCase):
+class BasicLogin(TestCase):
     def setUp(self):
         self.c = Client()
 

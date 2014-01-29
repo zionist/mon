@@ -7,6 +7,7 @@ urlpatterns = patterns(
 
     url(r'^auctions/$', views.get_auctions, name='auctions'),
     url(r'^auctions/mo/(?P<pk>[0-9]+)/$', views.get_mo_auctions, name='mo-auctions'),
+    url(r'^auctions/mo/$', views.get_mo_auctions, {'mo': True}, name='mo-user-auctions'),
     url(r'^auction/add/$', views.add_auction, name='create-auction'),
     url(r'^auction/(?P<pk>[0-9]+)/$', views.get_auction, name='change-auction'),
     url(r'^auction/update/(?P<pk>[0-9]+)/$', views.update_auction, name='update-auction'),
