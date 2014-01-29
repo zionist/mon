@@ -26,7 +26,11 @@
                     <li id="buildings" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Объекты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
+                            <li><a href="{% url 'buildings_by_mo' %}">{% trans 'Объекты' %}</a></li>
+                            <li class="divider"></li>
+                            {% if user.is_staff %}
+                                <li><a href="{% url 'buildings' %}">{% trans 'Все объекты' %}</a></li>
+                            {% endif %}
                             <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
@@ -91,6 +95,10 @@
                             <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
                             <li><a href="{% url 'choices' %}">{% trans 'Список материалов' %}</a></li>
                             {% endif %}
+                            {% if user.is_staff %}
+                                <li><a href="{% url 'select-mos' %}">{% trans 'Выбрать МО' %}</a></li>
+                            {% endif %}
+
                             <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
                         </ul>
                     </li>
