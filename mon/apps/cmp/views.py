@@ -103,16 +103,25 @@ def get_auctions(request, pk=None):
 
 
 @login_required
-def get_mo_auctions(request, pk=None):
+def get_mo_auctions(request, pk=None, mo=None):
     template = 'mo_auctions.html'
-    context = {'title': _(u'Аукционы')}
+    if mo:
+        context = {'title': _(u'Аукционы %s' %
+                              request.user.customuser.mo)}
+    else:
+        context = {'title': _(u'Аукционы')}
     if Auction.objects.all().exists():
         if pk:
             mo_object = MO.objects.get(pk=pk)
             objects = Auction.objects.filter(mo=pk).order_by('stage')
             context.update({'object': mo_object})
         else:
-            objects = Auction.objects.all().order_by('stage')
+            # filter user's mo auctions
+            if mo:
+                objects = Auction.objects.filter(mo=request.user.customuser.mo).order_by('stage')
+            # list all
+            else:
+                objects = Auction.objects.all().order_by('stage')
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:

@@ -176,7 +176,11 @@ def get_developers(request):
 @login_required
 def get_buildings(request, pk=None, strv=None, numv=None, mo=None):
     template = 'builds.html'
-    context = {'title': _(u'Объекты рынка жилья')}
+    if mo:
+        context = {'title': _(u'Объекты рынка жилья %s' %
+                              request.user.customuser.mo)}
+    else:
+        context = {'title': _(u'Все объекты рынка жилья')}
     if Building.objects.all().exists() or Ground.objects.all().exists():
         objects, build_objects, ground_objects = [], [], []
         if Building.objects.all().exists():

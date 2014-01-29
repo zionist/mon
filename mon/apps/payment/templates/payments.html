@@ -3,46 +3,54 @@
 
 {% block content %}
     <h4>{{title}}</h4>
-
-
-
     {% if user.is_staff %}
         <div class="row">
-        <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
-        <!--<a class="btn btn-small" href="{% url 'accounting' 0 %}">-->
-            <!--{% trans 'Общая сводка' %}</a>-->
-        <!--<a class="btn btn-small" href="{% url 'accounting' 1 %}">-->
-            <!--{% trans 'Общая сводка за день' %}</a>-->
-        <!--<a class="btn btn-small" href="{% url 'accounting' 2 %}">-->
-            <!--{% trans 'Общая сводка за месяц' %}</a>-->
-        <!--<a class="btn btn-small" href="{% url 'accounting' 3 %}">-->
-            <!--{% trans 'Общая сводка за текущий год' %}</a>-->
-        <!--<a class="btn btn-small" href="{% url 'accounting' 4 %}">-->
-            <!--{% trans 'Общая сводка за предыдущий год' %}</a>-->
-        <div class='span8'><li id="accounting" class="dropdown" style="list-style: none;">
-            <a class="btn btn-small" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
-                <b class="caret"></b></a>
-            <ul class="dropdown-menu" role="menu" >
-                <li><a href="{% url 'accounting' 1 %}"> {% trans 'За день' %}</a></li>
-                <li><a href="{% url 'accounting' 2 %}"> {% trans 'За месяц' %}</a></li>
-                <li><a href="{% url 'accounting' 3 %}"> {% trans 'За текущий год' %}</a></li>
-                <li><a href="{% url 'accounting' 4 %}"> {% trans 'За предыдущий год' %}</a></li>
-            </ul>
-        </li>
-            {% if date_form %}
+            <div class="span3"><a class="btn btn-small" href="{% url 'create-payment' %}">
+                {% trans 'Добавить платеж' %}</a>
+            </div>
+            <div class="span3">
+                <li id="accounting" class="dropdown" style="list-style: none;">
+                    <a class="btn btn-small" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
+                        <b class="caret"></b></a>
+                    <ul class="dropdown-menu" role="menu" >
+                        <li><a href="{% url 'accounting' 1 %}"> {% trans 'За день' %}</a></li>
+                        <li><a href="{% url 'accounting' 2 %}"> {% trans 'За месяц' %}</a></li>
+                        <li><a href="{% url 'accounting' 3 %}"> {% trans 'За текущий год' %}</a></li>
+                        <li><a href="{% url 'accounting' 4 %}"> {% trans 'За предыдущий год' %}</a></li>
+                    </ul>
+                </li>
+            </div>
+        </div>
+        <div class="row">  &nbsp; </div>
+        {% if date_form %}
             <form class='inline' method="POST" action="{% url 'date-accounting' %}"> {% csrf_token %}
-                <!--<br>-->
-                <!--<table border="0" width="40%"><tr>-->
-                    {% for field in date_form %}
-                    <td width="50%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td>
-                    {% endfor %}
-                    <td width="25%"><button type="submit" name="date_select"> {% trans ' Составить ' %} </button></td></tr>
-                <!--</table>-->
+                <div class="row">
+                    <div class="span6"> <strong> {% trans 'Сделать выборку по периоду времени:' %} </strong> </div>
+                </div>
+
+                <div class="row">
+                    <div class="span3">
+                        {{ date_form.prev.label_tag }}{{ date_form.prev.errors }}
+                    </div>
+                    <div class="span3">
+                        {{ date_form.dt.label_tag }}{{ date_form.dt.errors }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span3">
+                        {{ date_form.prev }}
+                    </div>
+                    <div class="span3">
+                        {{ date_form.dt }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="span3">
+                        <button type="submit" class="btn-info" name="date_select"> {% trans ' Составить ' %} </button>
+                    </div>
+                </div>
             </form>
             {% endif %}
-        </div>
-    </div>
-
     {% else %}
     <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
         <br><div class="auction-table">
@@ -100,7 +108,6 @@
             </table>
             </div>
         {% endif %}
-
         {% if payment_list %}
             <div class="auction-table">
             <table class="table table-condensed table-striped table-hover">
