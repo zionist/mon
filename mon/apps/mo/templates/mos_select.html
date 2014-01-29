@@ -1,0 +1,33 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles %}
+
+{% block content %}
+    <h4>{{title}}</h4>
+    <div class="row"> &nbsp; </div>
+    {% if error %}
+        <div class="error">{{ error }}</div><br>
+    {% endif %}
+    {% if errorlist %}
+        <div class="error">{{ errorlist }}</div>
+    {% else %}
+        {% if mo_list %}
+                {% for obj in mo_list %}
+                    {% if obj.id %}
+                        <div class="row">
+                            <div class="span6">
+                                {% if obj.selected %}
+                                    <span class="text-info"> Выбран: {{obj.name}} / {% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС{% elif obj.creation_form == 2%}С{% endif %} </span>
+                                {% else %}
+                                    {{obj.name}} / {% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС{% elif obj.creation_form == 2%}С{% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="span6">
+                                <a class="btn btn-info btn-small right" href="{% url 'select-mo' obj.id %}">Выбрать</a></td>
+                            </div>
+                        </div>
+                        <div class="row"> &nbsp; </div>
+                    {% endif %}
+                {% endfor %}
+        {% endif %}
+    {% endif %}
+{% endblock %}
