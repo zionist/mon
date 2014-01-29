@@ -11,7 +11,7 @@ urlpatterns = patterns(
 
     url(r'^mos/$', views.get_mos, name='mos'),
     url(r'^mo/add/$', views.add_mo, name='create-mo'),
-    url(r'^mo/add/(?P<pk>[0-9]+)/$', views.add_agreement, name='add-agreement-mo'),
+    url(r'^mo/add/(?P<pk>[0-9]+)/(?P<state>[0-2]+)/$', views.add_agreement, name='add-agreement-mo'),
     url(r'^mo/(?P<pk>[0-9]+)/$', views.get_mo, name='change-mo'),
     url(r'^mo/update/(?P<pk>[0-9]+)/$', views.update_mo, name='update-mo'),
     url(r'^mo/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_mo, name='pre-delete-mo'),

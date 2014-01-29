@@ -14,7 +14,7 @@
         <div class="error">{{ errorlist }}</div>
     {% else %}
 
-        {% if mo_list %}
+        {% if mo_list and not formset %}
             <div class="auction-table">
             <table class="table table-condensed table-striped table-hover">
                 <tr><th> {% trans 'Наименование' %} / {% trans 'Форма создания спец. жил. фонда' %}</th>
@@ -26,7 +26,8 @@
                     {% if obj.id %}
                         <tr>
                             <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a> /
-                                {% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС{% elif obj.creation_form == 2%}С{% endif %}
+                                {% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС
+                                {% elif obj.creation_form == 2%}С{% endif %}
                             {% if mo_contracts %}
                                 <br><br><strong>{% trans 'Контракты: ' %} </strong>
                                 {% for contract in obj.contract_set.all %}
@@ -34,14 +35,28 @@
                                 {% endfor %}
                             {% endif %}
                             </td>
-                            <td>{{obj.departamentagreement_set.all.0.subvention_performance}}</td>
-                            <td>{{obj.departamentagreement_set.all.0.subvention.amount}}</td>
+                            <td>{{obj.home_orphans}}</td>
+                            <td>{{obj.common_amount}}</td>
                             <td>{{obj.contract_set.all.count}}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}
             </table>
             </div>
+        {% endif %}
+        {% if formset %}
+        <form method="POST" action="{% url 'filter' 20 %}"> {% csrf_token %}
+            <br>
+            <table border="0">
+            {% for form in formset %}<tr>
+                {% for field in form %}
+                <td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td>
+                {% endfor %}</tr>
+            {% endfor %}
+            </table>
+            <br>
+            <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
+        </form>
         {% endif %}
     {% endif %}
 {% endblock %}

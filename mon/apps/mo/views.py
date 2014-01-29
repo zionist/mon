@@ -18,7 +18,8 @@ from django.contrib.auth.decorators import permission_required, login_required
 
 from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
-    RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, RegionalBudgetShowForm
+    RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, \
+    RegionalBudgetShowForm, MOPerformanceForm
 from apps.build.models import Building, Ground, ContractDocuments
 from apps.cmp.models import Auction
 
@@ -39,8 +40,11 @@ def add_mo(request):
             sub.fed_budget = fed_form.save()
             sub.reg_budget = reg_form.save()
             sub.save(update_fields=['fed_budget', 'reg_budget'])
+            mo = form.save()
+            mo.home_orphans = sub.subvention_performance
+            mo.save(update_fields=['home_orphans'])
+            dep.mo = mo
             dep.subvention = sub
-            dep.mo = form.save()
             dep.save(update_fields=['subvention', 'mo'])
             return redirect('mos')
     else:
@@ -55,9 +59,12 @@ def add_mo(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
-def add_agreement(request, pk):
+def add_agreement(request, pk, state=None):
     template = 'mo_adding_agreement.html'
-    context = {'title': _(u'Добавление соглашения с министерством')}
+    state = int(state)
+    title = _(u'Добавление дополнительного соглашения с министерством') \
+    if state == 1 else _(u'Добавление письма о вычете средств')
+    context = {'title': title}
     mo = MO.objects.get(pk=pk)
     context.update({'object': mo})
     prefix, dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'mo', 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
@@ -65,14 +72,12 @@ def add_agreement(request, pk):
         form = MOShowForm(request.POST, prefix=prefix, instance=mo)
         dep_form = DepartamentAgreementForm(request.POST, prefix=dep_prefix)
         sub_form = SubventionForm(request.POST, prefix=sub_prefix)
-        fed_form = FederalBudgetForm(request.POST, prefix=fed_prefix)
-        reg_form = RegionalBudgetForm(request.POST, prefix=reg_prefix)
-        if form.is_valid() and dep_form.is_valid() and sub_form.is_valid() and fed_form.is_valid() and reg_form.is_valid():
+        if form.is_valid() and dep_form.is_valid() and sub_form.is_valid():
             dep = dep_form.save()
             sub = sub_form.save()
-            sub.fed_budget = fed_form.save()
-            sub.reg_budget = reg_form.save()
-            sub.save(update_fields=['fed_budget', 'reg_budget'])
+            if state != 1:
+                sub.amount = -sub.amount
+                sub.save(update_fields=['amount'])
             dep.subvention = sub
             dep.mo = mo
             dep.save(update_fields=['subvention', 'mo'])
@@ -81,10 +86,8 @@ def add_agreement(request, pk):
         form = MOShowForm(prefix=prefix, instance=mo)
         dep_form = DepartamentAgreementForm(prefix=dep_prefix)
         sub_form = SubventionForm(prefix=sub_prefix)
-        fed_form = FederalBudgetForm(prefix=fed_prefix)
-        reg_form = RegionalBudgetForm(prefix=reg_prefix)
-    context.update({'form': form, 'dep_form': dep_form, 'sub_form': sub_form,
-                    'formsets': [fed_form, reg_form], 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name],
+    context.update({'form': form, 'dep_form': dep_form, 'sub_form': sub_form, 'state' :state,
+                    'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name],
                     'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -307,9 +310,27 @@ def get_filter(request, num, extra=None):
         context.update({'payment_list': objects})
     elif num == 20:
         # 20 МО, которые предоставили жилые помещения детям-сиротам
-        objects = MO.objects.filter(home_orphans__gt=0)
+        objects = MO.objects.filter(pk__in=[mo.pk for mo in MO.objects.filter(departamentagreement__subvention_performance__gt=0)])
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
+        forms = []
+        if request.method == 'POST':
+            success = 0
+            for mo in objects:
+                form = MOPerformanceForm(request.POST, instance=mo, prefix='mo_%s' % mo.pk)
+                forms.append(form)
+                if form.is_valid():
+                    form.save()
+                    success += 1
+                if success == len(forms):
+                    redirect('mos')
+        else:
+            for mo in objects:
+                mo.home_orphans = sum([int(dep.subvention_performance) for dep in mo.departamentagreement_set.all()
+                                       if dep.subvention_performance])
+                mo.save(update_fields=['home_orphans'])
+                forms.append(MOPerformanceForm(instance=mo, prefix='mo_%s' % mo.pk))
+        context.update({'formset': forms})
     elif num == 21:
         # 21 МО, которые имеют перспективы освоения дополнительных денежных средств на текущий год.
         objects = MO.objects.filter(has_trouble=True)

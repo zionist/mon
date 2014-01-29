@@ -53,7 +53,7 @@ class MO(BaseName, ):
     def __unicode__(self):
         return '%s' % self.name
 
-    creation_form = models.IntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+    creation_form = models.CommaSeparatedIntegerField(max_length=24, help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         blank=True, null=True, choices=CREATION_FORM_CHOICES , )
     has_trouble = models.NullBooleanField(blank=True, null=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))

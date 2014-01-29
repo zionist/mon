@@ -98,3 +98,10 @@ class RegionalBudgetShowForm(forms.ModelForm):
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
+
+
+class MOPerformanceForm(forms.ModelForm):
+    class Meta:
+        model = MO
+        fields = ('name', 'home_orphans')
+

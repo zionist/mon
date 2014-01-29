@@ -11,10 +11,13 @@
     {% else %}
         {% if form and object %}
             <div class="row">
-                <div class="span5"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">
+                <div class="span3"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">
                     {% trans 'Редактировать' %}</a></div>
-                <div class="span5"><a class="btn btn-info" href="{% url 'add-agreement-mo' object.id %}">
-                    {% trans 'Добавить соглашение с министерством' %}</a></div>
+                <div class="span7"><a class="btn btn-info" href="{% url 'add-agreement-mo' object.id 1 %}">
+                    {% trans 'Добавить доп. соглашение' %}</a>
+                    <a class="btn btn-info" href="{% url 'add-agreement-mo' object.id 0 %}">
+                    {% trans 'Добавить письмо о вычете средств' %}</a>
+                </div>
                 <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-mo' object.id %}">
                     {% trans 'Удалить' %}</a></div>
             </div><br />

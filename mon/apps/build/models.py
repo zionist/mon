@@ -62,7 +62,7 @@ class ContractDocuments(BaseDocumentModel, BaseFile):
         attrs = deepcopy(self.__dict__)
         for k in attrs:
             if k and not '_id' in k and getattr(self, k) and \
-               isinstance(getattr(self, k), models.fields.files.FileFieldFile):
+               isinstance(getattr(self, k), models.fields.files.FieldFile):
                 return True
         return False
 

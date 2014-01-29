@@ -9,7 +9,7 @@
         </div>
     {% else %}
         {% if form or formsets %}
-            <form method="POST" action="{% url 'add-agreement-mo' object.id %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'add-agreement-mo' object.id state %}"> {% csrf_token %}
 
                 {% if form %}
                 <br>
