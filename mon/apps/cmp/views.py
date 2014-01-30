@@ -77,11 +77,7 @@ def count_flats(obj_set, vals, **kwargs):
 @login_required
 def get_auctions(request, pk=None):
     template = 'auctions.html'
-    if all:
-        context = {'title': _(u'Аукционы')}
-    else:
-        context = {'title': _(u'Аукционы %s' %
-                              request.user.customuser.mo)}
+    context = {'title': _(u'Все аукционы')}
     if MO.objects.all().exists():
         mos = MO.objects.all().order_by('name')
         objects = [{'id': mo.id, 'name': mo.name, 'creation_form': mo.creation_form, 'auctions': mo.auction_set,
