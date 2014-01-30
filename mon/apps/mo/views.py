@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import xlwt
 from datetime import datetime
 from django.http import HttpResponse, HttpResponseNotFound, \
     HttpResponseForbidden
@@ -394,3 +395,31 @@ def get_filter(request, num, extra=None):
     if not objects:
         context.update({'errorlist': _(u'Объекты, соответствующие запросу, не найдены')})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+@login_required
+def xls_work_table(request):
+    # create
+    book = xlwt.Workbook(encoding='utf8')
+    sheet = book.add_sheet('untitled')
+
+    # custom colors
+    xlwt.add_palette_colour("c_light_grey", 0x21)
+    book.set_colour_RGB(0x21, 216, 216, 216)
+
+    # styles
+    style_plain = xlwt.easyxf("align: vertical center, horizontal center;")
+    style_bold = xlwt.easyxf(
+        "font: bold 1;"
+        "align: vertical center, horizontal center;"
+    )
+    date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
+    green_style = xlwt.easyxf("pattern: pattern solid, fore_colour c_light_grey;")
+
+    # make sheet
+    sheet.write_merge(0,0,1,6, u'Численность', style_bold)
+    sheet.write_merge(0,5,0,0, u'№', style_bold)
+
+    response = HttpResponse(mimetype='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=list.xls'
+    book.save(response)
+    return response

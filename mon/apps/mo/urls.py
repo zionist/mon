@@ -21,5 +21,7 @@ urlpatterns = patterns(
     url(r'^mo/delete/(?P<pk>[0-9]+)/$', views.delete_mo, name='delete-mo'),
 
     url(r'^mo/filter/(?P<num>[0-9]+)/$', views.get_filter, name='filter'),
+    url(r'^mo/xls/work_table/$', views.xls_work_table, name='xls_work_table'),
+
 
 )
