@@ -150,6 +150,7 @@ def mos_select(request, pk=None, ):
         context.update({'mo_list': obj_list})
     return render(request, template, context, context_instance=RequestContext(request))
 
+
 def select_mo(request, pk=None):
     if not request.user.is_staff:
         return HttpResponseForbidden('Forbidden')
@@ -159,7 +160,7 @@ def select_mo(request, pk=None):
     user.save()
     if request.method != "GET":
         return HttpResponseNotFound("Not found")
-    return redirect('select-mos')
+    return redirect('change-mo', pk=mo.pk)
 
 
 @login_required

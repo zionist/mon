@@ -31,9 +31,11 @@ from .forms import RoomForm, HallwayForm, WCForm, KitchenForm, \
 
 def main(request):
     if not request.user.is_authenticated():
-        return HttpResponseRedirect("/login")
-    context = {'title': _(u'Мониторинг')}
-    return render(request, 'base_site.html', context)
+        return redirect("login")
+    if request.user.is_staff:
+        return redirect("select-mos")
+    else:
+        return redirect("change-mo", pk=request.user.customuser.mo.pk)
 
 
 def get_fk_forms(parent=None, request=None, multi=None):
