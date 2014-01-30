@@ -22,7 +22,16 @@
               <div class="nav-collapse collapse">
                 <ul class="nav">
                     <!--<li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>-->
-                    <li id="payments"><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                    <li id="payments" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Платежи' %}<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                            {% if user.is_staff %}
+                            <li class="divider"></li>
+                            <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
                     <li id="buildings" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Объекты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
@@ -46,16 +55,19 @@
                             {% endif %}
                         </ul>
                     </li>
-
-
-                    <li id="contracts"><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
-                    <li id="results" class="dropdown">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Выезды' %}<b class="caret"></b></a>
+                    <li id="contracts" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Контракты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href="{% url 'results' %}">{% trans 'Выезды' %}</a></li>
-                            <li><a href="{% url 'select-mo-form' %}">{% trans 'Создать бланк осмотра' %}</a></li>
+                            <li><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
+                            {% if user.is_staff %}
+                            <li class="divider"></li>
+                            <li><a href="{% url 'contracts-all' %}">{% trans 'Все контракты' %}</a></li>
+                            {% endif %}
                         </ul>
                     </li>
+
+
+
                     {% endif %}
                     <li id="creation" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Добавить' %}<b class="caret"></b></a>

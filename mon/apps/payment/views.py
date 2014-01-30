@@ -39,21 +39,19 @@ def add_payment(request):
 
 
 @login_required
-def get_payments(request, pk=None, mo_selected=None):
+def get_payments(request, pk=None, all=False):
     template = 'payments.html'
-    if mo_selected:
+    if all:
+        context = {'title': _(u'Все платежи')}
+    else:
         context = {'title': _(u'Платежи %s' %
                               request.user.customuser.mo)}
-    else:
-        context = {'title': _(u'Все платежи')}
     prefix = 'acc_date'
     if Payment.objects.all().exists():
         if pk:
             payment_object = Payment.objects.get(pk=pk)
             context.update({'object': payment_object})
-        print "# 1"
-        if not request.user.is_staff and not request.user.is_superuser or mo_selected:
-            print "# 2"
+        if not request.user.is_staff and not request.user.is_superuser or not all:
             mo = request.user.customuser.mo
             agreements = mo.departamentagreement_set.all()
             amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])

@@ -6,6 +6,7 @@ urlpatterns = patterns(
     'apps.payment.views',
 
     url(r'^payments/$', views.get_payments, name='payments'),
+    url(r'^payments/all$', views.get_payments, {'all': True}, name='payments-all'),
     url(r'^payments/mo_selected/$', views.get_payments, {'mo_selected': True},
         name='mo-payments'),
     url(r'^payment/acc/(?P<select>[0-9]+)$', views.get_accounting, name='accounting'),

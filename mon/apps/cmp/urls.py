@@ -14,6 +14,7 @@ urlpatterns = patterns(
     url(r'^auction/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_auction, name='pre-delete-auction'),
     url(r'^auction/delete/(?P<pk>[0-9]+)/$', views.delete_auction, name='delete-auction'),
 
+    url(r'^contracts/all/$', views.get_contracts, {'all': True}, name='contracts-all'),
     url(r'^contracts/$', views.get_contracts, name='contracts'),
     url(r'^contract/add/$', views.add_contract, name='create-contract'),
     url(r'^contract/(?P<pk>[0-9]+)/$', views.get_contract, name='change-contract'),

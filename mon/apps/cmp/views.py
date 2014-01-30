@@ -296,11 +296,18 @@ def add_contract_from_auction(request, pk):
 
 
 @login_required
-def get_contracts(request, pk=None):
+def get_contracts(request, pk=None, all=False):
     template = 'contracts.html'
-    context = {'title': _(u'Контракты')}
+    if all:
+        context = {'title': _(u'Все контракты')}
+    else:
+        context = {'title': _(u'Контракты %s' %
+                              request.user.customuser.mo)}
     if Contract.objects.all().exists():
-        objects = Contract.objects.all()
+        if all:
+            objects = Contract.objects.all()
+        else:
+            objects = Contract.objects.filter(mo=request.user.customuser.mo)
         if pk:
             contract_object = Contract.objects.get(pk=pk)
             context.update({'object': contract_object})
