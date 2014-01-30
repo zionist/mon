@@ -65,9 +65,17 @@
                             {% endif %}
                         </ul>
                     </li>
-
-
-
+                    <li id="results" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Выезды' %}<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'results' %}">{% trans 'Выезды' %}</a></li>
+                            <li><a href="{% url 'select-mo-form' %}">{% trans 'Создать бланк осмотра' %}</a></li>
+                            {% if user.is_staff %}
+                            <li class="divider"></li>
+                            <li><a href="{% url 'results-all' %}">{% trans 'Все выезды' %}</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
                     {% endif %}
                     <li id="creation" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Добавить' %}<b class="caret"></b></a>

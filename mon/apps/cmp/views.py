@@ -448,11 +448,18 @@ def add_result(request):
 
 
 @login_required
-def get_results(request, pk=None):
+def get_results(request, pk=None, all=False):
     template = 'results.html'
-    context = {'title': _(u'Выезды в МО')}
+    if all:
+        context = {'title': _(u'Все выезды')}
+    else:
+        context = {'title': _(u'Выезды в %s' %
+                              request.user.customuser.mo)}
     if Result.objects.all().exists():
-        objects = Result.objects.all()
+        if all:
+            objects = Result.objects.all()
+        else:
+            objects = Result.objects.filter(building__mo=request.user.customuser.mo)
         if pk:
             result_object = Result.objects.get(pk=pk)
             context.update({'object': result_object})
