@@ -77,7 +77,11 @@ def count_flats(obj_set, vals, **kwargs):
 @login_required
 def get_auctions(request, pk=None):
     template = 'auctions.html'
-    context = {'title': _(u'Аукционы')}
+    if all:
+        context = {'title': _(u'Аукционы')}
+    else:
+        context = {'title': _(u'Аукционы %s' %
+                              request.user.customuser.mo)}
     if MO.objects.all().exists():
         mos = MO.objects.all().order_by('name')
         objects = [{'id': mo.id, 'name': mo.name, 'creation_form': mo.creation_form, 'auctions': mo.auction_set,
@@ -103,25 +107,22 @@ def get_auctions(request, pk=None):
 
 
 @login_required
-def get_mo_auctions(request, pk=None, mo=None):
+def get_mo_auctions(request, pk=None):
     template = 'mo_auctions.html'
-    if mo:
-        context = {'title': _(u'Аукционы %s' %
-                              request.user.customuser.mo)}
-    else:
-        context = {'title': _(u'Аукционы')}
     if Auction.objects.all().exists():
         if pk:
             mo_object = MO.objects.get(pk=pk)
+            context = {'title': _(u'Аукционы %s' % mo_object)}
             objects = Auction.objects.filter(mo=pk).order_by('stage')
             context.update({'object': mo_object})
+        elif request.user.customuser.mo:
+            mo_object = request.user.customuser.mo
+            context = {'title': _(u'Аукционы %s' % mo_object)}
+            objects = Auction.objects.filter(mo=mo_object).order_by('stage')
+            context.update({'object': mo_object})
         else:
-            # filter user's mo auctions
-            if mo:
-                objects = Auction.objects.filter(mo=request.user.customuser.mo).order_by('stage')
-            # list all
-            else:
-                objects = Auction.objects.all().order_by('stage')
+            context = {'title': _(u'Все аукционы')}
+            objects = Auction.objects.all().order_by('stage')
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:

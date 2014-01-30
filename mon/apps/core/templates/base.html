@@ -26,10 +26,10 @@
                     <li id="buildings" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Объекты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href="{% url 'mo-buildings' %}">{% trans 'Объекты' %}</a></li>
+                            <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
                             {% if user.is_staff %}
                                 <li class="divider"></li>
-                                <li><a href="{% url 'buildings' %}">{% trans 'Все объекты' %}</a></li>
+                                <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
                             {% endif %}
                             <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                         </ul>
@@ -39,10 +39,10 @@
                     <li id="auctions" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Аукционы' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href="{% url 'mo-user-auctions' %}">{% trans 'Аукционы' %}</a></li>
+                            <li><a href="{% url 'auctions' %}">{% trans 'Аукционы' %}</a></li>
                             {% if user.is_staff %}
                                 <li class="divider"></li>
-                                <li><a href="{% url 'auctions' %}">{% trans 'Все аукционы' %}</a></li>
+                                <li><a href="{% url 'auctions-all' %}">{% trans 'Все аукционы' %}</a></li>
                             {% endif %}
                         </ul>
                     </li>

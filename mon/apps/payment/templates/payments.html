@@ -3,6 +3,9 @@
 
 {% block content %}
     <h4>{{title}}</h4>
+    <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
+    <div class="row">  &nbsp; </div>
+    <div class="row">  <div class="span12"> <strong> Выборка: </strong> </div> </div>
     {% if user.is_staff %}
         <div class="row">
             {% if date_form %}
@@ -34,9 +37,6 @@
             </div>
             <div class="span6">
                     <div class="row">  &nbsp; </div>
-                    <div class="span3"><a class="btn btn-small" href="{% url 'create-payment' %}">
-                        {% trans 'Добавить платеж' %}</a>
-                    </div>
                     <div class="span2">
                         <li id="accounting" class="dropdown" style="list-style: none;">
                             <a class="btn btn-small" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
@@ -51,8 +51,8 @@
                     </div>
             </div>
         </div>
-    {% else %}
-    <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
+    {% endif %}
+    {% if accounting %}
         <br><div class="auction-table">
             <br><table class="table table-condensed table-striped table-hover">
                 <tr>
@@ -71,8 +71,8 @@
                 </tr>
             </table>
         </div>
-    {% endif %}
     <br><br>
+    {% endif %}
     {% if error %}
         <div class="error">{{ error }}</div><br>
     {% endif %}
