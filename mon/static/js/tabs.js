@@ -9,6 +9,7 @@
       "/payment/payment": "payments",
       "/obj/building/": "buildings",
       "/obj/buildings/$": "buildings",
+      "/obj/buildings/all/$": "buildings",
       "/obj/buildings/mo/$": "buildings",
       "/cmp/auction/": "auctions",
       "/cmp/auctions": "auctions",
