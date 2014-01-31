@@ -216,7 +216,7 @@ def get_buildings(request, pk=None, strv=None, numv=None, all=False):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
-def get_building(request, pk, state=None, extra=None):
+def get_building(request, pk, state=None, monitoring=False, extra=None):
     context = {'title': _(u'Параметры объекта')}
     if state and int(state) == 2:
         build = Ground.objects.get(pk=pk)

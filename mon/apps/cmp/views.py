@@ -111,7 +111,7 @@ def get_mo_auctions(request, pk=None):
             context = {'title': _(u'Аукционы %s' % mo_object)}
             objects = Auction.objects.filter(mo=pk).order_by('stage')
             context.update({'object': mo_object})
-        elif request.user.customuser.mo:
+        elif not request.user.is_superuser and request.user.customuser.mo:
             mo_object = request.user.customuser.mo
             context = {'title': _(u'Аукционы %s' % mo_object)}
             objects = Auction.objects.filter(mo=mo_object).order_by('stage')
