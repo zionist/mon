@@ -412,6 +412,7 @@ def xls_work_table(request):
         "font: bold 1;"
         "align: vertical center, horizontal center;"
     )
+
     date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
     green_style = xlwt.easyxf("pattern: pattern solid, fore_colour c_light_grey;")
 
