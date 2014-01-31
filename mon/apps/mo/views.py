@@ -44,7 +44,8 @@ def add_mo(request):
             sub.reg_budget = reg_form.save()
             sub.save(update_fields=['fed_budget', 'reg_budget'])
             mo = form.save()
-            mo.home_orphans = sub.subvention_performance
+            if hasattr(sub, 'subvention_performance'):
+                mo.home_orphans = sub.subvention_performance
             mo.save(update_fields=['home_orphans'])
             dep.mo = mo
             dep.subvention = sub
