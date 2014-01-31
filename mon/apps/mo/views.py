@@ -169,7 +169,7 @@ def get_mo(request, pk, extra=None):
     context = {'title': _(u'Муниципальное образование')}
     mo = MO.objects.get(pk=pk)
     form = MOShowForm(instance=mo)
-    context.update({'object': mo, 'form': form})
+    context.update({'object': mo, 'form': form, 'agreement': True})
     dep_agreements = mo.departamentagreement_set.all()
     forms = []
     for dep_agreement in dep_agreements:
@@ -181,9 +181,72 @@ def get_mo(request, pk, extra=None):
         sub_form = SubventionShowForm(instance=sub)
         fed_form = FederalBudgetShowForm(instance=fed)
         reg_form = RegionalBudgetShowForm(instance=reg)
-        forms.append({'dep_form': dep_form, 'sub_form': sub_form, 'formsets': [fed_form, reg_form]})
+        forms.append({'dep_form': dep_form, 'sub_form': sub_form,
+                      'formsets': [fed_form, reg_form]})
+    context.update({'forms': forms, 'agreements': dep_agreements, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
+    return render(request, 'mo.html', context, context_instance=RequestContext(request))
+
+
+@login_required
+def get_agreement(request, pk):
+    context = {'title': _(u'Соглашение с министерством')}
+    dep_agreement = DepartamentAgreement.objects.get(pk=pk)
+    form = DepartamentAgreementShowForm(instance=dep_agreement)
+    context.update({'object': dep_agreement, 'form': form})
+    sub = dep_agreement.subvention
+    fed = sub.fed_budget
+    reg = sub.reg_budget
+
+    sub_form = SubventionShowForm(instance=sub)
+    fed_form = FederalBudgetShowForm(instance=fed)
+    reg_form = RegionalBudgetShowForm(instance=reg)
+    forms = ({'sub_form': sub_form, 'formsets': [fed_form, reg_form]})
     context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
     return render(request, 'mo.html', context, context_instance=RequestContext(request))
+
+
+@login_required
+def update_agreement(request, pk, extra=None):
+    context = {'title': _(u'Соглашение с министерством')}
+    dep_agreement = DepartamentAgreement.objects.get(pk=pk)
+    prefix = 'dep'
+    context.update({'object': dep_agreement, 'agreement': True, 'prefix': prefix})
+    forms = []
+    if request.method == "POST":
+        sub = dep_agreement.subvention
+        fed = sub.fed_budget
+        reg = sub.reg_budget
+        dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
+        dep_form = DepartamentAgreementForm(request.POST, instance=dep_agreement, prefix=dep_prefix)
+        sub_form = SubventionForm(request.POST, instance=sub, prefix=sub_prefix)
+        fed_form = FederalBudgetForm(request.POST, instance=fed, prefix=fed_prefix)
+        reg_form = RegionalBudgetForm(request.POST, instance=reg, prefix=reg_prefix)
+        forms.append({'dep_form': dep_form, 'sub_form': sub_form, 'formsets': [fed_form, reg_form],
+                      'prefs': [dep_prefix, sub_prefix, reg_prefix, fed_prefix]})
+        if dep_form.is_valid() and sub_form.is_valid() and fed_form.is_valid() and reg_form.is_valid():
+            dep_form.save()
+
+            sub_form.save()
+            fed_form.save()
+            reg_form.save()
+            context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
+            return redirect('mos')
+        else:
+            context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
+            return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
+    else:
+        sub = dep_agreement.subvention
+        fed = sub.fed_budget
+        reg = sub.reg_budget
+        dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
+        dep_form = DepartamentAgreementForm(instance=dep_agreement, prefix=dep_prefix)
+        sub_form = SubventionForm(instance=sub, prefix=sub_prefix)
+        fed_form = FederalBudgetForm(instance=fed, prefix=fed_prefix)
+        reg_form = RegionalBudgetForm(instance=reg, prefix=reg_prefix)
+        forms.append({'dep_form': dep_form, 'sub_form': sub_form, 'formsets': [fed_form, reg_form],
+                      'prefs': [dep_prefix, sub_prefix, reg_prefix, fed_prefix]})
+        context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
+    return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
 
 
 @login_required
@@ -269,6 +332,38 @@ def delete_mo(request, pk):
     else:
         context.update({'error': _(u'Возникла ошибка при удалении муниципального образования!')})
     return render_to_response("mo_deleting.html", context, context_instance=RequestContext(request))
+
+
+@login_required
+def pre_delete_agreement(request, pk):
+    context = {'title': _(u'Удаление соглашения с министерством')}
+    dep = DepartamentAgreement.objects.get(pk=pk)
+    context.update({'object': dep})
+    return render_to_response("agreement_deleting.html", context, context_instance=RequestContext(request))
+
+
+@login_required
+def delete_agreement(request, pk):
+    context = {'title': _(u'Удаление соглашения с министерством')}
+    dep = DepartamentAgreement.objects.get(pk=pk)
+    if dep and 'delete' in request.POST:
+        sub = dep.subvention
+        if sub:
+            fed = sub.fed_budget
+            reg = sub.reg_budget
+
+            if fed:
+                fed.delete()
+            if reg:
+                reg.delete()
+            sub.delete()
+        dep.delete()
+        return redirect('mos')
+    elif 'cancel' in request.POST:
+        return redirect('mos')
+    else:
+        context.update({'error': _(u'Возникла ошибка при удалении соглашения с министерством!')})
+    return render_to_response("agreement_deleting.html", context, context_instance=RequestContext(request))
 
 
 @login_required
