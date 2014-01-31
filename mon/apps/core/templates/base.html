@@ -21,17 +21,17 @@
 
               <div class="nav-collapse collapse">
                 <ul class="nav">
-                    <!--<li id="main"><a href="{% url 'main' %}">{% trans 'Главная' %}</a></li>-->
-                    <li id="payments" class="dropdown">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Платежи' %}<b class="caret"></b></a>
+                    <li id="monitoring" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Мониторинг' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
                             {% if not user.is_superuser %}
-                            <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                            <li><a href="">{% trans 'Объекты мониторинга' %}</a></li>
                             {% endif %}
                             {% if user.is_staff %}
                             <li class="divider"></li>
-                            <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
+                            <li><a href="">{% trans 'Все объекты мониторинга' %}</a></li>
                             {% endif %}
+                            <li><a href="">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
                     <li id="buildings" class="dropdown">
@@ -47,6 +47,7 @@
                             <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
+
                     {% if user.is_staff %}
                     <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
                     <li id="auctions" class="dropdown">
@@ -73,6 +74,7 @@
                             {% endif %}
                         </ul>
                     </li>
+
                     <li id="results" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Выезды' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
@@ -134,6 +136,15 @@
                     <li id="manage" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
+
+                            {% if not user.is_superuser %}
+                            <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                            {% endif %}
+                            {% if user.is_staff %}
+                            <li class="divider"></li>
+                            <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
+                            {% endif %}
+
                             {% if user.is_superuser %}
                             <li><a href="{% url 'create-user' %}">{% trans 'Создать пользователя' %}</a></li>
                             <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
