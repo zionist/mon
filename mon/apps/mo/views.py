@@ -123,8 +123,7 @@ def mos_select(request, pk=None, ):
     if not request.user.is_staff:
         return HttpResponseForbidden('Forbidden')
     if request.user.is_superuser:
-        return HttpResponse(u'Реализация выбора МО ' \
-                            u'для суперпользователя не предусмотрена')
+        return redirect('mos')
     title = _(u'Выбор муниципального образования')
     template = 'mos_select.html'
     context = {'title': title}

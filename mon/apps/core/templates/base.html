@@ -25,7 +25,9 @@
                     <li id="payments" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Платежи' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
+                            {% if not user.is_superuser %}
                             <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                            {% endif %}
                             {% if user.is_staff %}
                             <li class="divider"></li>
                             <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
@@ -35,7 +37,9 @@
                     <li id="buildings" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Объекты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
+                            {% if not user.is_superuser %}
                             <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
+                            {% endif %}
                             {% if user.is_staff %}
                                 <li class="divider"></li>
                                 <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
@@ -48,7 +52,9 @@
                     <li id="auctions" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Аукционы' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
+                            {% if not user.is_superuser %}
                             <li><a href="{% url 'auctions' %}">{% trans 'Аукционы' %}</a></li>
+                            {% endif %}
                             {% if user.is_staff %}
                                 <li class="divider"></li>
                                 <li><a href="{% url 'auctions-all' %}">{% trans 'Все аукционы' %}</a></li>
@@ -58,7 +64,9 @@
                     <li id="contracts" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Контракты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
+                            {% if not user.is_superuser %}
                             <li><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
+                            {% endif %}
                             {% if user.is_staff %}
                             <li class="divider"></li>
                             <li><a href="{% url 'contracts-all' %}">{% trans 'Все контракты' %}</a></li>
@@ -68,7 +76,9 @@
                     <li id="results" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Выезды' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
+                            {% if not user.is_superuser %}
                             <li><a href="{% url 'results' %}">{% trans 'Выезды' %}</a></li>
+                            {% endif %}
                             <li><a href="{% url 'select-mo-form' %}">{% trans 'Создать бланк осмотра' %}</a></li>
                             {% if user.is_staff %}
                             <li class="divider"></li>
