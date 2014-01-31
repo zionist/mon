@@ -2,7 +2,8 @@
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, Developer
+from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, \
+    Developer, CREATION_FORM_CHOICES
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseFile, BaseFile
 from apps.user.models import CustomUser
@@ -79,6 +80,9 @@ class Contract(BaseContract, BaseCompareData):
     summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
     sign_date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
     period_of_payment = models.DateField(help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
+    creation_form = models.SmallIntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+        verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+        blank=True, null=True, choices=CREATION_FORM_CHOICES)
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
 
