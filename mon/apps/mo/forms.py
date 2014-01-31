@@ -7,9 +7,15 @@ from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 from .models import MO, RegionalBudget, FederalBudget, Subvention, DepartamentAgreement, PeopleAmount
+from apps.core.models import CREATION_FORM_CHOICES
+from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple
 
 
 class MOForm(forms.ModelForm):
+
+    creation_form = CSIMultipleChoiceField(label=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+        required=False, widget=CSICheckboxSelectMultiple, choices=CREATION_FORM_CHOICES)
+
     class Meta:
         model = MO
         fields = ('name', 'creation_form', 'has_trouble')
@@ -104,4 +110,3 @@ class MOPerformanceForm(forms.ModelForm):
     class Meta:
         model = MO
         fields = ('name', 'home_orphans')
-

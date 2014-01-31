@@ -74,22 +74,26 @@ def count_flats(obj_set, vals, **kwargs):
                 amount += int(obj.get(val))
     return amount
 
+
 @login_required
 def get_auctions(request, pk=None):
     template = 'auctions.html'
     context = {'title': _(u'Все аукционы')}
     if MO.objects.all().exists():
         mos = MO.objects.all().order_by('name')
-        objects = [{'id': mo.id, 'name': mo.name, 'creation_form': mo.creation_form, 'auctions': mo.auction_set,
-                    'amount_0': mo.departamentagreement_set.all()[0].subvention_performance,
-                    'amount_1': mo.auction_set.filter(stage=0).count(),
-                    'amount_2': mo.auction_set.filter(stage=1).count(),
-                    'amount_3': mo.auction_set.filter(stage=3).count(),
-                    'amount_4': mo.auction_set.filter(stage=4).count()} for mo in mos]
+        objects = []
+        for mo in mos:
+            amount_0 = mo.departamentagreement_set.all()[0].subvention_performance if mo.departamentagreement_set.all() else 0
+            amount_1 = mo.auction_set.filter(stage=0).count() if mo.auction_set.filter(stage=0).exists() else 0
+            amount_2 = mo.auction_set.filter(stage=1).count() if mo.auction_set.filter(stage=1).exists() else 0
+            amount_3 = mo.auction_set.filter(stage=3).count() if mo.auction_set.filter(stage=3).exists() else 0
+            amount_4 = mo.auction_set.filter(stage=4).count() if mo.auction_set.filter(stage=4).exists() else 0
+            objects.append({'id': mo.id, 'name': mo.name, 'creation_form': mo.creation_form, 'auctions': mo.auction_set,
+                            'amount_0': amount_0, 'amount_1': amount_1, 'amount_2': amount_2, 'amount_3': amount_3,
+                            'amount_4': amount_4})
         for obj in objects:
             for name in ['amount_1', 'amount_2', 'amount_3', 'amount_4']:
                 obj.update({name: count_flats(obj.get('auctions'), vals=['flats_amount'], **{'stage': name[-1:]})})
-
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:

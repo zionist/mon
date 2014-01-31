@@ -55,7 +55,7 @@ class MO(BaseName, ):
 
     creation_form = models.CommaSeparatedIntegerField(max_length=24, help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
-                                        blank=True, null=True, choices=CREATION_FORM_CHOICES , )
+                                        blank=True, null=True, )
     has_trouble = models.NullBooleanField(blank=True, null=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
     home_orphans = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
     common_economy = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая эканомия по субвенциям"), verbose_name=_(u"Общая эканомия по субвенциям"))
