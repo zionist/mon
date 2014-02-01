@@ -1,0 +1,33 @@
+{% extends "base_site.html" %}
+{% load i18n staticfiles%}
+
+
+{% block content %}
+    <h4>{{ title }}</h4>
+    {% if errorlist or error %}
+        {% if errorlist %}
+            <div class="error">
+                {{ errorlist }}
+                 {% for error in errorlist%}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            <br>
+        {% endif %}
+        {% if error %}
+            <div class="error">
+                {{ error }}
+            </div>
+            <br>
+        {% endif %}
+    {% else %}
+        {% trans ' Вы действительно хотите удалить объект мониторинга по адресу ' %} {{ object.address }}?
+
+        <form method="POST" action="{% url 'delete-monitoring' object.id object.state %}"> {% csrf_token %}
+            <br>
+            <button class="btn-danger" type="submit" name="delete"> {% trans ' Удалить ' %} </button>
+            &nbsp;<button class="btn-info" type="cancel" name="cancel"> {% trans ' Отменить ' %} </button>
+        </form>
+            <br>
+    {% endif %}
+{% endblock %}

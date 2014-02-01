@@ -12,6 +12,7 @@ from .models import Building, Ground
 from apps.core.models import STATE_CHOICES, \
     WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
 from apps.core.forms import cmp_single
+from apps.build.models import Contract
 from apps.core.models import Choices
 
 
@@ -26,6 +27,8 @@ class GroundForm(autocomplete_light.ModelForm):
         self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
+        self.fields['contract'] = forms.ModelChoiceField(Contract.objects.all(),
+           label=_(u"Контракт"), help_text=_(u"Контракт"), required=True)
 
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
@@ -42,9 +45,38 @@ class GroundForm(autocomplete_light.ModelForm):
 
 class BuildingForm(GroundForm):
 
+    def __init__(self, *args, **kwargs):
+        super(BuildingForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = Building
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',)
+
+
+
+class BuildingMonitoringForm(GroundForm):
+
+    def __init__(self, *args, **kwargs):
+        super(BuildingMonitoringForm, self).__init__(*args, **kwargs)
+        self.fields.pop('contract')
+
+    class Meta:
+        model = Building
+        fields = ('address', 'flats_amount', 'area', 'comment',
+                  'approve_status', 'mo')
+
+
+class GroundMonitoringForm(GroundForm):
+
+    def __init__(self, *args, **kwargs):
+        super(GroundMonitoringForm, self).__init__(*args, **kwargs)
+        self.fields.pop('contract')
+
+    class Meta:
+        model = Ground
+        fields = ('address', 'cad_num', 'area', 'cad_passport', 'comment',
+                  'approve_status', 'mo')
+
 
 class BuildingSelectForm(forms.Form):
     state = forms.ChoiceField(label=_(u'Тип объекта'), required=True, choices=STATE_CHOICES, help_text=_(u"Тип объекта"), )
@@ -55,6 +87,10 @@ class BuildingSelectForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(BuildingSelectForm, self).__init__(*args, **kwargs)
         self.verbose_name = _(u"Выбор типа объекта рынка жилья и застройщика(владельца)")
+
+
+class BuildingSelectMonitoringForm(BuildingSelectForm):
+    pass
 
 
 class BuildingShowForm(BuildingForm):

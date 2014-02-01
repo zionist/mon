@@ -1,0 +1,31 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+
+{% block content %}
+    <h4>{{ title }}</h4>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form or formsets %}
+            <form method="POST" enctype="multipart/form-data" action="{% url 'update-monitoring' object.id object.state %}"> {% csrf_token %}
+                <p class="blue">{% trans ' Общие параметры' %}</p>
+                {% include "4_col_form.html" %}
+                {% with form=text_area_fields %}
+                {% include "2_col_form.html" %}
+                {% endwith %}
+                {% endif %}
+                {% for form in formsets %}
+                <br />
+                <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
+                {% include "4_col_form.html" %}
+                {% endfor %}
+                {% if form %}
+                <br />
+                <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
