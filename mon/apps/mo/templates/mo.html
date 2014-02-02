@@ -24,12 +24,20 @@
         </div><br />
             {% if agreement %}
                 <div class="row">
-                    <div class="span3"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">
+                    <div class="span5"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">
                         {% trans 'Редактировать' %}</a></div>
-                    <div class="span7"><a class="btn btn-info" href="{% url 'add-agreement-mo' object.id 1 %}">
-                        {% trans 'Добавить доп. соглашение' %}</a>
-                        <a class="btn btn-info" href="{% url 'add-agreement-mo' object.id 0 %}">
-                        {% trans 'Добавить письмо о вычете средств' %}</a>
+                    <div class="span5">
+                        <li id="agreements" class="dropdown" style="list-style-type:none;">
+                            <a href="#" role="button" class="dropdown-toggle btn" data-toggle="dropdown">{% trans 'Соглашения ' %}<b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" >
+                                <li><a href="{% url 'add-agreement-mo' object.id %}">
+                            {% trans 'Добавить соглашение' %}</a></li>
+                                <li><a href="{% url 'add-dop-agreement-mo' object.id 1 %}">
+                            {% trans 'Добавить доп. соглашение' %}</a></li>
+                                <li><a href="{% url 'add-dop-agreement-mo' object.id 0 %}">
+                            {% trans 'Добавить письмо о вычете средств' %}</a></li>
+                            </ul>
+                        </li>
                     </div>
                     <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-mo' object.id %}">
                         {% trans 'Удалить' %}</a></div>

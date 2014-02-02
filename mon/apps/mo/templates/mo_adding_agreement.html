@@ -8,9 +8,32 @@
             {{ errorlist }}
         </div>
     {% else %}
-        {% if form or formsets %}
-            <form method="POST" action="{% url 'add-agreement-mo' object.id state %}"> {% csrf_token %}
+        {% if form and not formsets %}
+            <form method="POST" action="{% url 'add-dop-agreement-mo' object.id state %}"> {% csrf_token %}
 
+                {% if form %}
+                <br>
+                <table border="0">
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                <table border="0">
+                    <h4>{% trans ' Реквизиты соглашения с министерством' %}</h4>
+                    {% for field in dep_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+
+                    {% for field in sub_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+                <br>
+                <button type="submit" name = "mo"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% elif form and formsets %}
+            <form method="POST" action="{% url 'add-agreement-mo' object.id %}"> {% csrf_token %}
                 {% if form %}
                 <br>
                 <table border="0">
