@@ -73,7 +73,7 @@ class GroundMonitoringForm(autocomplete_light.ModelForm):
     class Meta:
         model = Ground
         fields = ('address', 'cad_num', 'area', 'cad_passport', 'comment',
-                  'approve_status', 'mo')
+                  'approve_status', 'mo', 'contract')
 
 
 class BuildingSelectForm(forms.Form):
