@@ -50,11 +50,11 @@ class BuildingForm(GroundForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',)
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state', 'contract')
 
 
 
-class BuildingMonitoringForm(GroundForm):
+class BuildingMonitoringForm(autocomplete_light.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingMonitoringForm, self).__init__(*args, **kwargs)
@@ -62,10 +62,10 @@ class BuildingMonitoringForm(GroundForm):
     class Meta:
         model = Building
         fields = ('address', 'flats_amount', 'area', 'comment',
-                  'approve_status', 'mo')
+                  'approve_status', 'mo', 'contract')
 
 
-class GroundMonitoringForm(GroundForm):
+class GroundMonitoringForm(autocomplete_light.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(GroundMonitoringForm, self).__init__(*args, **kwargs)
