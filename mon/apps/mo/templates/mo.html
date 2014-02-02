@@ -10,6 +10,18 @@
         </div>
     {% else %}
         {% if form and object %}
+        <div class="row">
+            <div class="span3"><a class="btn" href="{% url 'monitorings' object.id %}">
+                {% trans 'Мониторинг' %}</a></div>
+            <div class="span2"><a class="btn" href="{% url 'buildings' object.id %}">
+                {% trans 'Объекты' %}</a></div>
+            <div class="span2"><a class="btn" href="{% url 'contracts' object.id %}">
+                {% trans 'Контракты' %}</a></div>
+            <div class="span2"><a class="btn" href="{% url 'mo-auctions' object.id %}">
+                {% trans 'Аукционы' %}</a></div>
+            <div class="span3 text-right"><a class="btn" href="{% url 'results' object.id %}">
+                {% trans 'Выезды' %}</a></div>
+        </div><br />
             {% if agreement %}
                 <div class="row">
                     <div class="span3"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">

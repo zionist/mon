@@ -38,6 +38,7 @@ from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
 from apps.user.models import CustomUser
+from apps.mo.models import MO
 
 
 @login_required
@@ -244,9 +245,13 @@ def get_developers(request):
                   context_instance=RequestContext(request))
 
 @login_required
-def get_buildings(request, pk=None, strv=None, numv=None, all=False):
+def get_buildings(request, mo=None, strv=None, numv=None, all=False):
     template = 'builds.html'
-    if all:
+    if mo:
+        mo_obj = MO.objects.get(pk=mo)
+        context = {'title': _(u'Объекты рынка жилья %s' %
+                              mo_obj.name)}
+    elif all:
         context = {'title': _(u'Все объекты рынка жилья')}
     else:
         context = {'title': _(u'Объекты рынка жилья %s' %
@@ -254,29 +259,24 @@ def get_buildings(request, pk=None, strv=None, numv=None, all=False):
     if Building.objects.all().exists() or Ground.objects.all().exists():
         objects, build_objects, ground_objects = [], [], []
         if Building.objects.filter(contract__isnull=False).exists():
-            if not request.user.is_staff or not all:
+            if mo:
+                build_objects = Building.objects.filter(mo=mo).\
+                    filter(contract__isnull=False).order_by('state')
+            elif all:
+                build_objects = Building.objects.filter(contract__isnull=False).order_by('state')
+            else:
                 build_objects = Building.objects.filter(mo=request.user.customuser.mo).\
                     filter(contract__isnull=False).order_by('state')
-            else:
-                build_objects = Building.objects.filter(contract__isnull=False).order_by('state')
-            get = Building.objects.get
         if Ground.objects.all().exists():
-            if not request.user.is_staff or not all:
-                ground_objects = Ground.objects.filter(mo=request.user.customuser.mo).\
+            if mo:
+                ground_objects = Ground.objects.filter(mo=mo). \
                     filter(contract__isnull=False).order_by('state')
+            elif all:
+                ground_objects = Ground.objects.filter(contract__isnull=False).order_by('state')
             else:
-                ground_objects = Ground.objects.filter(contract__isnull=False).\
-                    order_by('state')
-            get = Ground.objects.get
+                ground_objects = Ground.objects.filter(mo=request.user.customuser.mo). \
+                    filter(contract__isnull=False).order_by('state')
         objects = [x for x in build_objects] + [x for x in ground_objects]
-        if pk or strv or numv:
-            if pk:
-                build_object = get(pk=pk)
-            if strv:
-                build_object = get(address__icontains=strv)
-            if numv:
-                build_object = get(state=numv)
-            context.update({'object': build_object})
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
@@ -290,9 +290,13 @@ def get_buildings(request, pk=None, strv=None, numv=None, all=False):
 
 
 @login_required
-def get_monitorings(request, pk=None, strv=None, numv=None, all=False):
+def get_monitorings(request, mo=None, all=False):
     template = 'monitorings.html'
-    if all:
+    if mo:
+        mo_obj = MO.objects.get(pk=mo)
+        context = {'title': _(u'Объекты мониторинга %s' %
+                              mo_obj.name)}
+    elif all:
         context = {'title': _(u'Все объекты мониторинга')}
     else:
         context = {'title': _(u'Объекты мониторинга %s' %
@@ -300,28 +304,24 @@ def get_monitorings(request, pk=None, strv=None, numv=None, all=False):
     if Building.objects.all().exists() or Ground.objects.all().exists():
         objects, build_objects, ground_objects = [], [], []
         if Building.objects.filter(contract__isnull=True).exists():
-            if not request.user.is_staff or not all:
-                build_objects = Building.objects.filter(mo=request.user.customuser.mo).\
+            if mo:
+                build_objects = Building.objects.filter(mo=mo). \
                     filter(contract__isnull=True).order_by('state')
-            else:
+            elif all:
                 build_objects = Building.objects.filter(contract__isnull=True).order_by('state')
-            get = Building.objects.get
-        if Ground.objects.filter(contract__isnull=True).exists():
-            if not request.user.is_staff or not all:
-                ground_objects = Ground.objects.filter(mo=request.user.customuser.mo).\
-                    filter(contract__isnull=True).order_by('state')
             else:
+                build_objects = Building.objects.filter(mo=request.user.customuser.mo). \
+                    filter(contract__isnull=True).order_by('state')
+        if Ground.objects.all().exists():
+            if mo:
+                ground_objects = Ground.objects.filter(mo=mo). \
+                    filter(contract__isnull=True).order_by('state')
+            elif all:
                 ground_objects = Ground.objects.filter(contract__isnull=True).order_by('state')
-            get = Ground.objects.get
+            else:
+                ground_objects = Ground.objects.filter(mo=request.user.customuser.mo). \
+                    filter(contract__isnull=True).order_by('state')
         objects = [x for x in build_objects] + [x for x in ground_objects]
-        if pk or strv or numv:
-            if pk:
-                build_object = get(pk=pk)
-            if strv:
-                build_object = get(address__icontains=strv)
-            if numv:
-                build_object = get(state=numv)
-            context.update({'object': build_object})
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:

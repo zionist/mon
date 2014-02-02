@@ -115,7 +115,7 @@ def get_mo_auctions(request, pk=None):
             context = {'title': _(u'Аукционы %s' % mo_object)}
             objects = Auction.objects.filter(mo=pk).order_by('stage')
             context.update({'object': mo_object})
-        elif not request.user.is_superuser and request.user.customuser.mo:
+        elif request.user.customuser.mo:
             mo_object = request.user.customuser.mo
             context = {'title': _(u'Аукционы %s' % mo_object)}
             objects = Auction.objects.filter(mo=mo_object).order_by('stage')
@@ -300,21 +300,21 @@ def add_contract_from_auction(request, pk):
 
 
 @login_required
-def get_contracts(request, pk=None, all=False):
+def get_contracts(request, mo=None, all=False):
     template = 'contracts.html'
-    if all:
-        context = {'title': _(u'Все контракты')}
-    else:
-        context = {'title': _(u'Контракты %s' %
-                              request.user.customuser.mo)}
     if Contract.objects.all().exists():
-        if all:
+        if mo:
+            mo_obj = MO.objects.get(pk=mo)
+            context = {'title': _(u'Контракты %s' %
+                                  mo_obj.name)}
+            objects = Contract.objects.filter(mo=mo)
+        elif all:
             objects = Contract.objects.all()
+            context = {'title': _(u'Все контракты')}
         else:
             objects = Contract.objects.filter(mo=request.user.customuser.mo)
-        if pk:
-            contract_object = Contract.objects.get(pk=pk)
-            context.update({'object': contract_object})
+            context = {'title': _(u'Контракты %s' %
+                                  request.user.customuser.mo)}
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
@@ -452,21 +452,24 @@ def add_result(request):
 
 
 @login_required
-def get_results(request, pk=None, all=False):
+def get_results(request, mo=None, all=False):
     template = 'results.html'
-    if all:
+    if mo:
+        mo_obj = MO.objects.get(pk=mo)
+        context = {'title': _(u'Выезды в %s' %
+                              mo_obj.name)}
+    elif all:
         context = {'title': _(u'Все выезды')}
     else:
         context = {'title': _(u'Выезды в %s' %
                               request.user.customuser.mo)}
     if Result.objects.all().exists():
-        if all:
+        if mo:
+            objects = Result.objects.filter(building__mo=mo)
+        elif all:
             objects = Result.objects.all()
         else:
             objects = Result.objects.filter(building__mo=request.user.customuser.mo)
-        if pk:
-            result_object = Result.objects.get(pk=pk)
-            context.update({'object': result_object})
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
