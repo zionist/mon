@@ -37,6 +37,21 @@ class SubventionForm(forms.ModelForm):
         exclude = ('date', 'reg_budget', 'fed_budget')
 
 
+class SubventionMinusForm(forms.ModelForm):
+    class Meta:
+        model = Subvention
+        exclude = ('date', 'reg_budget', 'fed_budget')
+
+    def clean(self):
+        cd = super(SubventionMinusForm, self).clean()
+        amount = cd.get('amount')
+        if amount and int(amount) > 0:
+            msg = _(u'Должно быть отрицательным')
+            self._errors["amount"] = self.error_class([msg])
+            del cd["amount"]
+        return cd
+
+
 class DepartamentAgreementForm(forms.ModelForm):
     class Meta:
         model = DepartamentAgreement
