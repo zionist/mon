@@ -58,7 +58,6 @@ class BuildingMonitoringForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingMonitoringForm, self).__init__(*args, **kwargs)
-        self.fields.pop('contract')
 
     class Meta:
         model = Building
@@ -70,7 +69,6 @@ class GroundMonitoringForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
         super(GroundMonitoringForm, self).__init__(*args, **kwargs)
-        self.fields.pop('contract')
 
     class Meta:
         model = Ground

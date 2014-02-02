@@ -40,6 +40,7 @@ from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, Kitche
 from apps.user.models import CustomUser
 
 
+@login_required
 def select_monitoring_state(request):
     template = 'monitoring_creation.html'
     context = {'title': _(u'Добавление объекта мониторинга')}
@@ -58,6 +59,7 @@ def select_monitoring_state(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def select_building_state(request):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление объекта рынка жилья')}
@@ -76,6 +78,7 @@ def select_building_state(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def add_building(request, dev_pk=None, state=None):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление объекта рынка жилья')}
@@ -134,6 +137,7 @@ def add_building(request, dev_pk=None, state=None):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def add_monitoring(request, dev_pk=None, state=None):
     template = 'monitoring_creation.html'
     context = {'title': _(u'Добавление объекта мониторинга')}
@@ -150,6 +154,7 @@ def add_monitoring(request, dev_pk=None, state=None):
         elif select and int(select) in [0, 1]:
             form = BuildingMonitoringForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
+        form.fields.pop('contract')
         if not request.user.is_staff:
             form.fields.pop('approve_status')
             form.fields.pop('mo')
@@ -171,11 +176,13 @@ def add_monitoring(request, dev_pk=None, state=None):
         elif select and int(select) in [0, 1]:
             form = BuildingMonitoringForm(request.POST, prefix=prefix)
         form, text_area_form = split_form(form)
+        form.fields.pop('contract')
         if not request.user.is_staff:
             form.fields.pop('approve_status')
             form.fields.pop('mo')
         context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix,})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
 
 @login_required
 def manage_developer(request, pk=None, state=None):
@@ -327,6 +334,7 @@ def get_monitorings(request, pk=None, strv=None, numv=None, all=False):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def get_building(request, pk, state=None, extra=None):
     context = {'title': _(u'Параметры объекта')}
     if state and int(state) == 2:
@@ -347,6 +355,7 @@ def get_building(request, pk, state=None, extra=None):
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def get_monitoring(request, pk, state=None, extra=None):
     context = {'title': _(u'Параметры объекта мониторинга')}
     if state and int(state) == 2:
@@ -366,6 +375,7 @@ def get_monitoring(request, pk, state=None, extra=None):
     return render(request, 'monitoring.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def approve_building(request, pk, state=None):
     """
     Send for approve (set approve status = 1)
@@ -383,6 +393,7 @@ def approve_building(request, pk, state=None):
     return redirect('buildings')
 
 
+@login_required
 def update_building(request, pk, state=None, extra=None):
     context = {'title': _(u'Параметры объекта')}
     if state and int(state) == 2:
@@ -405,6 +416,7 @@ def update_building(request, pk, state=None, extra=None):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             new_build = form.save()
+            new_build.room = room_f.save()
             if not request.user.is_staff:
                 new_build.approve_status = build.approve_status
                 new_build.mo = build.mo
@@ -444,6 +456,7 @@ def update_building(request, pk, state=None, extra=None):
         return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_monitoring(request, pk, state=None, extra=None):
     context = {'title': _(u'Параметры объекта мониторинга')}
     if state and int(state) == 2:
@@ -459,12 +472,30 @@ def update_monitoring(request, pk, state=None, extra=None):
             form = GroundMonitoringForm(request.POST, request.FILES, prefix=prefix, instance=build)
         else:
             form = BuildingMonitoringForm(request.POST, request.FILES, prefix=prefix, instance=build)
-            # check access rules. Add approve_status from object to form
+        form.fields['contract'].required = False
+        # check access rules. Add approve_status from object to form
         if not request.user.is_staff:
+            form.fields.pop('contract')
             form.fields.pop('approve_status')
             form.fields.pop('mo')
         if form.is_valid():
-            new_build = form.save()
+            new_build = form.save(commit=False)
+            # "move" to objects
+            if form.cleaned_data.get('contract'):
+                new_build.contract = form.cleaned_data['contract']
+                new_build.room = Room()
+                new_build.room.save()
+                new_build.room_id = new_build.room.pk
+                new_build.hallway = Hallway()
+                new_build.hallway.save()
+                new_build.hallway_id = new_build.hallway.pk
+                new_build.wc = WC()
+                new_build.wc.save()
+                new_build.wc_id = new_build.wc.pk
+                new_build.kitchen = Kitchen()
+                new_build.kitchen.save()
+                new_build.kitchen_id = new_build.kitchen.pk
+                new_build.save(update_fields=['room', 'kitchen', 'wc', 'hallway', 'contract'])
             if not request.user.is_staff:
                 new_build.approve_status = build.approve_status
                 new_build.mo = build.mo
@@ -481,8 +512,8 @@ def update_monitoring(request, pk, state=None, extra=None):
             form = GroundMonitoringForm(prefix=prefix, instance=build)
         else:
             form = BuildingMonitoringForm(prefix=prefix, instance=build)
-            # remove approve_status field from view if not admin
         if not request.user.is_staff:
+            form.fields.pop('contract')
             form.fields.pop('approve_status')
             form.fields.pop('mo')
         form, text_area_form = split_form(form)
@@ -527,6 +558,7 @@ def copy_building(request, pk):
                     state=new_building.state)
 
 
+@login_required
 def pre_delete_building(request, pk, state=None):
     context = {'title': _(u'Удаление объекта рынка жилья')}
     if state and int(state) == 2:
@@ -540,6 +572,7 @@ def pre_delete_building(request, pk, state=None):
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def pre_delete_monitoring(request, pk, state=None):
     context = {'title': _(u'Удаление объекта мониторинга')}
     if state and int(state) == 2:
@@ -553,6 +586,7 @@ def pre_delete_monitoring(request, pk, state=None):
     return render_to_response("monitoring_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_building(request, pk, state=None):
     context = {'title': _(u'Удаление объекта')}
     if state and int(state) == 2:
@@ -576,6 +610,7 @@ def delete_building(request, pk, state=None):
     return render_to_response("build_deleting.html", context, context_instance=RequestContext(request))
 
 
+@login_required
 def delete_monitoring(request, pk, state=None):
     context = {'title': _(u'Удаление объекта мониторинга')}
     if state and int(state) == 2:
