@@ -46,7 +46,7 @@ class Migration(SchemaMigration):
             ('ceiling_hook', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
             ('heaters', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
             ('smoke_filter', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('sink_with_mixer', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+            ('sink_with_mixer', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
         db.send_create_signal('core', ['BaseKitchen'])
 
@@ -61,8 +61,8 @@ class Migration(SchemaMigration):
             ('smoke_filter', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
             ('is_tower_dryer', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
             ('is_toilet', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('bath_with_mixer', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
-            ('sink_with_mixer', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+            ('bath_with_mixer', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+            ('sink_with_mixer', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
         ))
         db.send_create_signal('core', ['BaseWC'])
 
@@ -260,7 +260,7 @@ class Migration(SchemaMigration):
             'heaters': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lamp': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'sink_with_mixer': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'sink_with_mixer': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'smoke_filter': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'sockets': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'switches': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'})
@@ -277,14 +277,14 @@ class Migration(SchemaMigration):
         },
         'core.basewc': {
             'Meta': {'object_name': 'BaseWC'},
-            'bath_with_mixer': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'bath_with_mixer': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'ceiling_hook': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'heaters': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_toilet': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'is_tower_dryer': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'lamp': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
-            'sink_with_mixer': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'sink_with_mixer': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
             'smoke_filter': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'sockets': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'switches': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'})

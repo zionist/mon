@@ -11,7 +11,7 @@ import autocomplete_light
 
 from .models import CompareData, Result, Auction, Person, AuctionDocuments
 from apps.build.models import Contract, ContractDocuments
-from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES
+from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, WATER_REMOVAL_CHOICES, HEATING_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple, cmp_single, cmp_multi
 from apps.core.models import Choices
 
@@ -87,10 +87,14 @@ class AuctionForm(forms.ModelForm):
         self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
                                                   widget=CSICheckboxSelectMultiple, choices=choices)
 
+    water_removal = CSIMultipleChoiceField(label=_(u"Водоотведение"), required=False,
+                                           widget=CSICheckboxSelectMultiple, choices=WATER_REMOVAL_CHOICES)
     water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
                                               widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,
                                               widget=CSICheckboxSelectMultiple, choices=HOT_WATER_SUPPLY_CHOICES)
+    heating = CSIMultipleChoiceField(label=_(u"Отопление"), required=False,
+                                     widget=CSICheckboxSelectMultiple, choices=HEATING_CHOICES)
 
     class Meta:
         model = Auction

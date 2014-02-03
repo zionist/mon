@@ -25,9 +25,12 @@
                 {% for obj in mo_list %}
                     {% if obj.id %}
                         <tr>
-                            <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a> /
-                                {% if obj.creation_form == 0 %}П{% elif obj.creation_form == 1%}ДС
-                                {% elif obj.creation_form == 2%}С{% endif %}
+                            <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a>
+                                {% with creation_form=obj.creation_form %}
+                                {% if '0' in creation_form %}/ П {% endif %}
+                                {% if '1' in creation_form %}/ ДС {% endif %}
+                                {% if '2' in creation_form %}/ С {% endif %}
+                                {% endwith %}
                             {% if mo_contracts %}
                                 <br><br><strong>{% trans 'Контракты: ' %} </strong>
                                 {% for contract in obj.contract_set.all %}

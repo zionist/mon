@@ -9,7 +9,7 @@ class RegionalBudget(BaseBudget, ):
 
     class Meta:
         app_label = "mo"
-        verbose_name = _(u"Региональный бюджет")
+        verbose_name = _(u"Краевой бюджет")
 
     def __unicode__(self):
         return '%s' % self.id

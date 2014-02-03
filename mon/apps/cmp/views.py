@@ -108,6 +108,7 @@ def get_auctions(request, pk=None):
 
 @login_required
 def get_mo_auctions(request, pk=None):
+    context = {'title': _(u'Аукционы')}
     template = 'mo_auctions.html'
     if Auction.objects.all().exists():
         if pk:
@@ -302,6 +303,7 @@ def add_contract_from_auction(request, pk):
 @login_required
 def get_contracts(request, mo=None, all=False):
     template = 'contracts.html'
+    context = {'title': _(u'Контракты')}
     if Contract.objects.all().exists():
         if mo:
             mo_obj = MO.objects.get(pk=mo)

@@ -8,9 +8,9 @@ STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящи
 READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж в комментариях)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
 WATER_SETTLEMENT_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 HOT_WATER_SUPPLY_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
-WATER_REMOVAL_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-ELECTRIC_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
-GAS_SUPPLY_CHOICES = ((0, _(u'Центральное')),  (1, _(u'Индивидуальное')))
+WATER_REMOVAL_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
+ELECTRIC_SUPPLY_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
+GAS_SUPPLY_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 CREATION_FORM_CHOICES = ((0, _(u'Приобретение')),  (1, _(u'Долевое строительство')), (2, _(u'Строительство')),)
 SEPARATE_CHOICES = ((0, _(u'Не указано')),  (1, _(u'Совместный')),  (2, _(u'Раздельный')),)
 STAGE_CHOICES = ((0, _(u'Подача заявок')),  (1, _(u'Работа комиссии')),
@@ -22,8 +22,12 @@ PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения �
                                (2, _(u'Перспективы освоения денежных средств в планируемом году.')))
 APPROVE_CHOICES = ((0, _(u'Не проверено')), (1, _(u'Требуется проверка')), (2, (u'Проверено')), )
 STOVE_CHOICES = ((0, _(u'Не указано')), (1, _(u'Газовая кухонная плита')), (2, (u'Электрическая кухонная плита')), )
-YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
+HEATING_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное поквартирное')),  (3, _(u'Автономное')))
+SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Раковина')), (2, (u'Раковина со смесителем')), )
+BATH_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ванна')), (2, (u'Ванна со смесителем')), )
+AREA_CMP_CHOICES = ((0, _(u'Не менее')), (1, _(u'Равно')), )
 
+YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
 
 
 class Choices(models.Model):
@@ -193,7 +197,6 @@ class BaseEngineerNetworks(models.Model):
     class Meta:
         abstract = True
 
-    water_removal = models.IntegerField(help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), choices=WATER_REMOVAL_CHOICES , )
     electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
     gas_supply = models.IntegerField(help_text=_(u"Газоснабжение"), null=True, blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
 
@@ -211,8 +214,10 @@ class BaseWaterSupply(BaseEngineerNetworks):
     class Meta:
         abstract = True
 
+    water_removal = models.IntegerField(help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), choices=WATER_REMOVAL_CHOICES , )
     water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), default=0, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
     hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), default=0, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
+    heating = models.IntegerField(help_text=_(u"Отопление"), null=True, blank=True, verbose_name=_(u"Отопление"), choices=GAS_SUPPLY_CHOICES , )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -327,7 +332,7 @@ class BaseRoom(BaseDevices):
 
 
 class BaseKitchen(BaseDevices):
-    sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
+    sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
 
     class Meta:
         app_label = "core"
@@ -348,12 +353,12 @@ class BaseKitchen(BaseDevices):
 class BaseWC(BaseDevices, ):
     is_tower_dryer = models.NullBooleanField(help_text=_(u"Полотенцесушитель"), verbose_name=_(u"Полотенцесушитель"), blank=True, )
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
-    bath_with_mixer = models.NullBooleanField(help_text=_(u"Ванна со смесителем"), verbose_name=_(u"Ванна со смесителем"), blank=True, )
-    sink_with_mixer = models.NullBooleanField(help_text=_(u"Раковина со смесителем"), verbose_name=_(u"Раковина со смесителем"), blank=True, )
+    bath_with_mixer = models.IntegerField(help_text=_(u"Ванна"), default=0, blank=True, null=True, verbose_name=_(u"Ванна"), choices=BATH_CHOICES)
+    sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
 
     class Meta:
         app_label = "core"
-        verbose_name = "Санузел"
+        verbose_name = "Ванная комната"
 
     def __unicode__(self):
         return '%s' % self.id
@@ -417,7 +422,7 @@ class WC(BaseMaterials, BaseWC, ):
     separate = models.IntegerField(default=0, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES)
 
     class Meta:
-        verbose_name = u"Санузел"
+        verbose_name = u"Ванная комната"
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -460,7 +465,9 @@ class BaseCompareData(BaseCommonChars, ):
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
     flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
-    area = models.IntegerField(help_text=_(u"Общая площадь"), null=True, verbose_name=_(u"Общая площадь"), blank=True, )
+    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
+    area = models.FloatField(help_text=_(u"Общая площадь"), null=True, verbose_name=_(u"Общая площадь"), blank=True, )
+
     room = models.ForeignKey(Room, null=True, blank=True, )
     wc = models.ForeignKey(WC, null=True, blank=True, )
     hallway = models.ForeignKey(Hallway, null=True, blank=True, )
@@ -498,8 +505,10 @@ class BaseMultiWaterSupply(BaseEngineerNetworks):
     class Meta:
         abstract = True
 
+    water_removal = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), )
     water_settlement = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), )
     hot_water_supply = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), )
+    heating = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Отопление"), null=True, blank=True, verbose_name=_(u"Отопление"), )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -560,7 +569,8 @@ class BaseAuctionData(BaseMultiWaterSupply, BaseSocialObjects, BaseTerritoryImpr
         abstract = True
 
     flats_amount = models.IntegerField(help_text=_(u"Количество квартир по номеру заказа"), null=True, verbose_name=_(u"Количество квартир по номеру заказа"), blank=True, )
-    area = models.IntegerField(help_text=_(u"Площадь квартир по номеру заказа"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа"), blank=True, )
+    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
+    area = models.FloatField(help_text=_(u"Площадь квартир по номеру заказа"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа"), blank=True, )
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
 
