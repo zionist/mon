@@ -13,14 +13,15 @@
         <div class="row">
             <div class="span2"><a class="btn" href="{% url 'monitorings' object.id %}">
                 {% trans 'Мониторинг' %}</a></div>
-            <div class="span2"><a class="btn" href="{% url 'buildings' object.id %}">
-                {% trans 'Объекты' %}</a></div>
-            <div class="span2"><a class="btn" href="{% url 'contracts' object.id %}">
-                {% trans 'Контракты' %}</a></div>
-            <div class="span2"><a class="btn" href="{% url 'mo-auctions' object.id %}">
-                {% trans 'Аукционы' %}</a></div>
-            <div class="span2"><a class="btn" href="{% url 'results' object.id %}">
-                {% trans 'Выезды' %}</a></div>
+            {% if user.is_staff %}
+                <div class="span2"><a class="btn" href="{% url 'buildings' object.id %}">
+                    {% trans 'Объекты' %}</a></div>
+                <div class="span2"><a class="btn" href="{% url 'contracts' object.id %}">
+                    {% trans 'Контракты' %}</a></div>
+                <div class="span2"><a class="btn" href="{% url 'mo-auctions' object.id %}">
+                    {% trans 'Аукционы' %}</a></div>
+                <div class="span2"><a class="btn" href="{% url 'results' object.id %}">
+                    {% trans 'Выезды' %}</a></div>
             <div class="span2 text-right">
                 <li id="agreements" class="dropdown" style="list-style-type:none;">
                     <a href="#" role="button" class="dropdown-toggle btn" data-toggle="dropdown">{% trans 'Соглашения ' %}<b class="caret"></b></a>
@@ -34,6 +35,7 @@
                     </ul>
                 </li>
             </div>
+            {% endif %}
         </div><br />
             {% if agreement %}
                 <div class="row">

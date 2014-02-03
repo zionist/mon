@@ -21,6 +21,12 @@
 
               <div class="nav-collapse collapse">
                 <ul class="nav">
+                    {% if user.is_staff %}
+                    <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
+                    {% else %}
+                    <li id="mos"><a href="{% url 'change-mo' user.customuser.mo.pk %}">{% trans 'МО' %}</a></li>
+                    {% endif %}
+                    {% if not hide_menu %}
                     <li id="monitoring" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Мониторинг' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
@@ -47,9 +53,10 @@
                             <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
+                    {% endif %}
 
                     {% if user.is_staff %}
-                    <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
+                    {% if not hide_menu %}
                     <li id="auctions" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Аукционы' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
@@ -88,8 +95,7 @@
                             {% endif %}
                         </ul>
                     </li>
-                    {% else %}
-                        <li id="mos"><a href="{% url 'change-mo' user.customuser.mo.pk %}">{% trans 'МО' %}</a></li>
+                    {% endif %}
                     {% endif %}
 
                     <li id="creation" class="dropdown">
@@ -151,10 +157,6 @@
                             <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
                             <li><a href="{% url 'choices' %}">{% trans 'Список материалов' %}</a></li>
                             {% endif %}
-                            {% if user.is_staff %}
-                                <li><a href="{% url 'select-mos' %}">{% trans 'Выбрать МО' %}</a></li>
-                            {% endif %}
-
                             <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
                         </ul>
                     </li>

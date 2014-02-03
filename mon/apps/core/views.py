@@ -33,7 +33,7 @@ def main(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect("/login")
     if request.user.is_staff:
-        return redirect("select-mos")
+        return redirect("mos")
     else:
         return redirect("change-mo", pk=request.user.customuser.mo.pk)
 
