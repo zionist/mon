@@ -479,7 +479,7 @@ def update_monitoring(request, pk, state=None, extra=None):
             form.fields.pop('approve_status')
             form.fields.pop('mo')
         if form.is_valid():
-            new_build = form.save(commit=False)
+            new_build = form.save()
             # "move" to objects
             if form.cleaned_data.get('contract'):
                 new_build.contract = form.cleaned_data['contract']
