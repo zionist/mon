@@ -172,9 +172,11 @@
    </div>
    <div class="container">
        <br />
+       {% if user.customuser.mo %}
        <div class="row">
            <div class="span12"> <p class="blue"> Выбрано {{ user.customuser.mo }}</p></div>
        </div>
+       {% endif %}
        {% block content %}{% endblock %}
    </div>
 

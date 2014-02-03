@@ -11,7 +11,8 @@ import autocomplete_light
 
 from .models import CompareData, Result, Auction, Person, AuctionDocuments
 from apps.build.models import Contract, ContractDocuments
-from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, WATER_REMOVAL_CHOICES, HEATING_CHOICES
+from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, WATER_REMOVAL_CHOICES, \
+    HEATING_CHOICES, ELECTRIC_SUPPLY_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple, cmp_single, cmp_multi
 from apps.core.models import Choices
 
@@ -42,10 +43,18 @@ class ContractForm(autocomplete_light.ModelForm):
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
 
+
+    electric_supply = forms.ChoiceField(label=_(u"Электроснабжение"), required=False,
+        widget=forms.Select, choices=ELECTRIC_SUPPLY_CHOICES)
+    water_removal = forms.ChoiceField(label=_(u"Водоотведение"), required=False,
+        widget=forms.Select, choices=WATER_REMOVAL_CHOICES)
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
         widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
+    heating = forms.ChoiceField(label=_(u"Отопление"), required=False,
+        widget=forms.Select, choices=HEATING_CHOICES)
+
 
     class Meta:
         model = Contract
@@ -76,6 +85,7 @@ class ContractDocumentsForm(forms.ModelForm):
 
 class AuctionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        print 'init'
         super(AuctionForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
@@ -87,6 +97,8 @@ class AuctionForm(forms.ModelForm):
         self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
                                                   widget=CSICheckboxSelectMultiple, choices=choices)
 
+    electric_supply = CSIMultipleChoiceField(label=_(u"Электроснабжение"), required=False,
+                                           widget=CSICheckboxSelectMultiple, choices=ELECTRIC_SUPPLY_CHOICES)
     water_removal = CSIMultipleChoiceField(label=_(u"Водоотведение"), required=False,
                                            widget=CSICheckboxSelectMultiple, choices=WATER_REMOVAL_CHOICES)
     water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
@@ -99,6 +111,16 @@ class AuctionForm(forms.ModelForm):
     class Meta:
         model = Auction
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
+
+    def clean(self):
+        cd = super(AuctionForm, self).clean()
+        mo = cd.get('mo')
+        cmp_date = cd.get('public_date')
+        if mo and cmp_date and mo.departamentagreement_set.filter(date__gt=cmp_date):
+            msg = _(u'Дата подписания соглашения с министерством еще не наступила')
+            self._errors["public_date"] = self.error_class([msg])
+            del cd["public_date"]
+        return cd
 
 
 class PersonForm(forms.ModelForm):

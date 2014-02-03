@@ -60,13 +60,13 @@
                 <table class="table table-condensed table-striped table-hover">
                     <tr><th> {% trans 'Номер' %}</th>
                         <th> {% trans 'Дата' %}</th>
-                        <th> {% trans 'Общая сумма выделенной субвенции' %}</th>
+                        <th> {% trans 'Общая сумма выделенной субвенции (руб.)' %}</th>
                     </tr>
                     {% for object in agreements %}
                     <tr>
                         <td><a href="{% url 'change-agreement' object.id %}">{{object.num}}</a></td>
                         <td>{{object.date}}</td>
-                        <td>{{object.subvention}}</td>
+                        <td>{{object.subvention.amount}}</td>
                     </tr>
                     {% endfor %}
                 </table>

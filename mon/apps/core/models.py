@@ -197,8 +197,7 @@ class BaseEngineerNetworks(models.Model):
     class Meta:
         abstract = True
 
-    electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
-    gas_supply = models.IntegerField(help_text=_(u"Газоснабжение"), null=True, blank=True, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
+    gas_supply = models.IntegerField(help_text=_(u"Газоснабжение"), null=True, blank=True, default=0, verbose_name=_(u"Газоснабжение"), choices=GAS_SUPPLY_CHOICES , )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -218,6 +217,7 @@ class BaseWaterSupply(BaseEngineerNetworks):
     water_settlement = models.IntegerField(help_text=_(u"Водоподведение"), default=0, blank=True, verbose_name=_(u"Водоподведение"), choices=WATER_SETTLEMENT_CHOICES , )
     hot_water_supply = models.IntegerField(help_text=_(u"Горячее водоснабжение"), default=0, blank=True, verbose_name=_(u"Горячее водоснабжение"), choices=HOT_WATER_SUPPLY_CHOICES , )
     heating = models.IntegerField(help_text=_(u"Отопление"), null=True, blank=True, verbose_name=_(u"Отопление"), choices=GAS_SUPPLY_CHOICES , )
+    electric_supply = models.IntegerField(help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), choices=ELECTRIC_SUPPLY_CHOICES , )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -505,6 +505,7 @@ class BaseMultiWaterSupply(BaseEngineerNetworks):
     class Meta:
         abstract = True
 
+    electric_supply = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Электроснабжение"), null=True, blank=True, verbose_name=_(u"Электроснабжение"), )
     water_removal = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Водоотведение"), null=True, blank=True, verbose_name=_(u"Водоотведение"), )
     water_settlement = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Водоподведение"), null=True, blank=True, verbose_name=_(u"Водоподведение"), )
     hot_water_supply = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Горячее водоснабжение"), null=True, blank=True, verbose_name=_(u"Горячее водоснабжение"), )
@@ -563,7 +564,7 @@ class AuctionHallway(BaseMultiMaterials, BaseHallway):
         return d
 
 
-class BaseAuctionData(BaseMultiWaterSupply, BaseSocialObjects, BaseTerritoryImprovement, ):
+class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImprovement, ):
 
     class Meta:
         abstract = True
