@@ -69,7 +69,7 @@ def get_mos(request, pk=None):
     template = 'mos.html'
     context = {'title': title}
     if MO.objects.all().exists():
-        objects = MO.objects.all()
+        objects = MO.objects.all().order_by('name')
         if pk:
             mo_object = MO.objects.get(pk=pk)
             context.update({'object': mo_object})

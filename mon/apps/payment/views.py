@@ -39,20 +39,31 @@ def add_payment(request):
 
 
 @login_required
-def get_payments(request, pk=None, all=False):
+def get_payments(request, mo=None, all=False):
     template = 'payments.html'
-    if all:
-        context = {'title': _(u'Все платежи')}
-    else:
-        context = {'title': _(u'Платежи %s' %
-                              request.user.customuser.mo)}
     prefix = 'acc_date'
     if Payment.objects.all().exists():
-        if pk:
-            payment_object = Payment.objects.get(pk=pk)
-            context.update({'object': payment_object})
-        if not request.user.is_staff and not request.user.is_superuser or not all:
+        if mo:
+            mo_obj = MO.objects.get(pk=mo)
+            context = {'title': _(u'Платежи %s' %
+                                  mo_obj.name)}
+            agreements = mo_obj.departamentagreement_set.all()
+            amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+            spent = sum([int(contract.summa) for contract in mo_obj.contract_set.all() if contract.summa])
+            percent = round(((float(spent)/amount) * 100), 3)
+            economy = sum([int(auction.start_price) for auction in mo_obj.auction_set.all() if auction.start_price]) - spent
+            accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
+                          'sub_amount': amount, 'economy': economy}
+            context.update({'accounting': accounting})
+            print agreements
+            objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
+        elif all:
+            objects = Payment.objects.all()
+            context = {'title': _(u'Все платежи')}
+        else:
             mo = request.user.customuser.mo
+            context = {'title': _(u'Платежи %s' %
+                                  mo.name)}
             agreements = mo.departamentagreement_set.all()
             amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
             spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
@@ -62,8 +73,6 @@ def get_payments(request, pk=None, all=False):
                           'sub_amount': amount, 'economy': economy}
             context.update({'accounting': accounting})
             objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
-        else:
-            objects = Payment.objects.all()
         form = DateForm(prefix=prefix)
         context.update({'date_form': form})
         page = request.GET.get('page', '1')

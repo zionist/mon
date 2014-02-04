@@ -173,9 +173,10 @@
    <div class="container">
        <br />
        {% if user.customuser.mo %}
-       <div class="row">
-           <div class="span12"> <p class="blue"> Выбрано {{ user.customuser.mo }}</p></div>
+       <div class="row info">
+           <div class="span12"> <a class="btn btn-info" href="{% url 'mos' %}"> {{ user.customuser.mo }}</a></div>
        </div>
+       <br />
        {% endif %}
        {% block content %}{% endblock %}
    </div>
