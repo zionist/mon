@@ -1,0 +1,26 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h4>{{ title }}</h4>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form %}
+            <form method="POST" action="{% url 'manage-monitoring-developer' object.id state  %} "> {% csrf_token %}
+                <br />
+                {% for field in form %}
+                    {% if field.is_hidden %}
+                        {{ field }}
+                    {% else %}
+                        <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endif %}
+                {% endfor %}
+                <br>
+                <button class="btn-info" type="submit" name="dev"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}
