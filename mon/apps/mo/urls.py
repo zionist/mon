@@ -22,7 +22,7 @@ urlpatterns = patterns(
     url(r'^mo/delete/(?P<pk>[0-9]+)/$', views.delete_mo, name='delete-mo'),
 
     url(r'^mo/dep/(?P<pk>[0-9]+)/$', views.get_agreement, name='change-agreement'),
-    url(r'^mo/dep/update/(?P<pk>[0-9]+)/$', views.update_agreement, name='update-agreement'),
+    url(r'^mo/dep/update/(?P<pk>[0-9]+)/(?P<state>[0-9]+)/$', views.update_agreement, name='update-agreement'),
     url(r'^mo/dep/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_agreement, name='pre-delete-agreement'),
     url(r'^mo/dep/delete/(?P<pk>[0-9]+)/$', views.delete_agreement, name='delete-agreement'),
 

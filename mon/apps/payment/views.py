@@ -40,6 +40,7 @@ def add_payment(request):
 
 @login_required
 def get_payments(request, mo=None, all=False):
+    context = {'title': _(u'Платежи')}
     template = 'payments.html'
     prefix = 'acc_date'
     if Payment.objects.all().exists():

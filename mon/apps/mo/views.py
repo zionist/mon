@@ -287,9 +287,9 @@ def add_agreement(request, pk):
 @login_required
 def add_dop_agreement(request, pk, state=None):
     template = 'mo_adding_agreement.html'
-    state = int(state)
-    title = _(u'Добавление дополнительного соглашения с министерством')\
-    if state == 1 else _(u'Добавление письма о вычете средств')
+    agreement_type = int(state)
+    title = _(u'Добавление дополнительного соглашения с министерством') if agreement_type == 1 \
+            else _(u'Добавление письма о вычете средств')
     context = {'title': title}
     mo = MO.objects.get(pk=pk)
     context.update({'object': mo})
@@ -297,35 +297,38 @@ def add_dop_agreement(request, pk, state=None):
     if request.method == "POST":
         form = MOShowForm(request.POST, prefix=prefix, instance=mo)
         dep_form = DepartamentAgreementForm(request.POST, prefix=dep_prefix)
-        sub_form = SubventionForm(request.POST, prefix=sub_prefix) if state == 1 else SubventionMinusForm(request.POST, prefix=sub_prefix)
-        print state, type(state)
+        sub_form = SubventionForm(request.POST, prefix=sub_prefix) if agreement_type == 1 else SubventionMinusForm(request.POST, prefix=sub_prefix)
         if dep_form.is_valid() and sub_form.is_valid():
             dep = dep_form.save()
             sub = sub_form.save()
-            if state != 1 and sub.amount and int(sub.amount) > 0:
+            if agreement_type != 1 and sub.amount and int(sub.amount) > 0:
                 sub.amount = -sub.amount
                 sub.save(update_fields=['amount'])
             dep.subvention = sub
             dep.mo = mo
-            dep.save(update_fields=['subvention', 'mo'])
+            dep.agreement_type = agreement_type
+            dep.save(update_fields=['subvention', 'mo', 'agreement_type'])
             return redirect('mos')
     else:
         form = MOShowForm(prefix=prefix, instance=mo)
         dep_form = DepartamentAgreementForm(prefix=dep_prefix)
-        sub_form = SubventionForm(prefix=sub_prefix) if state == 1 else SubventionMinusForm(prefix=sub_prefix)
-    context.update({'form': form, 'dep_form': dep_form, 'sub_form': sub_form, 'state' :state,
+        sub_form = SubventionForm(prefix=sub_prefix) if agreement_type == 1 else SubventionMinusForm(prefix=sub_prefix)
+    context.update({'form': form, 'dep_form': dep_form, 'sub_form': sub_form, 'state' :agreement_type,
                     'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name],
                     'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
 @login_required
-def update_agreement(request, pk, extra=None):
-    context = {'title': _(u'Соглашение с министерством')}
+def update_agreement(request, pk, extra=None, state=None):
+    if state and int(state) in [1, 2]:
+        return update_dop_agreement(request, pk, state)
+    context = {'title': _(u'Соглашение с министерством'), 'state': state}
     dep_agreement = DepartamentAgreement.objects.get(pk=pk)
     prefix = 'dep'
     context.update({'object': dep_agreement, 'agreement': True, 'prefix': prefix})
     forms = []
+    fed_form, reg_form = None, None
     if request.method == "POST":
         sub = dep_agreement.subvention
         fed = sub.fed_budget
@@ -333,17 +336,15 @@ def update_agreement(request, pk, extra=None):
         dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
         dep_form = DepartamentAgreementForm(request.POST, instance=dep_agreement, prefix=dep_prefix)
         sub_form = SubventionForm(request.POST, instance=sub, prefix=sub_prefix)
-        fed_form = FederalBudgetForm(request.POST, instance=fed, prefix=fed_prefix)
+        fed_form = RegionalBudgetForm(request.POST, instance=fed, prefix=fed_prefix)
         reg_form = RegionalBudgetForm(request.POST, instance=reg, prefix=reg_prefix)
         forms.append({'dep_form': dep_form, 'sub_form': sub_form, 'formsets': [fed_form, reg_form],
                       'prefs': [dep_prefix, sub_prefix, reg_prefix, fed_prefix]})
         if dep_form.is_valid() and sub_form.is_valid() and fed_form.is_valid() and reg_form.is_valid():
             dep_form.save()
-
             sub_form.save()
             fed_form.save()
             reg_form.save()
-            context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
             return redirect('mos')
         else:
             context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
@@ -353,15 +354,46 @@ def update_agreement(request, pk, extra=None):
         dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
         dep_form = DepartamentAgreementForm(instance=dep_agreement, prefix=dep_prefix)
         sub_form = SubventionForm(instance=sub, prefix=sub_prefix)
-        formset = []
-        if sub.fed_budget:
-            fed_form = FederalBudgetForm(instance=sub.fed_budget, prefix=fed_prefix)
-            formset.append(fed_form)
-        if sub.reg_budget:
-            reg_form = RegionalBudgetForm(instance=sub.reg_budget, prefix=reg_prefix)
-            formset.append(reg_form)
-        forms.append({'dep_form': dep_form, 'sub_form': sub_form, 'formsets': formset,
+        fed_form = FederalBudgetForm(instance=sub.fed_budget, prefix=fed_prefix)
+        reg_form = RegionalBudgetForm(instance=sub.reg_budget, prefix=reg_prefix)
+        forms.append({'dep_form': dep_form, 'sub_form': sub_form, 'formsets': [fed_form, reg_form],
                       'prefs': [dep_prefix, sub_prefix, reg_prefix, fed_prefix]})
+        context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
+    return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
+
+
+def update_dop_agreement(request, pk, state):
+    agreement_type = int(state)
+    title = _(u'Редактирование дополнительного соглашения с министерством') if agreement_type == 1\
+            else _(u'Редактирование письма о вычете средств')
+    context = {'title': title, 'state': agreement_type}
+    dep_agreement = DepartamentAgreement.objects.get(pk=pk)
+    prefix = 'dep'
+    context.update({'object': dep_agreement, 'agreement': True, 'prefix': prefix})
+    forms = []
+    dep_prefix, sub_prefix = 'dep_mo', 'sub_mo'
+    if request.method == "POST":
+        sub = dep_agreement.subvention
+        dep_form = DepartamentAgreementForm(request.POST, instance=dep_agreement, prefix=dep_prefix)
+        sub_form = SubventionForm(request.POST, instance=sub, prefix=sub_prefix) if agreement_type == 1 \
+                   else SubventionMinusForm(request.POST, instance=sub, prefix=sub_prefix)
+        forms.append({'dep_form': dep_form, 'sub_form': sub_form,
+                      'prefs': [dep_prefix, sub_prefix]})
+        if dep_form.is_valid() and sub_form.is_valid():
+            dep_form.save()
+            sub_form.save()
+            return redirect('mos')
+        else:
+            context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
+            return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
+    else:
+        sub = dep_agreement.subvention
+        dep_prefix, sub_prefix = 'dep_mo', 'sub_mo'
+        dep_form = DepartamentAgreementForm(instance=dep_agreement, prefix=dep_prefix)
+        sub_form = SubventionForm(instance=sub, prefix=sub_prefix) if agreement_type == 1\
+                   else SubventionMinusForm(instance=sub, prefix=sub_prefix)
+        forms.append({'dep_form': dep_form, 'sub_form': sub_form,
+                      'prefs': [dep_prefix, sub_prefix]})
         context.update({'forms': forms, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
     return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
 

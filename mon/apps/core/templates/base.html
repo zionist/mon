@@ -24,7 +24,7 @@
                     {% if user.is_staff %}
                     <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
                     {% else %}
-                    <li id="mos"><a href="{% url 'change-mo' user.customuser.mo.pk %}">{% trans 'МО' %}</a></li>
+                    <li id="change-mos"><a href="{% url 'change-mo' user.customuser.mo.pk %}">{% trans 'МО' %}</a></li>
                     {% endif %}
                     {% if not hide_menu %}
                     <li id="monitoring" class="dropdown">
@@ -174,7 +174,7 @@
        <br />
        {% if user.customuser.mo %}
        <div class="row info">
-           <div class="span12"> <a class="btn btn-info" href="{% url 'mos' %}"> {{ user.customuser.mo }}</a></div>
+           <div class="span12"> <a class="btn btn-info" href="{% url 'mos' %}"> {% trans 'Выбрано: ' %} {{ user.customuser.mo }}</a></div>
        </div>
        <br />
        {% endif %}

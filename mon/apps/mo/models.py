@@ -4,6 +4,9 @@ from django.utils.translation import ugettext as _
 from apps.core.models import BaseName, BaseBudget, BaseSubvention, BaseDepartamentAgreement, BaseOrphan, \
     CREATION_FORM_CHOICES
 
+AGREEMENT_TYPE_CHOICES = ((0, _(u'Соглашение с министерством')), (1, _(u'Дополнительное соглашение с министерством')),
+                           (2, _(u'Письмо о вычете средств')),)
+
 
 class RegionalBudget(BaseBudget, ):
 
@@ -76,7 +79,8 @@ class DepartamentAgreement(BaseDepartamentAgreement, ):
     flats_amount = models.IntegerField(blank=True, default=0, help_text=_(u"Количество выделенных квартир на текущий год"), verbose_name=_(u"Количество выделенных квартир на текущий год"))
     mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование муниципального образования"), verbose_name=_(u"Наименование муниципального образования"), )
     subvention = models.ForeignKey(Subvention, blank=True, null=True, help_text=_(u"Субвенция"), verbose_name=_(u"Субвенция"), )
-
+    agreement_type= models.SmallIntegerField(help_text=_(u"Тип соглашения"), blank=True, verbose_name=_(u"Тип соглашения"),
+        choices=AGREEMENT_TYPE_CHOICES, default=0)
 
 class Orphan(BaseOrphan, ):
 

@@ -8,11 +8,21 @@ from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
 
 from .models import Payment
+from apps.build.models import Contract
+from apps.mo.models import Subvention
 
 
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
+        fields = ('num', 'amount', 'contract', 'subvention', 'pay_order', 'approve_status')
+
+    def __init__(self, *args, **kwargs):
+        user_mo = kwargs.get('user_mo') if 'user_mo' in kwargs else None
+        super(PaymentForm, self).__init__(*args, **kwargs)
+        if user_mo:
+            self.fields['subvention'].queryset = Subvention.objects.filter(mo=user_mo)
+            self.fields['contract'].queryset = Contract.objects.filter(mo=user_mo)
 
 
 class PaymentShowForm(forms.ModelForm):

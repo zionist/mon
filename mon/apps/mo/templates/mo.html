@@ -34,7 +34,7 @@
                             {% trans 'Добавить соглашение' %}</a></li>
                         <li><a href="{% url 'add-dop-agreement-mo' object.id 1 %}">
                             {% trans 'Добавить доп. соглашение' %}</a></li>
-                        <li><a href="{% url 'add-dop-agreement-mo' object.id 0 %}">
+                        <li><a href="{% url 'add-dop-agreement-mo' object.id 2 %}">
                             {% trans 'Добавить письмо о вычете средств' %}</a></li>
                     </ul>
                 </li>
@@ -50,7 +50,7 @@
                 </div><br />
             {% else %}
                 <div class="row">
-                    <div class="span3"><a class="btn btn-info" href="{% url 'update-agreement' object.id %}">
+                    <div class="span3"><a class="btn btn-info" href="{% url 'update-agreement' object.id object.agreement_type %}">
                         {% trans 'Редактировать' %}</a></div>
                     <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-agreement' object.id %}">
                         {% trans 'Удалить' %}</a></div>
@@ -65,12 +65,20 @@
                     <tr><th> {% trans 'Номер' %}</th>
                         <th> {% trans 'Дата' %}</th>
                         <th> {% trans 'Общая сумма выделенной субвенции (руб.)' %}</th>
+                        <th> {% trans 'Тип соглашения' %}</th>
                     </tr>
                     {% for object in agreements %}
                     <tr>
                         <td><a href="{% url 'change-agreement' object.id %}">{{object.num}}</a></td>
                         <td>{{object.date}}</td>
                         <td>{{object.subvention.amount}}</td>
+                        <td>{% with typ=object.agreement_type %}
+                                {% if typ == 0 %}{% trans 'Соглашение с министерством' %}
+                                {% elif typ == 1 %}{% trans 'Дополнительное соглашение с министерством' %}
+                                {% elif typ == 2 %}{% trans 'Письмо о вычете средств' %}
+                                {% endif %}
+                            {% endwith %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>

@@ -41,7 +41,7 @@
                 <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
             </form>
         {% elif agreement %}
-            <form method="POST" action="{% url 'update-agreement' object.id %}"> {% csrf_token %}
+            <form method="POST" action="{% url 'update-agreement' object.id object.agreement_type %}"> {% csrf_token %}
                 <br>
                 {% for set in forms %}
                 <table border="0">

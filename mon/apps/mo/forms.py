@@ -38,9 +38,14 @@ class SubventionForm(forms.ModelForm):
 
 
 class SubventionMinusForm(forms.ModelForm):
+
     class Meta:
         model = Subvention
         exclude = ('date', 'reg_budget', 'fed_budget')
+
+    def __init__(self, *args, **kwargs):
+        super(SubventionMinusForm, self).__init__(*args, **kwargs)
+        self.fields['amount'].label = _(u'Сумма субвенции, подлежащая вычету')
 
     def clean(self):
         cd = super(SubventionMinusForm, self).clean()
@@ -55,7 +60,21 @@ class SubventionMinusForm(forms.ModelForm):
 class DepartamentAgreementForm(forms.ModelForm):
     class Meta:
         model = DepartamentAgreement
-        exclude = ('mo', 'subvention')
+        exclude = ('mo', 'subvention', 'agreement_type')
+
+#    def __init__(self, mo=None, *args, **kwargs):
+#        self.prev_mo = kwargs.pop('prev_mo') if 'prev_mo' in kwargs else None
+#        super(DepartamentAgreementForm, self).__init__(*args, **kwargs)
+
+#    def clean(self):
+#        cd = super(DepartamentAgreementForm, self).clean()
+#        date = cd.get('date')
+#        if date and self.mo and DepartamentAgreement.objects.filter(mo=self.prev_mo, date__gt=date).exists():
+#            msg = _(u'Неверная дата')
+#            self._errors["date"] = self.error_class([msg])
+#            del cd["date"]
+#        return cd
+
 
 
 class PeopleAmountForm(forms.ModelForm):
