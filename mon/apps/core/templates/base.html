@@ -174,7 +174,7 @@
        <br />
        {% if user.customuser.mo %}
        <div class="row info">
-           <div class="span12"> <a class="btn btn-info" href="{% url 'mos' %}"> {{ user.customuser.mo }}</a></div>
+           <div class="span12 text-right"> Выбрано: <a class="btn btn-small btn-info" href="{% url 'mos' %}"> {{ user.customuser.mo }}</a></div>
        </div>
        <br />
        {% endif %}
