@@ -28,12 +28,12 @@ def add_payment(request):
     context = {'title': _(u'Добавление платежа')}
     prefix = 'pay'
     if request.method == "POST":
-        form = PaymentForm(request.POST, request.FILES, prefix=prefix)
+        form = PaymentForm(request.POST, request.FILES, prefix=prefix, initial={'user_mo': request.user.customuser.mo})
         if form.is_valid():
             form.save()
             return redirect('payments')
     else:
-        form = PaymentForm(prefix=prefix)
+        form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo})
     context.update({'form': form, 'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -56,7 +56,6 @@ def get_payments(request, mo=None, all=False):
             accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
                           'sub_amount': amount, 'economy': economy}
             context.update({'accounting': accounting})
-            print agreements
             objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
         elif all:
             objects = Payment.objects.all()

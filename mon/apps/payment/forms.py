@@ -18,10 +18,10 @@ class PaymentForm(forms.ModelForm):
         fields = ('num', 'amount', 'contract', 'subvention', 'pay_order', 'approve_status')
 
     def __init__(self, *args, **kwargs):
-        user_mo = kwargs.get('user_mo') if 'user_mo' in kwargs else None
+        user_mo = kwargs.get('initial').get('user_mo') if 'initial' in kwargs else None
         super(PaymentForm, self).__init__(*args, **kwargs)
         if user_mo:
-            self.fields['subvention'].queryset = Subvention.objects.filter(mo=user_mo)
+            self.fields['subvention'].queryset = Subvention.objects.filter(departamentagreement__mo=user_mo)
             self.fields['contract'].queryset = Contract.objects.filter(mo=user_mo)
 
 

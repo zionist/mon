@@ -62,19 +62,18 @@ class DepartamentAgreementForm(forms.ModelForm):
         model = DepartamentAgreement
         exclude = ('mo', 'subvention', 'agreement_type')
 
-#    def __init__(self, mo=None, *args, **kwargs):
-#        self.prev_mo = kwargs.pop('prev_mo') if 'prev_mo' in kwargs else None
-#        super(DepartamentAgreementForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        self.prev_mo = kwargs.get('initial').get('prev_mo') if 'initial' in kwargs else None
+        super(DepartamentAgreementForm, self).__init__(*args, **kwargs)
 
-#    def clean(self):
-#        cd = super(DepartamentAgreementForm, self).clean()
-#        date = cd.get('date')
-#        if date and self.mo and DepartamentAgreement.objects.filter(mo=self.prev_mo, date__gt=date).exists():
-#            msg = _(u'Неверная дата')
-#            self._errors["date"] = self.error_class([msg])
-#            del cd["date"]
-#        return cd
-
+    def clean(self):
+        cd = super(DepartamentAgreementForm, self).clean()
+        date = cd.get('date')
+        if date and self.prev_mo and DepartamentAgreement.objects.filter(mo=self.prev_mo, date__gt=date, agreement_type=0).exists():
+            msg = _(u'Неверная дата, уже есть соглашение с министерством с более поздней датой')
+            self._errors["date"] = self.error_class([msg])
+            del cd["date"]
+        return cd
 
 
 class PeopleAmountForm(forms.ModelForm):
