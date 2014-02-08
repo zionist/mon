@@ -58,12 +58,13 @@ class BuildingForm(GroundForm):
 class BuildingMonitoringForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        request = kwargs.pop('request')
         super(BuildingMonitoringForm, self).__init__(*args, **kwargs)
-        self.fields['mo'] = forms.ModelChoiceField(required=True,
-           queryset=MO.objects.filter(pk=request.user.customuser.mo.pk),
-           initial=request.user.customuser.pk)
-        self.fields['mo'].widget.attrs['readonly'] = True
+        mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
+        if mo:
+            self.fields['mo'].widget.attrs['readonly'] = True
+            self.fields['mo'] = forms.ModelChoiceField(required=True,
+               queryset=MO.objects.filter(pk=mo.pk),
+               initial=mo.pk)
 
     class Meta:
         model = Building
@@ -75,12 +76,13 @@ class GroundMonitoringForm(forms.ModelForm):
 
 
     def __init__(self, *args, **kwargs):
-        request = kwargs.pop('request')
         super(GroundMonitoringForm, self).__init__(*args, **kwargs)
-        self.fields['mo'] = forms.ModelChoiceField(required=True,
-            queryset=MO.objects.filter(pk=request.user.customuser.mo.pk),
-            initial=request.user.customuser.pk)
-        self.fields['mo'].widget.attrs['readonly'] = True
+        mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
+        if mo:
+            self.fields['mo'].widget.attrs['readonly'] = True
+            self.fields['mo'] = forms.ModelChoiceField(required=True,
+                                                       queryset=MO.objects.filter(pk=mo.pk),
+                                                       initial=mo.pk)
 
     class Meta:
         model = Ground

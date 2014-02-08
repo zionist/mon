@@ -10,5 +10,5 @@ from apps.mo.models import MO
 class CustomUser(User):
 
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"),
-                           verbose_name=_(u"муниципальное образование"), blank=True, null=True)
+                           verbose_name=_(u"муниципальное образование"), blank=False, null=True)
 
