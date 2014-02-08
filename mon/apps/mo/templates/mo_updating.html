@@ -40,33 +40,33 @@
                 <br>
                 <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
             </form>
-        <!--{% elif agreement %}-->
-            <!--<form method="POST" action="{% url 'update-agreement' object.id object.agreement_type %}"> {% csrf_token %}-->
-                <!--<br>-->
-                <!--{% for set in forms %}-->
-                <!--<table border="0">-->
-                    <!--{% for field in set.dep_form %}-->
-                    <!--<tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>-->
-                    <!--{% endfor %}-->
+        {% elif agreement and forms %}
+            <form method="POST" action="{% url 'update-agreement' object.id object.agreement_type %}"> {% csrf_token %}
+                <br>
+                {% for set in forms %}
+                <table border="0">
+                    {% for field in set.dep_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
 
-                    <!--{% for field in set.sub_form %}-->
-                    <!--<tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>-->
-                    <!--{% endfor %}-->
-                <!--</table>-->
-                <!--{% for form in set.formsets %}-->
-                <!--<table>-->
-                    <!--<h4>{% cycle titles.0 titles.1%}</h4>-->
-                    <!--{% for field in form %}-->
-                    <!--<tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>-->
-                    <!--{% endfor %}-->
-                <!--</table>-->
-                <!--{% endfor %}-->
-                <!--{% endfor %}-->
-                <!--<br>-->
-                <!--<button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>-->
-            <!--</form>-->
-        <!--{% endif %}-->
-        {% if agreement %}
+                    {% for field in set.sub_form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% for form in set.formsets %}
+                <table>
+                    <h4>{% cycle titles.0 titles.1%}</h4>
+                    {% for field in form %}
+                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    {% endfor %}
+                </table>
+                {% endfor %}
+                {% endfor %}
+                <br>
+                <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% endif %}
+        {% if agreement and not forms %}
             <div class="auction-table">
                 <p class="blue"><b>{% trans ' Реквизиты соглашений с министерством ' %}</b></p>
                 <table class="table table-condensed table-striped table-hover">

@@ -318,7 +318,7 @@ def update_agreement(request, pk, extra=None, state=None):
     context = {'title': _(u'Соглашение с министерством'), 'state': state}
     dep_agreement = DepartamentAgreement.objects.get(pk=pk)
     prefix = 'dep'
-    context.update({'object': dep_agreement, 'agreement': True, 'prefix': prefix})
+    context.update({'object': dep_agreement, 'agreement': True, 'update': True, 'prefix': prefix})
     forms = []
     fed_form, reg_form = None, None
     if request.method == "POST":
@@ -392,8 +392,16 @@ def update_dop_agreement(request, pk, state):
 
 @login_required
 def get_agreement(request, pk):
-    context = {'title': _(u'Соглашение с министерством')}
+    context = {}
     dep_agreement = DepartamentAgreement.objects.get(pk=pk)
+    typ = int(dep_agreement.agreement_type)
+    if typ == 1:
+        title = _(u'Дополнительное соглашение с министерством')
+    elif typ == 2:
+        title = _(u'Письмо о вычете средств')
+    else:
+        title = _(u'Соглашение с министерством')
+    context.update({'title': title})
     form = DepartamentAgreementShowForm(instance=dep_agreement)
     context.update({'object': dep_agreement, 'form': form})
     sub = dep_agreement.subvention
