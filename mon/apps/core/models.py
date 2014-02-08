@@ -123,7 +123,7 @@ class BaseBuilding(models.Model):
 
     approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
     state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
-    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=True, )
+    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )

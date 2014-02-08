@@ -14,6 +14,7 @@ from apps.core.models import STATE_CHOICES, \
 from apps.core.forms import cmp_single
 from apps.build.models import Contract
 from apps.core.models import Choices
+from apps.mo.models import MO
 
 
 
@@ -54,10 +55,15 @@ class BuildingForm(GroundForm):
 
 
 
-class BuildingMonitoringForm(autocomplete_light.ModelForm):
+class BuildingMonitoringForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request')
         super(BuildingMonitoringForm, self).__init__(*args, **kwargs)
+        self.fields['mo'] = forms.ModelChoiceField(required=True,
+           queryset=MO.objects.filter(pk=request.user.customuser.mo.pk),
+           initial=request.user.customuser.pk)
+        self.fields['mo'].widget.attrs['readonly'] = True
 
     class Meta:
         model = Building
@@ -65,10 +71,16 @@ class BuildingMonitoringForm(autocomplete_light.ModelForm):
                   'approve_status', 'mo', 'contract')
 
 
-class GroundMonitoringForm(autocomplete_light.ModelForm):
+class GroundMonitoringForm(forms.ModelForm):
+
 
     def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request')
         super(GroundMonitoringForm, self).__init__(*args, **kwargs)
+        self.fields['mo'] = forms.ModelChoiceField(required=True,
+            queryset=MO.objects.filter(pk=request.user.customuser.mo.pk),
+            initial=request.user.customuser.pk)
+        self.fields['mo'].widget.attrs['readonly'] = True
 
     class Meta:
         model = Ground
