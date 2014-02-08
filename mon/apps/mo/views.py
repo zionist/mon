@@ -139,15 +139,17 @@ def get_mo(request, pk, extra=None):
     # "select" mo
     selected_users = CustomUser.objects.filter(mo=mo).filter(is_staff=True).\
         exclude(is_superuser=True).exclude(username=request.user.username)
-    if request.user.is_staff:
+    if request.user.is_staff and not request.user.is_superuser:
         if selected_users:
             return HttpResponseForbidden(u"МО %s уже выбрано у пользователя %s" % (mo, selected_users[0]))
-    user = CustomUser.objects.get(pk=request.user.pk)
-    user.mo = mo
-    user.save()
+    if CustomUser.objects.filter(pk=request.user.pk).exists():
+        user = CustomUser.objects.get(pk=request.user.pk)
+        user.mo = mo
+        user.save()
     context.update({'object': mo, 'form': form, 'agreement': True})
     dep_agreements = mo.departamentagreement_set.all()
-    context.update({'hide_menu': True, 'agreements': dep_agreements})
+    hide_menu = True if not request.user.is_superuser else False
+    context.update({'hide_menu': hide_menu, 'agreements': dep_agreements})
     return render(request, 'mo.html', context, context_instance=RequestContext(request))
 
 
