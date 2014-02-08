@@ -150,10 +150,12 @@ def add_monitoring(request, dev_pk=None, state=None):
     context.update({'state': select, 'dev': dev_pk})
     if request.method == "POST" and 'build' in request.POST:
         if select and int(select) == 2:
-            form = GroundMonitoringForm(request.POST, request.FILES, prefix=prefix)
+            form = GroundMonitoringForm(request.POST, request.FILES,
+                                        prefix=prefix, request=request)
             state_int = int(select)
         elif select and int(select) in [0, 1]:
-            form = BuildingMonitoringForm(request.POST, request.FILES, prefix=prefix)
+            form = BuildingMonitoringForm(request.POST, request.FILES,
+                                          request=request, prefix=prefix)
             state_int = int(select)
         form.fields.pop('contract')
         if not request.user.is_staff:
@@ -171,11 +173,11 @@ def add_monitoring(request, dev_pk=None, state=None):
             form, text_area_form = split_form(form)
             context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, })
             return render_to_response(template, context, context_instance=RequestContext(request))
-    else:
+    elif request.method == "GET":
         if select and int(select) == 2:
-            form = GroundMonitoringForm(request.POST, prefix=prefix)
+            form = GroundMonitoringForm(prefix=prefix, request=request)
         elif select and int(select) in [0, 1]:
-            form = BuildingMonitoringForm(request.POST, prefix=prefix)
+            form = BuildingMonitoringForm(prefix=prefix, request=request)
         form, text_area_form = split_form(form)
         form.fields.pop('contract')
         if not request.user.is_staff:
@@ -389,10 +391,10 @@ def get_monitoring(request, pk, state=None, extra=None):
     context = {'title': _(u'Параметры объекта мониторинга')}
     if state and int(state) == 2:
         build = Ground.objects.get(pk=pk)
-        form = GroundMonitoringForm(instance=build)
+        form = GroundMonitoringForm(instance=build, request=request)
     else:
         build = Building.objects.get(pk=pk)
-        form = BuildingMonitoringForm(instance=build)
+        form = BuildingMonitoringForm(instance=build, request=request)
     if not request.user.is_staff:
         if build.mo != request.user.customuser.mo:
             return HttpResponseForbidden("Forbidden")
@@ -498,9 +500,11 @@ def update_monitoring(request, pk, state=None, extra=None):
     prefix = 'monitoring'
     if request.method == "POST":
         if state and int(state) == 2:
-            form = GroundMonitoringForm(request.POST, request.FILES, prefix=prefix, instance=build)
+            form = GroundMonitoringForm(request.POST, request.FILES, request=request,
+                                        prefix=prefix, instance=build)
         else:
-            form = BuildingMonitoringForm(request.POST, request.FILES, prefix=prefix, instance=build)
+            form = BuildingMonitoringForm(request.POST, request.FILES, request=request,
+                                          prefix=prefix, instance=build)
         form.fields['contract'].required = False
         # check access rules. Add approve_status from object to form
         if not request.user.is_staff:
@@ -538,9 +542,9 @@ def update_monitoring(request, pk, state=None, extra=None):
                           context, context_instance=RequestContext(request))
     else:
         if state and int(state) == 2:
-            form = GroundMonitoringForm(prefix=prefix, instance=build)
+            form = GroundMonitoringForm(prefix=prefix, request=request, instance=build)
         else:
-            form = BuildingMonitoringForm(prefix=prefix, instance=build)
+            form = BuildingMonitoringForm(prefix=prefix, request=request, instance=build)
         if not request.user.is_staff:
             form.fields.pop('contract')
             form.fields.pop('approve_status')
