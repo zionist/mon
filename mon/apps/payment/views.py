@@ -44,35 +44,30 @@ def get_payments(request, mo=None, all=False):
     template = 'payments.html'
     prefix = 'acc_date'
     if Payment.objects.all().exists():
-        if mo:
-            mo_obj = MO.objects.get(pk=mo)
-            context = {'title': _(u'Платежи %s' %
-                                  mo_obj.name)}
-            agreements = mo_obj.departamentagreement_set.all()
-            amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-            spent = sum([int(contract.summa) for contract in mo_obj.contract_set.all() if contract.summa])
-            percent = round(((float(spent)/amount) * 100), 3)
-            economy = sum([int(auction.start_price) for auction in mo_obj.auction_set.all() if auction.start_price]) - spent
-            accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
-                          'sub_amount': amount, 'economy': economy}
-            context.update({'accounting': accounting})
-            objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
+        if mo or request.user.customuser.mo:
+            mo = request.user.customuser.mo if request.user.customuser.mo else MO.objects.get(pk=mo)
+            context = {'title': _(u'Платежи %s') % mo.name}
+            from_dt = request.user.customuser.get_user_date()
+            if from_dt:
+                to_dt = datetime(from_dt.year + 1, 01, 01)
+                agreements = mo.departamentagreement_set.filter(date__gt=from_dt, date__lt=to_dt)
+                objects = Payment.objects.filter(date__gt=from_dt, date__lt=to_dt,
+                    subvention__in=[dep.subvention for dep in agreements])
+            else:
+                agreements = mo.departamentagreement_set.all()
+                objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
+            if agreements:
+                amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+                spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+                percent = round(((float(spent)/amount) * 100), 3)
+                economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+                accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
+                              'sub_amount': amount, 'economy': economy}
+                context.update({'accounting': accounting})
+
         elif all:
             objects = Payment.objects.all()
             context = {'title': _(u'Все платежи')}
-        else:
-            mo = request.user.customuser.mo
-            context = {'title': _(u'Платежи %s' %
-                                  mo.name)}
-            agreements = mo.departamentagreement_set.all()
-            amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-            spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-            percent = round(((float(spent)/amount) * 100), 3)
-            economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
-            accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
-                          'sub_amount': amount, 'economy': economy}
-            context.update({'accounting': accounting})
-            objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
         form = DateForm(prefix=prefix)
         context.update({'date_form': form})
         page = request.GET.get('page', '1')
@@ -97,6 +92,7 @@ def get_accounting(request, select=None):
     kwargs = {}
     form = DateForm(prefix=prefix)
     context.update({'date_form': form})
+    from_dt = request.user.customuser.get_user_date()
     if select and int(select) in [1,2,3,4]:
         state, dt = int(select), datetime.now()
         if state == 4:
@@ -115,18 +111,23 @@ def get_accounting(request, select=None):
             kwargs.update({'date__lt':form.cleaned_data.get('dt'), 'date__gt':form.cleaned_data.get('prev')})
         else:
             context.update({'date_form': form})
+    elif from_dt:
+        to_dt = datetime(from_dt.year + 1, 01, 01)
+        kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
     for mo in mos:
+        accounting = None
         agreements = mo.departamentagreement_set.filter(**kwargs)
-        amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-        spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-        percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
-        economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
-        payments = []
-        for dep in agreements:
-            payments = payments + (list(dep.subvention.payment_set.all()))
-        payment = sum([int(payment.amount) for payment in payments])
-        accounting = {'payment': payment, 'spent': spent, 'saved': amount - spent,
-                      'percent': percent, 'sub_amount': amount, 'economy': economy}
+        if agreements:
+            amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+            spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+            percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
+            economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+            payments = []
+            for dep in agreements:
+                payments = payments + (list(dep.subvention.payment_set.all()))
+            payment = sum([int(payment.amount) for payment in payments])
+            accounting = {'payment': payment, 'spent': spent, 'saved': amount - spent,
+                          'percent': percent, 'sub_amount': amount, 'economy': economy}
         objects.append({'mo': mo, 'accounting': accounting})
     context.update({'accountings': objects})
     return render(request, template, context, context_instance=RequestContext(request))
@@ -181,5 +182,3 @@ def delete_payment(request, pk):
     else:
         context.update({'error': _(u'Возникла ошибка при удалении платежа!')})
     return render_to_response("payment_deleting.html", context, context_instance=RequestContext(request))
-
-
