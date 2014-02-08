@@ -174,7 +174,26 @@
        <br />
        {% if user.customuser.mo %}
        <div class="row info">
-           <div class="span12 text-right"> Выбрано: <a class="btn btn-small btn-info" href="{% url 'mos' %}"> {{ user.customuser.mo }}</a></div>
+           <div class="span12 text-right"> {% trans 'Выбрано: '%} &nbsp;
+               <a class="btn btn-small btn-info" href="{% url 'mos' %}">
+               {{ user.customuser.mo }}</a> &nbsp;
+               <li id="dates" class="dropdown" style="list-style-type:none; display: inline;">
+                   <a href="#" role="button" class="dropdown-toggle btn btn-small btn-info" data-toggle="dropdown">
+                       {{ user.customuser.show_user_date }}<b class="caret"></b></a>
+                   <ul class="dropdown-menu" role="menu" >
+                       <li><a href="{% url 'select-user-date' user.id 0 %}">Не указано</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 1 %}">2012</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 2 %}">2013</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 3 %}">2014</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 4 %}">2015</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 5 %}">2016</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 6 %}">2017</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 7 %}">2018</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 8 %}">2019</a></li>
+                       <li><a href="{% url 'select-user-date' user.id 9 %}">2020</a></li>
+                   </ul>
+               </li>
+           </div>
        </div>
        <br />
        {% endif %}

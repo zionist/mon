@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from django.shortcuts import redirect, render, render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
@@ -8,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnIn
 from django.forms.models import inlineformset_factory
 
 from .forms import UserCustomCreationForm, UserCustomChangeForm
-from apps.user.models import CustomUser
+from apps.user.models import CustomUser, DATE_CHOICES
 from apps.core.models import Choices, Choice
 from apps.core.forms import ChoicesForm
 
@@ -89,6 +90,14 @@ def delete_user(request, pk):
         context.update({'error': _(u'Возникла ошибка при удалении пользователя!')})
     return render_to_response("user_deleting.html", context,
                               context_instance=RequestContext(request))
+
+
+def update_user_date(request, pk, select):
+    if CustomUser.objects.filter(pk=pk).exists():
+        user = CustomUser.objects.get(pk=pk)
+        user.date = int(select)
+        user.save(update_fields=['date'])
+        return redirect('mos')
 
 
 @user_passes_test(lambda u: u.is_superuser)
