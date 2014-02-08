@@ -40,31 +40,57 @@
                 <br>
                 <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
             </form>
-        {% elif agreement %}
-            <form method="POST" action="{% url 'update-agreement' object.id object.agreement_type %}"> {% csrf_token %}
-                <br>
-                {% for set in forms %}
-                <table border="0">
-                    {% for field in set.dep_form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
+        <!--{% elif agreement %}-->
+            <!--<form method="POST" action="{% url 'update-agreement' object.id object.agreement_type %}"> {% csrf_token %}-->
+                <!--<br>-->
+                <!--{% for set in forms %}-->
+                <!--<table border="0">-->
+                    <!--{% for field in set.dep_form %}-->
+                    <!--<tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>-->
+                    <!--{% endfor %}-->
 
-                    {% for field in set.sub_form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
+                    <!--{% for field in set.sub_form %}-->
+                    <!--<tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>-->
+                    <!--{% endfor %}-->
+                <!--</table>-->
+                <!--{% for form in set.formsets %}-->
+                <!--<table>-->
+                    <!--<h4>{% cycle titles.0 titles.1%}</h4>-->
+                    <!--{% for field in form %}-->
+                    <!--<tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>-->
+                    <!--{% endfor %}-->
+                <!--</table>-->
+                <!--{% endfor %}-->
+                <!--{% endfor %}-->
+                <!--<br>-->
+                <!--<button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>-->
+            <!--</form>-->
+        <!--{% endif %}-->
+        {% if agreement %}
+            <div class="auction-table">
+                <p class="blue"><b>{% trans ' Реквизиты соглашений с министерством ' %}</b></p>
+                <table class="table table-condensed table-striped table-hover">
+                    <tr><th> {% trans 'Номер' %}</th>
+                        <th> {% trans 'Дата' %}</th>
+                        <th> {% trans 'Общая сумма выделенной субвенции (руб.)' %}</th>
+                        <th> {% trans 'Тип соглашения' %}</th>
+                    </tr>
+                    {% for object in agreements %}
+                    <tr>
+                        <td><a href="{% url 'change-agreement' object.id %}">{{object.num}}</a></td>
+                        <td>{{object.date}}</td>
+                        <td>{{object.subvention.amount}}</td>
+                        <td>{% with typ=object.agreement_type %}
+                                {% if typ == 0 %}{% trans 'Соглашение с министерством' %}
+                                {% elif typ == 1 %}{% trans 'Дополнительное соглашение с министерством' %}
+                                {% elif typ == 2 %}{% trans 'Письмо о вычете средств' %}
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </table>
-                {% for form in set.formsets %}
-                <table>
-                    <h4>{% cycle titles.0 titles.1%}</h4>
-                    {% for field in form %}
-                    <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>
-                    {% endfor %}
-                </table>
-                {% endfor %}
-                {% endfor %}
-                <br>
-                <button type="submit" name = "result"> {% trans ' Сохранить ' %} </button>
-            </form>
-        {% endif %}
+                </div>
+            {% endif %}
     {% endif %}
 {% endblock %}
