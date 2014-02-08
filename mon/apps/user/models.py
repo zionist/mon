@@ -16,9 +16,9 @@ DICT_DATE_CHOICES = dict(DATE_CHOICES)
 class CustomUser(User):
 
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"),
-                           verbose_name=_(u"муниципальное образование"), blank=True, null=True)
+        verbose_name=_(u"муниципальное образование"), blank=True, null=True)
     date = models.PositiveSmallIntegerField(verbose_name=_(u"Дата для фильтра"), blank=True, null=True,
-                                            choices=DATE_CHOICES)
+        choices=DATE_CHOICES)
 
     def get_user_date(self):
         if self.date == 0:
