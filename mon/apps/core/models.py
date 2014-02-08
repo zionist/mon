@@ -51,7 +51,6 @@ class Choice(models.Model):
     value = models.CharField(help_text=u"Значение", verbose_name=u"Значение", max_length=4096, blank=True, null=True)
 
 
-
 class BaseName(models.Model):
 
     class Meta:
@@ -464,9 +463,9 @@ class BaseCompareData(BaseCommonChars, ):
 
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
-    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
-    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
-    area = models.FloatField(help_text=_(u"Общая площадь"), null=True, verbose_name=_(u"Общая площадь"), blank=True, )
+    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
+    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
+    area = models.FloatField(help_text=_(u"Общая площадь (кв. м)"), null=True, verbose_name=_(u"Общая площадь (кв. м)"), blank=True, )
 
     room = models.ForeignKey(Room, null=True, blank=True, )
     wc = models.ForeignKey(WC, null=True, blank=True, )
@@ -570,8 +569,8 @@ class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImpr
         abstract = True
 
     flats_amount = models.IntegerField(help_text=_(u"Количество квартир по номеру заказа"), null=True, verbose_name=_(u"Количество квартир по номеру заказа"), blank=True, )
-    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
-    area = models.FloatField(help_text=_(u"Площадь квартир по номеру заказа"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа"), blank=True, )
+    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
+    area = models.FloatField(help_text=_(u"Площадь квартир по номеру заказа (кв. м)"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа (кв. м)"), blank=True, )
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
 

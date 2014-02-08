@@ -139,12 +139,13 @@ def get_mo(request, pk, extra=None):
     # "select" mo
     selected_users = CustomUser.objects.filter(mo=mo).filter(is_staff=True).\
         exclude(is_superuser=True).exclude(username=request.user.username)
-    if request.user.is_staff:
+    if request.user.is_staff and not request.user.is_superuser:
         if selected_users:
             return HttpResponseForbidden(u"МО %s уже выбрано у пользователя %s" % (mo, selected_users[0]))
-    user = CustomUser.objects.get(pk=request.user.pk)
-    user.mo = mo
-    user.save()
+    if CustomUser.objects.filter(pk=request.user.pk).exists():
+        user = CustomUser.objects.get(pk=request.user.pk)
+        user.mo = mo
+        user.save()
     context.update({'object': mo, 'form': form, 'agreement': True})
     dep_agreements = mo.departamentagreement_set.all()
     forms = []
@@ -159,7 +160,8 @@ def get_mo(request, pk, extra=None):
         reg_form = RegionalBudgetShowForm(instance=reg)
         forms.append({'dep_form': dep_form, 'sub_form': sub_form,
                       'formsets': [fed_form, reg_form]})
-    context.update({'forms': forms, 'hide_menu': True,
+    hide_menu = True if not request.user.is_superuser else False
+    context.update({'forms': forms, 'hide_menu': hide_menu,
         'agreements': dep_agreements, 'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name]})
     return render(request, 'mo.html', context, context_instance=RequestContext(request))
 
