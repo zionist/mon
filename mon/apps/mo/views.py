@@ -25,6 +25,7 @@ from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, Subventio
 from apps.build.models import Building, Ground, ContractDocuments
 from apps.cmp.models import Auction
 from apps.user.models import CustomUser
+from apps.core.models import CREATION_FORM_CHOICES
 
 
 def add_mo(request):
@@ -582,21 +583,99 @@ def xls_work_table(request):
 
     # custom colors
     xlwt.add_palette_colour("c_light_grey", 0x21)
-    book.set_colour_RGB(0x21, 216, 216, 216)
+    xlwt.add_palette_colour("c_light_green", 0x22)
+    xlwt.add_palette_colour("c_light_blue", 0x23)
+    book.set_colour_RGB(0x21, 230, 230, 230)
+    book.set_colour_RGB(0x22, 200, 255, 200)
+    book.set_colour_RGB(0x23, 174, 255, 227)
 
     # styles
-    style_plain = xlwt.easyxf("align: vertical center, horizontal center;")
+    style_plain = xlwt.easyxf(
+        "font: height 180;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
     style_bold = xlwt.easyxf(
-        "font: bold 1;"
-        "align: vertical center, horizontal center;"
+        "font: bold 1, height 180;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
+    grey_style = xlwt.easyxf(
+        "pattern: pattern solid, fore_colour c_light_grey;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    green_style = xlwt.easyxf(
+        "pattern: pattern solid, fore_colour c_light_green;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    blue_style = xlwt.easyxf(
+        "pattern: pattern solid, fore_colour c_light_blue;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
     )
 
-    date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
-    green_style = xlwt.easyxf("pattern: pattern solid, fore_colour c_light_grey;")
+    ## make header
+    header_height = 8
+    now = datetime.now()
 
-    # make sheet
-    sheet.write_merge(0,0,1,6, u'Численность', style_bold)
-    sheet.write_merge(0,5,0,0, u'№', style_bold)
+    # МО
+    sheet.write_merge(0, 0, 1, 2, u'МО', style_bold)
+    sheet.write_merge(0, header_height, 0, 0, u'№', style_bold)
+
+    sheet.write_merge(1, header_height, 1, 1, u'Наименование муниципального образования', green_style)
+    sheet.write_merge(1, header_height, 2, 2, u"Форма создания специализированного жилищного фонда"
+                                  u" (С - строительство, ДС - долевое строительство "
+                                  u"П - приобретение)", green_style)
+    # Краевой бюджет
+    sheet.write_merge(0, 0, 3, 9, u'Краевой бюджет (по состоянию на %d.%d.%d %d:%d)' % \
+        (now.day, now.month, now.year, now.hour, now.minute), style_bold)
+    sheet.write_merge(1, header_height, 3, 3, u'Количество жилых помещений', green_style)
+    sheet.write_merge(1, header_height, 4, 4, u'Сумма с учетом коэффициента на администрирование', green_style)
+    sheet.write_merge(1, header_height, 5, 5, u'Сумма без учета коэффицента на администрирование', green_style)
+    sheet.write_merge(1, header_height, 6, 6, u'Профинансировано министерством', green_style)
+    sheet.write_merge(1, header_height, 7, 7, u'Кассовый расход', green_style)
+    sheet.write_merge(1, header_height, 8, 8, u'% исполнения по кассовому расходу', green_style)
+    sheet.write_merge(1, header_height, 9, 9, u'Остаток неосвоенных средств', green_style)
+
+    # Федеральный бюджет
+    sheet.write_merge(0, 0, 10, 16, u'Федеральный бюджет (по состоянию на %d.%d.%d %d:%d)' % \
+                                  (now.day, now.month, now.year, now.hour, now.minute), style_bold)
+    sheet.write_merge(1, header_height, 10, 10, u'Количество жилых помещений', blue_style)
+    sheet.write_merge(1, header_height, 11, 11, u'Сумма с учетом коэффициента на администрирование', blue_style)
+    sheet.write_merge(1, header_height, 12, 12, u'Сумма без учета коэффицента на администрирование', blue_style)
+    sheet.write_merge(1, header_height, 13, 13, u'Профинансировано министерством', blue_style)
+    sheet.write_merge(1, header_height, 14, 14, u'Кассовый расход', blue_style)
+    sheet.write_merge(1, header_height, 15, 15, u'% исполнения по кассовому расходу', blue_style)
+    sheet.write_merge(1, header_height, 16, 16, u'Остаток неосвоенных средств', blue_style)
+
+    # Итого
+    sheet.write_merge(0, 0, 17, 19, u'Итого федеральный и краевой бюджет', style_bold)
+    sheet.write_merge(1, header_height, 17, 17, u'Количество жилых помещений', style_plain)
+    sheet.write_merge(1, header_height, 18, 18, u'Сумма с учетом коэффициента на администрирование', style_plain)
+    sheet.write_merge(1, header_height, 19, 19, u'Кассовый расход', style_plain)
+
+    # Заключенные контракты
+    sheet.write_merge(0, 0, 20, 25, u'Заключенные контракты', style_bold)
+    sheet.write_merge(1, header_height, 20, 20, u'Количество жилых помещений', grey_style)
+    sheet.write_merge(1, header_height, 21, 21, u'Сумма по заключенным контрактам (без учета средств МО)', grey_style)
+    sheet.write_merge(1, header_height, 22, 22, u'Сумма муниципальных средств, включенных в сумму контракта', grey_style)
+    sheet.write_merge(1, header_height, 23, 23, u'Сумма по заключенным контрактам (ИТОГО)', grey_style)
+    sheet.write_merge(1, header_height, 24, 24, u'% исполнения от суммы предусмотренной субвенции', grey_style)
+    sheet.write_merge(1, header_height, 25, 25, u'Экономия по результатам заключенных контрактов', grey_style)
+
+    # fill table
+    row = header_height + 1
+    col = 0
+    num = 1
+    for mo in MO.objects.all():
+        sheet.write(row, col, u"%s" % num)
+        sheet.write(row, col + 1, mo.name)
+        sheet.write(row, col + 2, u", ".join([c[1] for c in CREATION_FORM_CHOICES if unicode(c[0]) in mo.creation_form.split(',')]))
+        row += 1
+        num += 1
 
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'
