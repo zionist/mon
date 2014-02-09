@@ -678,7 +678,7 @@ def xls_work_table(request):
     for mo in MO.objects.all():
         sheet.write(row, col, u"%s" % num)
         sheet.write(row, col + 1, mo.name)
-        sheet.write(row, col + 2, u", ".join([c[1] for c in CREATION_FORM_CHOICES if unicode(c[0]) in mo.creation_form.split(',')]))
+        sheet.write(row, col + 2, u", ".join([c[1] for c in CREATION_FORM_CHOICES if mo.creation_form and unicode(c[0]) in mo.creation_form.split(',')]))
 
         ## Краевой бюджет
         # Количество жилых помещений
