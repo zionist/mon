@@ -26,6 +26,7 @@ from apps.build.models import Building, Ground, ContractDocuments
 from apps.cmp.models import Auction
 from apps.user.models import CustomUser
 from apps.core.models import CREATION_FORM_CHOICES
+from apps.payment.models import Payment
 
 
 def add_mo(request):
@@ -577,6 +578,10 @@ def get_filter(request, num, extra=None):
 
 @login_required
 def xls_work_table(request):
+
+    import time
+    start = time.time()
+
     # create
     book = xlwt.Workbook(encoding='utf8')
     sheet = book.add_sheet('untitled')
@@ -705,7 +710,7 @@ def xls_work_table(request):
 
         # Краевой бюджет сумма без учета коэф администрирования
         reg_sum_without_k = 0
-        for arg in mo.departamentagreement_set.filter(agreement_type=0):
+        for arg in query.filter(agreement_type=0):
             if arg.subvention.reg_budget:
                 if arg.subvention.reg_budget.adm_coef:
                     reg_sum_without_k = reg_sum_with_k - arg.subvention.reg_budget.adm_coef
@@ -714,17 +719,8 @@ def xls_work_table(request):
         # Профинансировано министерством ?
 
         # Краевой бюджет кассовый расход
-        reg_spend_amount = 0
-        for contract in mo.contract_set.all():
-            for payment in contract.payment_set.all():
-                # only one agreement for subvention?
-                agreement = payment.subvention.departamentagreement_set.all()[0]
-                if agreement.agreement_type == 0:
-                    if payment.subvention.reg_budget:
-                        reg_spend_amount += payment.amount
-                # count additional agreements as part of reg spend amount
-                elif agreement.agreement_type == 1 or agreement.agreement_type == 2:
-                    reg_spend_amount += payment.subvention.amount
+        reg_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=2) \
+            .filter(contract__mo=mo).values("amount")])
         sheet.write(row, col + 7, u"%s руб." % reg_spend_amount)
 
         # % исполнения по кассовому расходу
@@ -771,14 +767,8 @@ def xls_work_table(request):
         # Профинансировано министерством ?
 
         # Федеральный бюджет кассовый расход
-        fed_spend_amount = 0
-        for contract in mo.contract_set.all():
-            for payment in contract.payment_set.all():
-                # only one agreement for subvention?
-                agreement = payment.subvention.departamentagreement_set.all()[0]
-                if agreement.agreement_type == 0:
-                    if payment.subvention.fed_budget:
-                        fed_spend_amount += payment.amount
+        fed_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=1)\
+            .filter(contract__mo=mo).values("amount")])
         sheet.write(row, col + 14, u"%s руб." % fed_spend_amount)
 
         # % исполнения по кассовому расходу
@@ -837,8 +827,12 @@ def xls_work_table(request):
         contracts_economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
         sheet.write(row, col + 25, u"%s руб." % contracts_economy)
 
+
         row += 1
         num += 1
+
+    end = time.time()
+    print end - start
 
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'
