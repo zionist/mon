@@ -21,12 +21,12 @@ class CustomUser(User):
         choices=DATE_CHOICES)
 
     def get_user_date(self):
-        if self.date == 0:
+        if not self.date or self.date == 0:
             return None
         dat = int(DICT_DATE_CHOICES.get(self.date))
         return datetime(dat, 01, 01)
 
     def show_user_date(self):
-        if self.date == 0:
+        if not self.date or self.date == 0:
             return _(u"Не указано")
         return DICT_DATE_CHOICES.get(self.date)
