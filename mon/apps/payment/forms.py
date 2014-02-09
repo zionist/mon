@@ -40,3 +40,11 @@ class DateForm(forms.Form):
     prev = forms.DateField(label=_(u'Начиная с'))
     dt = forms.DateField(label=_(u'по'))
 
+    def __init__(self, *args, **kwargs):
+        super(DateForm, self).__init__(*args, **kwargs)
+
+        self.fields['prev'].widget.attrs['class'] = 'span2'
+        self.fields['prev'].widget.attrs['style'] = 'height:26px;'
+        self.fields['dt'].widget.attrs['class'] = 'span2'
+        self.fields['dt'].widget.attrs['style'] = 'height:26px;'
+

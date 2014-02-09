@@ -4,51 +4,47 @@
 {% block content %}
     <h4>{{title}}</h4>
     <a class="btn btn-small" href="{% url 'create-payment' %}"> {% trans 'Добавить платеж' %}</a>
-    <div class="row">  &nbsp; </div>
-    <div class="row">  <div class="span12"> <strong> Выборка: </strong> </div> </div>
     {% if user.is_staff %}
         <div class="row">
+            <div class="span2">
+                <div class="row">  &nbsp; </div>
+                <div class="span3">
+                    <li id="accounting" class="dropdown" style="list-style: none;">
+                        <a class="btn btn-info" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
+                            <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'accounting' 1 %}"> {% trans 'За день' %}</a></li>
+                            <li><a href="{% url 'accounting' 2 %}"> {% trans 'За месяц' %}</a></li>
+                            <li><a href="{% url 'accounting' 3 %}"> {% trans 'За текущий год' %}</a></li>
+                            <li><a href="{% url 'accounting' 4 %}"> {% trans 'За предыдущий год' %}</a></li>
+                        </ul>
+                    </li>
+                </div>
+            </div>
             {% if date_form %}
-            <div class="span6">
+            <div class="right">
                 <form class='inline' method="POST" action="{% url 'date-accounting' %}"> {% csrf_token %}
                     <div class="row">
                         <div class="span3">
-                            {{ date_form.prev.label_tag }}{{ date_form.prev.errors }}
+                            &nbsp;{{ date_form.prev.errors }}
                         </div>
                         <div class="span3">
-                            {{ date_form.dt.label_tag }}{{ date_form.dt.errors }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="span3">
-                            {{ date_form.prev }}
-                        </div>
-                        <div class="span3">
-                            {{ date_form.dt }}
+                            &nbsp;{{ date_form.dt.errors }}
                         </div>
                     </div>
                     <div class="row">
                         <div class="span3">
-                            <button type="submit" class="btn-info" name="date_select"> {% trans ' Составить ' %} </button>
+                            {% trans 'Начиная с' %}&nbsp; {{ date_form.prev }}
+                        </div>
+                        <div class="span3">
+                            {% trans 'по' %}&nbsp; {{ date_form.dt }}
+                        </div>
+                        <div class="span2">
+                            <button type="submit" class="btn btn-small btn-info" name="date_select"> {% trans ' Составить ' %} </button>
                         </div>
                     </div>
                 </form>
                 {% endif %}
-            </div>
-            <div class="span6">
-                    <div class="row">  &nbsp; </div>
-                    <div class="span2">
-                        <li id="accounting" class="dropdown" style="list-style: none;">
-                            <a class="btn btn-small" href="#" role="button" data-toggle="dropdown">{% trans 'Общая сводка ' %}
-                                <b class="caret"></b></a>
-                            <ul class="dropdown-menu" role="menu" >
-                                <li><a href="{% url 'accounting' 1 %}"> {% trans 'За день' %}</a></li>
-                                <li><a href="{% url 'accounting' 2 %}"> {% trans 'За месяц' %}</a></li>
-                                <li><a href="{% url 'accounting' 3 %}"> {% trans 'За текущий год' %}</a></li>
-                                <li><a href="{% url 'accounting' 4 %}"> {% trans 'За предыдущий год' %}</a></li>
-                            </ul>
-                        </li>
-                    </div>
             </div>
         </div>
     {% endif %}
@@ -96,12 +92,16 @@
                     <tr><th colspan="6"> <strong>{{mo.grouper}}</strong></th></tr>
                     {% for obj in mo.list %}
                         <tr>
+                        {% if obj.accounting %}
                             <td>{{obj.accounting.sub_amount}}</td>
                             <td>{{obj.accounting.saved}}</td>
                             <td>{{obj.accounting.spent}}</td>
                             <td>{{obj.accounting.payment}}</td>
                             <td>{{obj.accounting.percent}}</td>
                             <td>{{obj.accounting.economy}}</td>
+                        {% else %}
+                            <td colspan="6">{% trans 'Нет ни одной субвенции для составления сводки' %}</td>
+                        {% endif %}
                         </tr>
                     {% endfor %}
                 {% endfor %}
