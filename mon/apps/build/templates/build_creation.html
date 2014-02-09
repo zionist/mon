@@ -14,7 +14,7 @@
             {% include "2_col_form.html" %}
             {% endwith %}
             <br>
-            <button class="btn-info" type="submit" name="state"> {% trans ' Отправить ' %} </button>
+            <button class="btn btn-info" type="submit" name="state"> {% trans ' Далее ' %} </button>
         </form>
         {% endif %}
         {% if form or formsets %}
@@ -33,7 +33,7 @@
                 {% include "4_col_form.html" %}
             {% endfor %}
             <br>
-            <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
+            <button class="btn btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
             </form>
         {% endif %}
     {% endif %}

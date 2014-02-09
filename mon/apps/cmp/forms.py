@@ -85,7 +85,6 @@ class ContractDocumentsForm(forms.ModelForm):
 
 class AuctionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        print 'init'
         super(AuctionForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
