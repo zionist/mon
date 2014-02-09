@@ -22,7 +22,14 @@
               <div class="nav-collapse collapse">
                 <ul class="nav">
                     {% if user.is_staff %}
-                    <li id="mos"><a href="{% url 'mos' %}">{% trans 'МО' %}</a></li>
+                    <li id="mos" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'МО' %}<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            <li><a href="{% url 'mos' %}">{% trans 'Муниципальные образования' %}</a></li>
+                            <li class="divider"></li>
+                            <li><a href="{% url 'xls_work_table' %}">{% trans 'Рабочая таблица' %}</a></li>
+                        </ul>
+                    </li>
                     {% else %}
                     <li id="change-mos"><a href="{% url 'change-mo' user.customuser.mo.pk %}">{% trans 'МО' %}</a></li>
                     {% endif %}

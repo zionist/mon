@@ -674,6 +674,67 @@ def xls_work_table(request):
         sheet.write(row, col, u"%s" % num)
         sheet.write(row, col + 1, mo.name)
         sheet.write(row, col + 2, u", ".join([c[1] for c in CREATION_FORM_CHOICES if unicode(c[0]) in mo.creation_form.split(',')]))
+        # Количество жилых помещений
+        flats_amount = 0
+        builds = mo.building_set.filter(contract__isnull=False)
+        grounds = mo.ground_set.filter(contract__isnull=False)
+        for build in builds:
+            if build.flats_amount:
+                flats_amount += build.flats_amount
+        for ground in grounds:
+            if ground.flats_amount:
+                flats_amount += ground.flats_amount
+        sheet.write(row, col + 3, flats_amount)
+
+        # Краевой бюджет сумма с учетом коэф администрирования
+        reg_sum_with_k = 0
+        for arg in mo.departamentagreement_set.filter(agreement_type=0):
+            if arg.subvention.reg_budget:
+                reg_sum_with_k += arg.subvention.reg_budget.sub_sum
+                if arg.subvention.reg_budget.adm_coef:
+                    reg_sum_with_k += arg.subvention.reg_budget.adm_coef
+        # count additional agreements as part of reg budget
+        for arg in mo.departamentagreement_set.all().exclude(agreement_type=0):
+            if arg.subvention.amount:
+                reg_sum_with_k += arg.subvention.amount
+        sheet.write(row, col + 4, u"%s руб." % reg_sum_with_k)
+
+        # Краевой бюджет сумма без учета коэф администрирования
+        reg_sum_without_k = 0
+        for arg in mo.departamentagreement_set.filter(agreement_type=0):
+            if arg.subvention.reg_budget:
+                if arg.subvention.reg_budget.adm_coef:
+                    reg_sum_without_k = reg_sum_with_k - arg.subvention.reg_budget.adm_coef
+        sheet.write(row, col + 5, u"%s руб." % reg_sum_without_k)
+
+        # Профинансировано министерством ?
+
+        # Краевой бюджет кассовый расход
+        reg_spend_amount = 0
+        for contract in mo.contract_set.all():
+            for payment in contract.payment_set.all():
+                # only one agreement for subvention?
+                agreement = payment.subvention.departamentagreement_set.all()[0]
+                if agreement.agreement_type == 0:
+                    if payment.subvention.reg_budget:
+                        reg_spend_amount += payment.amount
+                # count additional agreements as part of reg spend amount
+                elif agreement.agreement_type == 1 or agreement.agreement_type == 2:
+                    reg_spend_amount += payment.subvention.amount
+        sheet.write(row, col + 7, u"%s руб." % reg_spend_amount)
+
+        # % исполнения по кассовому расходу
+        percent_reg_rest_of_unspended = 0
+        reg_rest_of_unspended = reg_sum_with_k - reg_spend_amount
+        if reg_rest_of_unspended and reg_spend_amount:
+            percent_reg_rest_of_unspended = 100 / (float(reg_rest_of_unspended) / float(reg_spend_amount))
+        sheet.write(row, col + 8, u"%s " % percent_reg_rest_of_unspended + u"%")
+
+        # Остаток неосвоенных средств
+        reg_rest_of_unspended = reg_sum_with_k - reg_spend_amount
+        sheet.write(row, col + 9, u"%s руб." % reg_rest_of_unspended)
+
+
         row += 1
         num += 1
 
