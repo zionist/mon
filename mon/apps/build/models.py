@@ -3,7 +3,7 @@ from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, \
-    Developer, CREATION_FORM_CHOICES
+    Developer, CREATION_FORM_CHOICES, BUDGET_CHOICES
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseFile, BaseFile
 from apps.user.models import CustomUser
@@ -85,6 +85,8 @@ class Contract(BaseContract, BaseCompareData):
         blank=True, null=True, choices=CREATION_FORM_CHOICES)
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
+    budget = models.IntegerField(help_text=u"Бюджет", verbose_name=u"Бюджет",
+                              null=True, blank=False, max_length=1024, choices=BUDGET_CHOICES)
 
 
 class Ground(BaseBuilding, BaseCompareData, BaseFile):

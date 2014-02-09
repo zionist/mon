@@ -674,27 +674,31 @@ def xls_work_table(request):
         sheet.write(row, col, u"%s" % num)
         sheet.write(row, col + 1, mo.name)
         sheet.write(row, col + 2, u", ".join([c[1] for c in CREATION_FORM_CHOICES if unicode(c[0]) in mo.creation_form.split(',')]))
+
+        ## Краевой бюджет
         # Количество жилых помещений
-        flats_amount = 0
-        builds = mo.building_set.filter(contract__isnull=False)
-        grounds = mo.ground_set.filter(contract__isnull=False)
+        builds = mo.building_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
+        grounds = mo.ground_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
+        reg_flats_amount = 0
         for build in builds:
-            if build.flats_amount:
-                flats_amount += build.flats_amount
+                if build["flats_amount"] and build["contract__budget"] == u"2":
+                    reg_flats_amount += build["flats_amount"]
         for ground in grounds:
-            if ground.flats_amount:
-                flats_amount += ground.flats_amount
-        sheet.write(row, col + 3, flats_amount)
+            if ground["flats_amount"] and build["contract__budget"] == u"2":
+                reg_flats_amount += ground["flats_amount"]
+        sheet.write(row, col + 3, reg_flats_amount)
 
         # Краевой бюджет сумма с учетом коэф администрирования
         reg_sum_with_k = 0
-        for arg in mo.departamentagreement_set.filter(agreement_type=0):
+        query = mo.departamentagreement_set.all()
+        for arg in query.filter(agreement_type=0):
             if arg.subvention.reg_budget:
-                reg_sum_with_k += arg.subvention.reg_budget.sub_sum
+                if arg.subvention.reg_budget.sub_sum:
+                    reg_sum_with_k += arg.subvention.reg_budget.sub_sum
                 if arg.subvention.reg_budget.adm_coef:
                     reg_sum_with_k += arg.subvention.reg_budget.adm_coef
         # count additional agreements as part of reg budget
-        for arg in mo.departamentagreement_set.all().exclude(agreement_type=0):
+        for arg in query.exclude(agreement_type=0):
             if arg.subvention.amount:
                 reg_sum_with_k += arg.subvention.amount
         sheet.write(row, col + 4, u"%s руб." % reg_sum_with_k)
@@ -725,15 +729,113 @@ def xls_work_table(request):
 
         # % исполнения по кассовому расходу
         percent_reg_rest_of_unspended = 0
-        reg_rest_of_unspended = reg_sum_with_k - reg_spend_amount
-        if reg_rest_of_unspended and reg_spend_amount:
-            percent_reg_rest_of_unspended = 100 / (float(reg_rest_of_unspended) / float(reg_spend_amount))
+        if reg_sum_with_k and reg_spend_amount:
+            percent_reg_rest_of_unspended = (float(reg_spend_amount) / float(reg_sum_with_k)) * 100
         sheet.write(row, col + 8, u"%s " % percent_reg_rest_of_unspended + u"%")
 
         # Остаток неосвоенных средств
         reg_rest_of_unspended = reg_sum_with_k - reg_spend_amount
         sheet.write(row, col + 9, u"%s руб." % reg_rest_of_unspended)
 
+        ## Федеральный бюджет
+        # Количество жилых помещений
+        builds = mo.building_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
+        grounds = mo.ground_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
+        fed_flats_amount = 0
+        for build in builds:
+            if build["flats_amount"] and build["contract__budget"] == u"1":
+                fed_flats_amount += build["flats_amount"]
+        for ground in grounds:
+            if ground["flats_amount"] and build["contract__budget"] == u"1":
+                fed_flats_amount += ground["flats_amount"]
+        sheet.write(row, col + 10, fed_flats_amount)
+
+        # Федеральный бюджет сумма с учетом коэф администрирования
+        fed_sum_with_k = 0
+        query = mo.departamentagreement_set.all()
+        for arg in query.filter(agreement_type=0):
+            if arg.subvention.fed_budget and arg.subvention.fed_budget.sub_sum:
+                fed_sum_with_k += arg.subvention.fed_budget.sub_sum
+                if arg.subvention.fed_budget.adm_coef:
+                    fed_sum_with_k += arg.subvention.fed_budget.adm_coef
+        sheet.write(row, col + 11, u"%s руб." % fed_sum_with_k)
+
+        # Федеральный бюджет сумма без учета коэф администрирования
+        fed_sum_without_k = 0
+        for arg in mo.departamentagreement_set.filter(agreement_type=0):
+            if arg.subvention.fed_budget:
+                if arg.subvention.fed_budget.adm_coef:
+                    fed_sum_without_k = fed_sum_with_k - arg.subvention.fed_budget.adm_coef
+        sheet.write(row, col + 12, u"%s руб." % fed_sum_without_k)
+
+        # Профинансировано министерством ?
+
+        # Федеральный бюджет кассовый расход
+        fed_spend_amount = 0
+        for contract in mo.contract_set.all():
+            for payment in contract.payment_set.all():
+                # only one agreement for subvention?
+                agreement = payment.subvention.departamentagreement_set.all()[0]
+                if agreement.agreement_type == 0:
+                    if payment.subvention.fed_budget:
+                        fed_spend_amount += payment.amount
+        sheet.write(row, col + 14, u"%s руб." % fed_spend_amount)
+
+        # % исполнения по кассовому расходу
+        percent_fed_rest_of_unspended = 0
+        if fed_sum_with_k and fed_spend_amount:
+            percent_fed_rest_of_unspended = (float(fed_spend_amount) / float(fed_sum_with_k)) * 100
+        sheet.write(row, col + 15, u"%s " % percent_fed_rest_of_unspended + u"%")
+
+        # Остаток неосвоенных средств
+        fed_rest_of_unspended = fed_sum_with_k - fed_spend_amount
+        sheet.write(row, col + 16, u"%s руб." % fed_rest_of_unspended)
+
+        ## sums
+        # Количество жилых пормещений
+        sum_flats_amount = reg_flats_amount + fed_flats_amount
+        sheet.write(row, col + 17, sum_flats_amount)
+        # Сумма с учетом коэффицента администрирования
+        sum_sum_with_k = reg_sum_with_k + fed_sum_with_k
+        sheet.write(row, col + 18, u"%s руб." % sum_sum_with_k)
+        # Кассовый расход
+        sum_spend_amount = reg_spend_amount + fed_spend_amount
+        sheet.write(row, col + 19, u"%s руб." % sum_spend_amount)
+
+        ## contracts
+        # Количество жилых помещений
+        contracts_flats_amount = 0
+        contracts_summ = 0
+        query = mo.contract_set.all().values("flats_amount", "summa")
+        for contract in query:
+            if contract["flats_amount"]:
+                contracts_flats_amount += contract["flats_amount"]
+            # Сумма по заключенным контрактам ИТОГО
+            if contract["summa"]:
+                contracts_summ += contract["summa"]
+
+
+        # Количество жилых помещений
+        sheet.write(row, col + 20, contracts_flats_amount)
+
+        # Сумма по заключенным контрактам (без учета средств МО)
+
+        # Сумма муниципальных средств, включенных в сумму контракта
+
+        # Сумма по заключенным контрактам ИТОГО
+        sheet.write(row, col + 23, contracts_summ)
+
+        # % исполнения от суммы предусмотренной субвенции (сумма субвенций)
+        percent_rest_of_unspended_contract = 0
+        if reg_sum_with_k and fed_sum_with_k and reg_spend_amount:
+            percent_rest_of_unspended_contract = (float(contracts_summ) / float(reg_sum_with_k + fed_spend_amount)) * 100
+        sheet.write(row, col + 24, u"%s " % percent_rest_of_unspended_contract + u"%")
+
+        # Экономия по результатам заключенных контрактов
+        contracts_economy = 0
+        spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+        contracts_economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+        sheet.write(row, col + 25, u"%s руб." % contracts_economy)
 
         row += 1
         num += 1
