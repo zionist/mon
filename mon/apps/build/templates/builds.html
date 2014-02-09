@@ -15,7 +15,7 @@
         {% if building_list %}
             <table class="table table-condensed table-hover">
                 {% regroup building_list by state as objects_list %}
-                <tr><th> {% trans 'Адрес' %}</th><th> {% trans 'Кадастровый номер' %}</th>
+                <tr><th> {% trans 'Адрес' %}</th><th> </th>
                     <th> {% trans 'Муниципальное образование' %}</th> <th>{% trans 'Застройщик' %}</th>
                     <th>{% trans 'Количество жилых помещений' %}</th> <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr>
                     {% for state in objects_list %}
@@ -29,7 +29,7 @@
                             {% for item in state.list %}
                               <tr onclick="location.href = '{% url 'change-building' item.id item.state %}'">
                                     <td> <a href="{% url 'change-building' item.id item.state %}"> {{ item.address|truncatechars:50 }} </a> </td>
-                                  <td> {{ item.cad_num }} </td><td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
+                                  <td> {# item.cad_num #} </td><td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
                                   <td> {{ item.flats_amount }} </td><td> {{ item.complete_date }} </td>
                               </tr>
                             {% endfor %}
