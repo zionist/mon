@@ -90,7 +90,7 @@ class MOShowForm(forms.ModelForm):
         super(MOShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
-                self.fields[field].widget.attrs['disabled'] = 'disabled'
+                self.fields[field].widget.attrs['readonly'] = 'readonly'
 
 
 class DepartamentAgreementShowForm(forms.ModelForm):
@@ -102,7 +102,7 @@ class DepartamentAgreementShowForm(forms.ModelForm):
         super(DepartamentAgreementShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
-                self.fields[field].widget.attrs['disabled'] = 'disabled'
+                self.fields[field].widget.attrs['readonly'] = 'readonly'
 
 
 class SubventionShowForm(forms.ModelForm):
@@ -114,7 +114,7 @@ class SubventionShowForm(forms.ModelForm):
         super(SubventionShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
-                self.fields[field].widget.attrs['disabled'] = 'disabled'
+                self.fields[field].widget.attrs['readonly'] = 'readonly'
 
 
 class FederalBudgetShowForm(forms.ModelForm):
@@ -125,7 +125,7 @@ class FederalBudgetShowForm(forms.ModelForm):
         super(FederalBudgetShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
-                self.fields[field].widget.attrs['disabled'] = 'disabled'
+                self.fields[field].widget.attrs['readonly'] = 'readonly'
 
 
 class RegionalBudgetShowForm(forms.ModelForm):
@@ -136,7 +136,7 @@ class RegionalBudgetShowForm(forms.ModelForm):
         super(RegionalBudgetShowForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
-                self.fields[field].widget.attrs['disabled'] = 'disabled'
+                self.fields[field].widget.attrs['readonly'] = 'readonly'
 
 
 class MOPerformanceForm(forms.ModelForm):

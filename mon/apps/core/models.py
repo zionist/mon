@@ -78,6 +78,12 @@ class BaseBudget(models.Model):
                                         verbose_name=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
                                         blank=True, null=True, )
     adm_coef = models.IntegerField(help_text=_(u"Размер коэффициента на администрирование расходов"), null=True, verbose_name=_(u"Размер коэффициента на администрирование расходов"), blank=True, )
+    subvention_performance = models.IntegerField(help_text=_(u"Показатель результативности предоставления субвенции "
+                                                             u"(количество детей-сирот, подлежащих обеспечению жилыми "
+                                                             u"помещениями в текущем году)"), default=0,
+                                                 verbose_name=_(u"Показатель результативности предоставления субвенции "
+                                                               u"(количество детей-сирот, подлежащих обеспечению "
+                                                               u"жилыми помещениями в текущем году)"), blank=True, )
 
 
 class BaseSubvention(models.Model):
@@ -99,12 +105,6 @@ class BaseDepartamentAgreement(BaseDocumentModel, ):
                             verbose_name=_(u"Дата соглашения с министерством"), blank=True, )
     num = models.IntegerField(help_text=_(u"Номер соглашения с министерством"), null=True,
                               verbose_name=_(u"Номер соглашения с министерством"), blank=True, )
-    subvention_performance = models.IntegerField(help_text=_(u"Показатель результативности предоставления субвенции "
-                                                             u"(количество детей-сирот, подлежащих обеспечению жилыми "
-                                                             u"помещениями в текущем году)"), null=True,
-                                                 verbose_name=_(u"Показатель результативности предоставления субвенции "
-                                                                u"(количество детей-сирот, подлежащих обеспечению "
-                                                                u"жилыми помещениями в текущем году)"), blank=True, )
 
 
 class BaseOrphan(models.Model):
@@ -464,7 +464,7 @@ class BaseCompareData(BaseCommonChars, ):
 
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
-    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м, стоимостью не более 1 110 450 рублей)"), blank=True, )
+    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м)"), null=True, verbose_name=_(u"Количество однокомнатных квартир (площадью не менее 33 кв. м)"), blank=True, )
     area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
     area = models.FloatField(help_text=_(u"Общая площадь (кв. м)"), null=True, verbose_name=_(u"Общая площадь (кв. м)"), blank=True, )
 

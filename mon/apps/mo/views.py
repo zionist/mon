@@ -46,8 +46,10 @@ def add_mo(request):
             sub.reg_budget = reg_form.save()
             sub.save(update_fields=['fed_budget', 'reg_budget'])
             mo = form.save()
-            if hasattr(sub, 'subvention_performance'):
-                mo.home_orphans = int(mo.home_orphans) + int(sub.subvention_performance)
+            if hasattr(sub.fed_budget, 'subvention_performance') and sub.fed_budget.subvention_performance:
+                mo.home_orphans = int(mo.home_orphans) + int(sub.fed_budget.subvention_performance)
+            if hasattr(sub.reg_budget, 'subvention_performance') and sub.fed_budget.subvention_performance:
+                mo.home_orphans = int(mo.home_orphans) + int(sub.reg_budget.subvention_performance)
             mo.save(update_fields=['home_orphans'])
             dep.mo = mo
             dep.subvention = sub
@@ -265,6 +267,11 @@ def add_agreement(request, pk):
             sub.reg_budget = reg_form.save()
             sub.save(update_fields=['fed_budget', 'reg_budget'])
             dep.subvention = sub
+            if hasattr(sub.fed_budget, 'subvention_performance') and sub.fed_budget.subvention_performance:
+                mo.home_orphans = int(mo.home_orphans) + int(sub.fed_budget.subvention_performance)
+            if hasattr(sub.reg_budget, 'subvention_performance') and sub.fed_budget.subvention_performance:
+                mo.home_orphans = int(mo.home_orphans) + int(sub.reg_budget.subvention_performance)
+            mo.save(update_fields=['home_orphans'])
             dep.mo = mo
             dep.save(update_fields=['subvention', 'mo'])
             return redirect('mos')
@@ -545,7 +552,7 @@ def get_filter(request, num, extra=None):
         context.update({'payment_list': objects})
     elif num == 20:
         # 20 МО, которые предоставили жилые помещения детям-сиротам
-        objects = MO.objects.filter(pk__in=[mo.pk for mo in MO.objects.filter(departamentagreement__subvention_performance__gt=0)])
+        objects = MO.objects.filter(pk__in=[mo.pk for mo in MO.objects.filter(home_orphans__gt=0)])
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
         forms = []
@@ -561,9 +568,9 @@ def get_filter(request, num, extra=None):
                     redirect('mos')
         else:
             for mo in objects:
-                mo.home_orphans = sum([int(dep.subvention_performance) for dep in mo.departamentagreement_set.all()
-                                       if dep.subvention_performance])
-                mo.save(update_fields=['home_orphans'])
+#                mo.home_orphans = sum([int(dep.subvention_performance) for dep in mo.departamentagreement_set.all()
+#                                       if dep.subvention_performance])
+#                mo.save(update_fields=['home_orphans'])
                 forms.append(MOPerformanceForm(instance=mo, prefix='mo_%s' % mo.pk))
         context.update({'formset': forms})
     elif num == 21:

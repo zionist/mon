@@ -68,8 +68,8 @@ class BuildingMonitoringForm(forms.ModelForm):
 
     class Meta:
         model = Building
-        fields = ('address', 'flats_amount', 'area', 'comment',
-                  'approve_status', 'mo', 'contract')
+        fields = ('start_year', 'finish_year', 'address', 'flats_amount', 'area', 'comment',
+                  'approve_status', 'mo', 'cad_num', 'contract')
 
 
 class GroundMonitoringForm(forms.ModelForm):
@@ -86,8 +86,8 @@ class GroundMonitoringForm(forms.ModelForm):
 
     class Meta:
         model = Ground
-        fields = ('address', 'cad_num', 'area', 'cad_passport', 'comment',
-                  'approve_status', 'mo', 'contract')
+        fields = ('start_year', 'finish_year', 'address', 'area', 'cad_passport', 'comment',
+                  'approve_status', 'mo', 'cad_num', 'contract')
 
 
 class BuildingSelectForm(forms.Form):
