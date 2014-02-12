@@ -47,6 +47,7 @@
                             <li><a href="">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
+                    {% if user.is_staff %}
                     <li id="buildings" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Объекты' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
@@ -58,6 +59,17 @@
                                 <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
                             {% endif %}
                             <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li id="payments" class="dropdown">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Платежи' %}<b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" >
+                            {% if not user.is_superuser %}
+                            <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                            {% endif %}
+                            <li class="divider"></li>
+                            <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
                         </ul>
                     </li>
                     {% endif %}
@@ -108,7 +120,9 @@
                     <li id="creation" class="dropdown">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">{% trans 'Добавить' %}<b class="caret"></b></a>
                         <ul class="dropdown-menu" role="menu" >
-                            <li><a href="{% url 'create-building' %}">{% trans 'Добавить объект рынка жилья' %}</a></li>
+                            {% if user.is_staff %}
+                                <li><a href="{% url 'create-building' %}">{% trans 'Добавить объект рынка жилья' %}</a></li>
+                            {% endif %}
                             <li><a href="{% url 'create-monitoring' %}">{% trans 'Добавить объект мониторинга' %}</a></li>
                             <li><a href="{% url 'manage-developer' dev.id dev.state %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
                             {% if user.is_staff %}
@@ -147,26 +161,28 @@
                         </ul>
                     </li>
                     {% endif %}
-                    <li id="manage" class="dropdown">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>
-                        <ul class="dropdown-menu" role="menu" >
+                    {% if user.is_staff %}
+                        <li id="manage" class="dropdown">
+                            <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" >
 
-                            {% if not user.is_superuser %}
-                            <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
-                            {% endif %}
-                            {% if user.is_staff %}
-                            <li class="divider"></li>
-                            <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
-                            {% endif %}
+                                {% if not user.is_superuser %}
+                                <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
+                                {% endif %}
+                                <li class="divider"></li>
+                                <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
 
-                            {% if user.is_superuser %}
-                            <li><a href="{% url 'create-user' %}">{% trans 'Создать пользователя' %}</a></li>
-                            <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
-                            <li><a href="{% url 'choices' %}">{% trans 'Список материалов' %}</a></li>
-                            {% endif %}
-                            <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
-                        </ul>
-                    </li>
+                                {% if user.is_superuser %}
+                                <li><a href="{% url 'create-user' %}">{% trans 'Создать пользователя' %}</a></li>
+                                <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
+                                <li><a href="{% url 'choices' %}">{% trans 'Список материалов' %}</a></li>
+                                {% endif %}
+                                <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
+                    {% endif %}
                 </ul>
               </div>
             </div>
@@ -231,6 +247,7 @@
        <link media="screen" href="{{ STATIC_URL }}css/bootstrap.css" type="text/css" rel="stylesheet" />
        <link media="screen" href="{{ STATIC_URL }}css/style.css" type="text/css" rel="stylesheet" />
        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,400,300,600,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+       <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&subset=cyrillic-ext,latin' rel='stylesheet' type='text/css'>
    {% endblock %}
     </body>
 {% endblock %}
