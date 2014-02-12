@@ -38,9 +38,9 @@
                         {% trans 'Аукционы' %}</a>
                     <a class="btn" href="{% url 'results' object.id %}">
                         {% trans 'Выезды' %}</a>
+                {% endif %}
                     <a class="btn" href="{% url 'payments' object.id %}">
                         {% trans 'Платежи' %}</a>
-                {% endif %}
             </div>
         </div><br />
             {% if agreement %}
