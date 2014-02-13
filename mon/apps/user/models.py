@@ -24,7 +24,7 @@ class CustomUser(User):
         if not self.date or self.date == 0:
             return None
         dat = int(DICT_DATE_CHOICES.get(self.date))
-        return datetime(dat, 01, 01)
+        return datetime(dat, 01, 02)
 
     def show_user_date(self):
         if not self.date or self.date == 0:
