@@ -44,7 +44,6 @@
                             <li class="divider"></li>
                             <li><a href="{% url 'monitorings-all' %}">{% trans 'Все объекты мониторинга' %}</a></li>
                             {% endif %}
-                            <li><a href="">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
                     {% if user.is_staff %}
@@ -58,7 +57,6 @@
                                 <li class="divider"></li>
                                 <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
                             {% endif %}
-                            <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                         </ul>
                     </li>
                     {% endif %}
@@ -68,8 +66,10 @@
                             {% if not user.is_superuser %}
                             <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
                             {% endif %}
+                            {% if user.is_staff %}
                             <li class="divider"></li>
                             <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     {% endif %}
@@ -165,13 +165,7 @@
                         <li id="manage" class="dropdown">
                             <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Управление<b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" >
-
-                                {% if not user.is_superuser %}
-                                <li><a href="{% url 'payments' %}">{% trans 'Платежи' %}</a></li>
-                                {% endif %}
-                                <li class="divider"></li>
-                                <li><a href="{% url 'payments-all' %}">{% trans 'Все платежи' %}</a></li>
-
+                                <li><a href="{% url 'developers' %}">{% trans 'Застройщики' %}</a></li>
                                 {% if user.is_superuser %}
                                 <li><a href="{% url 'create-user' %}">{% trans 'Создать пользователя' %}</a></li>
                                 <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
