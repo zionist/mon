@@ -4,7 +4,7 @@ from datetime import date
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, BaseContract, \
-    Developer, CREATION_FORM_CHOICES, BUDGET_CHOICES
+    Developer, CREATION_FORM_CHOICES, BUDGET_CHOICES, STATE_CHOICES
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseFile, BaseFile
 from apps.user.models import CustomUser
@@ -100,34 +100,21 @@ class Ground(BaseBuilding, BaseCompareData, BaseFile):
         name = self.cad_num if self.cad_num else self.address
         return "%s" % name
 
-    cad_num = models.CharField(help_text=_(u"Кадастровый номер участка"), null=True, max_length=2048, verbose_name=_(u"Кадастровый номер участка"), blank=True, )
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date.today())
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date.today())
-
-    start_date = models.DateField(help_text=_(u"Предполагаемый срок начала строительства"), null=True, verbose_name=_(u"Предполагаемый срок начала строительства"), blank=True, )
-    finish_date = models.DateField(help_text=_(u"Предполагаемый срок окончания строительства"), null=True, verbose_name=_(u"Предполагаемый срок окончания строительства"), blank=True, )
-
+    cad_num = models.CharField(help_text=_(u"Кадастровый номер участка"), unique=True, db_index=True, max_length=2048, verbose_name=_(u"Кадастровый номер участка"))
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
-    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
-    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
+    start_date = models.DateField(help_text=_(u"Предполагаемый срок начала строительства"), null=True, verbose_name=_(u"Предполагаемый срок начала строительства"), blank=True, )
+    finish_date = models.DateField(help_text=_(u"Предполагаемый срок окончания строительства"), null=True, verbose_name=_(u"Предполагаемый срок окончания строительства"), blank=True, )
 
 
 class Building(BaseBuilding, BaseCompareData, BaseFile):
-    cad_num = models.CharField(help_text=_(u"Кадастровый номер"), null=True, max_length=2048, verbose_name=_(u"Кадастровый номер"), blank=True, )
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date.today())
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date.today())
-
+    cad_num = models.CharField(help_text=_(u"Кадастровый номер"), unique=True, db_index=True, max_length=2048, verbose_name=_(u"Кадастровый номер"))
     developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
-    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
-    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
     flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
 
     class Meta:
@@ -135,11 +122,29 @@ class Building(BaseBuilding, BaseCompareData, BaseFile):
         verbose_name = _(u"Строение")
 
     def __unicode__(self):
+        if not self.address:
+            return ""
         try:
             num = str(self.flat_num)
         except TypeError:
             num = ""
-        if not self.address:
-            return ""
         address = ', '.join([self.address, num])
         return "%s" % address
+
+
+class CopyBuilding(BaseBuilding, BaseCompareData, BaseFile):
+    building_state = models.SmallIntegerField(null=True, blank=True, choices=STATE_CHOICES, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
+
+    cad_num = models.CharField(help_text=_(u"Кадастровый номер"), null=True, max_length=2048, verbose_name=_(u"Кадастровый номер"), blank=True, )
+    developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
+    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
+    contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
+
+    class Meta:
+        app_label = "build"
+        verbose_name = _(u"Типовое строение")
+
+    def __unicode__(self):
+        if not self.address:
+            return ""
+        return "%s" % self.address

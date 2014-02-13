@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from datetime import date
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -122,6 +123,9 @@ class BaseBuilding(models.Model):
     class Meta:
         abstract = True
 
+    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date.today())
+    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date.today())
+
     approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
     state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
     address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
@@ -129,6 +133,10 @@ class BaseBuilding(models.Model):
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
+
+    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
+    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
+    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
 
 
 class BaseContract(BaseName):
