@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
-from datetime import date
+from datetime import date, datetime
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -30,6 +30,9 @@ AREA_CMP_CHOICES = ((0, _(u'Не менее')), (1, _(u'Равно')), )
 BUDGET_CHOICES = ((1, _(u'Федеральный')),  (2, _(u'Краевой')), )
 
 YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
+
+START_YEAR_DEFAULT = date(datetime.now().year - 1, 01, 01)
+STOP_YEAR_DEFAULT = date(datetime.now().year + 4, 12, 31)
 
 
 class Choices(models.Model):
@@ -102,8 +105,8 @@ class BaseDepartamentAgreement(BaseDocumentModel, ):
     class Meta:
         abstract = True
 
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date(2013,01,01))
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date(2018,12,31))
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
     date = models.DateField(help_text=_(u"Дата соглашения с министерством"), null=True,
                             verbose_name=_(u"Дата соглашения с министерством"), blank=True, )
     num = models.IntegerField(help_text=_(u"Номер соглашения с министерством"), null=True,
@@ -125,8 +128,8 @@ class BaseBuilding(models.Model):
     class Meta:
         abstract = True
 
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date(2013,01,01))
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date(2018,12,31))
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
 
     approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
     state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
@@ -146,8 +149,8 @@ class BaseContract(BaseName):
     class Meta:
         abstract = True
 
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date(2013,01,01))
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date(2018,12,31))
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
 
     num = models.CharField(help_text=_(u"Номер"), max_length=2048, verbose_name=_(u"Номер"), )
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
@@ -158,8 +161,8 @@ class BaseResult(models.Model):
     class Meta:
         abstract = True
 
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date(2013,01,01))
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date(2018,12,31))
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
 
     check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
     doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
@@ -585,8 +588,8 @@ class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImpr
     class Meta:
         abstract = True
 
-    start_year = models.DateField(help_text=_(u"Предполагаемый срок начала учета в системе"), verbose_name=_(u"Предполагаемый срок  начала учета в системе"), blank=True, default=date(2013,01,01))
-    finish_year = models.DateField(help_text=_(u"Предполагаемый срок окончания учета в системе"), verbose_name=_(u"Предполагаемый срок окончания учета в системе"), blank=True, default=date(2018,12,31))
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
 
     flats_amount = models.IntegerField(help_text=_(u"Количество квартир по номеру заказа"), null=True, verbose_name=_(u"Количество квартир по номеру заказа"), blank=True, )
     area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
