@@ -28,7 +28,7 @@ class GroundForm(autocomplete_light.ModelForm):
         self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
-        self.fields['contract'] = forms.ModelChoiceField(Contract.objects.all(),
+        self.fields['contract'] = forms.ModelChoiceField(queryset=Contract.objects.all(),
            label=_(u"Контракт"), help_text=_(u"Контракт"), required=True)
 
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
@@ -51,7 +51,7 @@ class BuildingForm(GroundForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state', 'contract')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
 
 
 

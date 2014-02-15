@@ -119,9 +119,10 @@ def add_building(request, dev_pk=None, state=None):
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         if select and int(select) == 2:
-            form = GroundForm(request.POST, prefix=prefix)
+            form = GroundForm(prefix=prefix)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(request.POST, prefix=prefix)
+            form = BuildingForm(prefix=prefix)
+        print form.initial
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
         if not request.user.is_staff:
