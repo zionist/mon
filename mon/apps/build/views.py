@@ -200,8 +200,8 @@ def add_monitoring(request, dev_pk=None, state=None):
 
 
 @login_required
-def manage_developer(request, pk=None, state=None, ):
-    template = 'developer_creation.html'
+def manage_developer(request, pk=None, state=None,
+                     template='developer_creation.html',  monitoring=False):
     context = {'title': _(u'Добавление застройщика(владельца) объекта')}
     if state:
         context.update({'state': int(state)})
@@ -210,8 +210,14 @@ def manage_developer(request, pk=None, state=None, ):
         if form.is_valid() and 'dev' in request.POST:
             dev = form.save()
             if state:
-                return redirect('add-building', state, dev.id)
-            return redirect('buildings')
+                if monitoring:
+                    return redirect('add-monitoring', state, dev.id)
+                else:
+                    return redirect('add-building', state, dev.id)
+            if monitoring:
+                return redirect('monitorings')
+            else:
+                return redirect('buildings')
     else:
         developer = Developer.objects.get(pk=pk)
         context.update({'object': developer})
@@ -220,7 +226,10 @@ def manage_developer(request, pk=None, state=None, ):
             form = DeveloperForm(request.POST, instance=developer)
             if form.is_valid() and 'dev' in request.POST:
                 form.save()
-                return redirect('buildings')
+                if monitoring:
+                    return redirect('monitorings')
+                else:
+                    return redirect('buildings')
             else:
                 form = DeveloperForm(request.POST, instance=developer)
     context.update({'form': form})
@@ -230,31 +239,9 @@ def manage_developer(request, pk=None, state=None, ):
 
 @login_required
 def manage_monitoring_developer(request, pk=None, state=None, ):
-    template = 'monitoring_developer_creation.html'
-    context = {'title': _(u'Добавление застройщика(владельца) объекта')}
-    if state:
-        context.update({'state': int(state)})
-    if not pk:
-        form = DeveloperForm(request.POST or {})
-        if form.is_valid() and 'dev' in request.POST:
-            dev = form.save()
-            if state:
-                return redirect('add-monitoring', state, dev.id)
-            return redirect('monitorings')
-    else:
-        developer = Developer.objects.get(pk=pk)
-        context.update({'object': developer})
-        form = DeveloperForm(instance=developer)
-        if request.method == "POST":
-            form = DeveloperForm(request.POST, instance=developer)
-            if form.is_valid() and 'dev' in request.POST:
-                form.save()
-                return redirect('monitorings')
-            else:
-                form = DeveloperForm(request.POST, instance=developer)
-    context.update({'form': form})
-    return render_to_response(template, context,
-                              context_instance=RequestContext(request))
+    return manage_developer(request, pk, state,
+                            template='monitoring_developer_creation.html',
+                            monitoring=True)
 
 
 @login_required()
