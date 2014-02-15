@@ -321,7 +321,8 @@ def get_contracts(request, mo=None, all=False):
             from_dt = request.user.customuser.get_user_date()
             if from_dt:
                 kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
-        kwargs.update({'mo': mo_obj})
+        if mo_obj:
+            kwargs.update({'mo': mo_obj})
         objects = Contract.objects.filter(**kwargs)
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)

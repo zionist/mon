@@ -101,7 +101,7 @@ class Ground(BaseBuilding, BaseCompareData, BaseFile):
         return "%s" % name
 
     cad_num = models.CharField(help_text=_(u"Кадастровый номер участка"), unique=True, db_index=True, max_length=2048, verbose_name=_(u"Кадастровый номер участка"))
-    developer = models.ForeignKey(Developer, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
+    developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
@@ -133,12 +133,12 @@ class Building(BaseBuilding, BaseCompareData, BaseFile):
 
 
 class CopyBuilding(BaseBuilding, BaseCompareData, BaseFile):
-    building_state = models.SmallIntegerField(null=True, blank=True, choices=STATE_CHOICES, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
-
     cad_num = models.CharField(help_text=_(u"Кадастровый номер"), null=True, max_length=2048, verbose_name=_(u"Кадастровый номер"), blank=True, )
     developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
-    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
+    mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), blank=True, null=True, verbose_name=_(u"Муниципальное образование"), )
+    contract = models.ForeignKey(Contract, blank=False, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
+
+    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
 
     class Meta:
         app_label = "build"

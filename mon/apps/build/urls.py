@@ -20,6 +20,16 @@ urlpatterns = patterns(
         name='change-monitoring'),
     url(r'^monitoring/update/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.update_monitoring, name='update-monitoring'),
     url(r'^monitoring/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/$', views.add_monitoring, name='add-monitoring'),
+
+
+    url(r'^building_copies/$', views.get_building_copies, name='building_copies'),
+    url(r'^building_copies/(?P<mo>[0-9]+)/$', views.get_building_copies, name='building_copies'),
+    url(r'^building_copies/all/$', views.get_building_copies, {'all': True}, name='building_copies-all'),
+    #url(r'^building_copy/update/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.update_building_copy, name='update-building_copy'),
+    #url(r'^building_copy/delete/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.delete_building_copy, name='delete-building_copy'),
+    #url(r'^building_copy/pre_delete/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.pre_delete_building_copy, name='pre-delete-building_copy'),
+
+
     #url(r'^monitoring/approve/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.approve_building, name='approve-building'),
     url(r'^monitoring/pre_delete/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.pre_delete_monitoring, name='pre-delete-monitoring'),
     url(r'^monitoring/delete/(?P<pk>[0-9]+)/(?P<state>[0-9]*)/$', views.delete_monitoring, name='delete-monitoring'),

@@ -20,12 +20,18 @@
     {% else %}
         {% if object %}
             <div class="row">
-                <div class="span5"><a class="btn btn-info" href="{% url 'update-building' object.id object.state %}">
+                <div class="span6"><a class="btn btn-info" href="{% url 'update-building' object.id object.state %}">
                     {% trans 'Редактировать' %}</a></div>
-                <div class="span3"><a class="btn" href="{% url 'copy-building' object.id %}">
-                    {% trans 'Скопировать объект' %}</a></div>
-                <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id object.state %}">
+
+                 <form method="POST" enctype="multipart/form-data" action="{% url 'copy-building' object.id %}"> {% csrf_token %}
+                    <div class="span2"> {{ copyform.amount.label }}  </div>
+                    <div class="span1"> {{ copyform.amount }} </div>
+                    <div class="span1"><button class="btn" type="submit" >
+                         {% trans 'Скопировать' %} </button></div>
+
+                <div class="span2 text-right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id object.state %}">
                     {% trans 'Удалить' %}</a></div>
+                 </form>
             </div><br />
         {% endif %}
     {% endif %}

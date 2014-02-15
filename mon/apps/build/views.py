@@ -30,7 +30,7 @@ from django.contrib.formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
-from apps.build.models import Building, Ground
+from apps.build.models import Building, Ground, CopyBuilding
 from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
     GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, \
     GroundMonitoringForm, BuildingSelectMonitoringForm
@@ -38,6 +38,8 @@ from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
 from apps.user.models import CustomUser
+from apps.build.forms import CopyForm
+from apps.cmp.models import Contract
 from apps.mo.models import MO
 
 
@@ -286,7 +288,8 @@ def get_developers(request):
                   context_instance=RequestContext(request))
 
 @login_required
-def get_buildings(request, mo=None, all=False, template=None, title=None, null_contract=False):
+def get_buildings(request, mo=None, all=False, template=None,
+                  title=None, null_contract=False, copies=False):
     template = 'builds.html' if not template else template
     title = title if title else u' рынка жилья'
     objects, build_objects, ground_objects = [], [], []
@@ -309,10 +312,14 @@ def get_buildings(request, mo=None, all=False, template=None, title=None, null_c
         context = {'title': _(u'Объекты %s' % (title))}
         kwargs.update({'mo': mo_obj})
 
-    if Building.objects.filter(**kwargs).exists():
-        build_objects = Building.objects.filter(**kwargs).order_by('state')
-    if Ground.objects.filter(**kwargs).exists():
-        ground_objects = Ground.objects.filter(**kwargs).order_by('state')
+    if copies:
+        if CopyBuilding.objects.filter(**kwargs).exists():
+            build_objects = CopyBuilding.objects.filter(**kwargs).order_by('state')
+    else:
+        if Building.objects.filter(**kwargs).exists():
+            build_objects = Building.objects.filter(**kwargs).order_by('state')
+        if Ground.objects.filter(**kwargs).exists():
+            ground_objects = Ground.objects.filter(**kwargs).order_by('state')
 
     objects = [x for x in build_objects] + [x for x in ground_objects]
     page = request.GET.get('page', '1')
@@ -335,7 +342,16 @@ def get_monitorings(request, mo=None, all=False):
 
 
 @login_required
+def get_building_copies(request, mo=None, all=False):
+    template = 'builds.html'
+    title = u' копий'
+    return get_buildings(request, mo, all=all, template=template,
+                         title=title, null_contract=False, copies=True)
+
+
+@login_required
 def get_building(request, pk, state=None, extra=None):
+
     context = {'title': _(u'Параметры объекта')}
     if state and int(state) == 2:
         build = Ground.objects.get(pk=pk)
@@ -350,7 +366,7 @@ def get_building(request, pk, state=None, extra=None):
         form.fields.pop('approve_status')
         form.fields.pop('mo')
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
-    context.update({'object': build, 'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+    context.update({'object': build, 'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
@@ -539,37 +555,61 @@ def update_monitoring(request, pk, state=None, extra=None):
 @login_required()
 def copy_building(request, pk):
 
-    def copy_object(obj):
+    def _copy_object(obj):
         new_obj = deepcopy(obj)
         new_obj.id = None
         new_obj.pk = None
         return new_obj
 
-    if request.method != "GET":
-        return HttpResponseNotFound()
+    form = CopyForm(request.POST)
+    if form.is_valid():
+        print "# valid"
+    else:
+        print " not valid"
+
+    amount = form.cleaned_data["amount"]
+    if amount <= 0:
+        return HttpResponse(u"Пожалуйста введите положительное целое число")
+
     try:
         building = Building.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound('Not found')
 
-    new_building = copy_object(building)
-    if new_building.flat_num:
-        new_building.flat_num += 1
-    new_building.room = copy_object(building.room)
-    new_building.room.save()
-    new_building.room_id = new_building.room.id
-    new_building.hallway = copy_object(building.hallway)
-    new_building.hallway.save()
-    new_building.hallway_id = new_building.hallway.id
-    new_building.wc = copy_object(building.wc)
-    new_building.wc.save()
-    new_building.wc_id = new_building.wc.id
-    new_building.kitchen = copy_object(building.kitchen)
-    new_building.kitchen.save()
-    new_building.kitchen_id = new_building.kitchen.id
-    new_building.save()
-    return redirect('update-building', pk=new_building.pk,
-                    state=new_building.state)
+    build_dict = forms.model_to_dict(building)
+
+    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'contract', 'id', 'developer']:
+        build_dict.pop(n)
+
+    # does not work https://docs.djangoproject.com/en/dev/ref/models/querysets/ (bulk_create)
+    # copies = []
+    # for c in xrange(amount):
+    #    copies.append(CopyBuilding(**build_dict))
+    # CopyBuilding.objects.bulk_create(copies)
+
+    for copy in xrange(amount):
+        # fks
+        copy = CopyBuilding(**build_dict)
+        copy.mo = building.mo
+        copy.contract = building.contract
+        copy.developer = building.developer
+
+        # create new fk related objects
+        copy.room = _copy_object(building.room)
+        copy.room.save()
+        copy.room_id = copy.room.id
+        copy.hallway = _copy_object(building.hallway)
+        copy.hallway.save()
+        copy.hallway_id = copy.hallway.id
+        copy.wc = _copy_object(building.wc)
+        copy.wc.save()
+        copy.wc_id = copy.wc.id
+        copy.save()
+
+
+    return HttpResponse("ok")
+    #return redirect('update-building', pk=new_building.pk,
+    #                state=new_building.state)
 
 
 @login_required

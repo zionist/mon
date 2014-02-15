@@ -54,6 +54,9 @@ class BuildingForm(GroundForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
 
 
+class CopyForm(forms.Form):
+    amount = forms.IntegerField(required=True, initial=1, help_text=_(u"Количество копий"), label=_(u"Количество копий"))
+
 
 class BuildingMonitoringForm(forms.ModelForm):
 
