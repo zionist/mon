@@ -8,6 +8,7 @@ from apps.core.models import BaseDocumentModel, BaseBuilding, BaseCompareData, B
 from apps.mo.models import MO
 from apps.imgfile.models import File, BaseFile, BaseFile
 from apps.user.models import CustomUser
+from django.forms.models import model_to_dict
 
 
 class ContractDocuments(BaseDocumentModel, BaseFile):

@@ -10,7 +10,8 @@ from copy import deepcopy
 
 from django import forms
 from django.http import HttpResponse, HttpResponseNotFound, \
-    HttpResponseBadRequest, HttpResponseRedirect, HttpResponseForbidden
+    HttpResponseBadRequest, HttpResponseRedirect, HttpResponseForbidden, \
+    QueryDict
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_list_or_404, \
@@ -20,7 +21,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
+from django.forms.models import inlineformset_factory, formset_factory, \
+    modelformset_factory, model_to_dict
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.servers.basehttp import FileWrapper
@@ -32,7 +34,7 @@ from django.conf import settings
 
 from apps.build.models import Building, Ground, CopyBuilding
 from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
-    GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, \
+    GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, CopyBuildingForm, \
     GroundMonitoringForm, BuildingSelectMonitoringForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
@@ -256,6 +258,51 @@ def delete_developer(request, pk):
     return redirect("developers")
 
 
+@login_required()
+def delete_building_copy(request, pk):
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        copy = CopyBuilding.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    copy.room.delete()
+    copy.hallway.delete()
+    copy.wc.delete()
+    copy.kitchen.delete()
+    copy.delete()
+    return redirect("building_copies")
+
+
+@login_required()
+def update_building_copy(request, pk):
+    # TODO: add file moving code
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        copy = CopyBuilding.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    form = CopyBuildingForm(prefix='build', instance=copy)
+    prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
+    form, text_area_form = split_form(form)
+    context = {'title': _(u'Добавление рынка жилья')}
+    context.update({'state': copy.state, 'dev': copy.developer.pk})
+    context.update({'object': copy, 'form': form,
+                    'text_area_fields': text_area_form, 'prefix': prefix,
+                    'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': [
+                        BaseRoom._meta.verbose_name,
+                        BaseHallway._meta.verbose_name,
+                        BaseWC._meta.verbose_name,
+                        BaseKitchen._meta.verbose_name,
+                        ]})
+    delete_building_copy(request, copy.pk)
+    return render(request, 'build_creation.html', context,
+                  context_instance=RequestContext(request))
+
+
 @login_required
 def get_developers(request):
     template = 'developers.html'
@@ -330,7 +377,7 @@ def get_monitorings(request, mo=None, all=False):
 
 @login_required
 def get_building_copies(request, mo=None, all=False):
-    template = 'builds.html'
+    template = 'copies.html'
     title = u' копий'
     return get_buildings(request, mo, all=all, template=template,
                          title=title, null_contract=False, copies=True)
@@ -549,11 +596,6 @@ def copy_building(request, pk):
         return new_obj
 
     form = CopyForm(request.POST)
-    if form.is_valid():
-        print "# valid"
-    else:
-        print " not valid"
-
     amount = form.cleaned_data["amount"]
     if amount <= 0:
         return HttpResponse(u"Пожалуйста введите положительное целое число")
@@ -591,12 +633,11 @@ def copy_building(request, pk):
         copy.wc = _copy_object(building.wc)
         copy.wc.save()
         copy.wc_id = copy.wc.id
+        copy.kitchen = _copy_object(building.kitchen)
+        copy.kitchen.save()
+        copy.kitchen_id = copy.kitchen.id
         copy.save()
-
-
-    return HttpResponse("ok")
-    #return redirect('update-building', pk=new_building.pk,
-    #                state=new_building.state)
+    return get_building_copies(request)
 
 
 @login_required

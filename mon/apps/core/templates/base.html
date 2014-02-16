@@ -52,10 +52,12 @@
                         <ul class="dropdown-menu" role="menu" >
                             {% if not user.is_superuser %}
                             <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
+                            <li><a href="{% url 'building_copies' %}">{% trans 'Копии объектов' %}</a></li>
                             {% endif %}
                             {% if user.is_staff %}
                                 <li class="divider"></li>
                                 <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
+                            <li><a href="{% url 'building_copies-all' %}">{% trans 'Все копии объектов' %}</a></li>
                             {% endif %}
                         </ul>
                     </li>
