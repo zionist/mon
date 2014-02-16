@@ -683,27 +683,36 @@ def xls_work_table(request):
     row = header_height + 1
     col = 0
     num = 1
+    object_kwargs = {}
+    payment_kwargs = {}
+    agreement_kwargs = {}
+    if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
+        from_dt = request.user.customuser.get_user_date()
+        to_dt = datetime(from_dt.year + 1, 01, 01)
+        agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        object_kwargs = {'start_year__lt': from_dt, 'finish_year__gt': from_dt}
+    payment_kwargs.update({} )
     for mo in MO.objects.all():
         sheet.write(row, col, u"%s" % num)
         sheet.write(row, col + 1, mo.name)
-        sheet.write(row, col + 2, u", ".join([c[1] for c in CREATION_FORM_CHOICES if mo.creation_form and unicode(c[0]) in mo.creation_form.split(',')]))
+        mo_createion_form_map = {
+            u"Приобретение": u"П",
+            u"Долевое строительство": u"ДС",
+            U"Строительство": u"C",
+            }
+        sheet.write(row, col + 2, u", ".join([mo_createion_form_map[c[1]] for c in CREATION_FORM_CHOICES if mo.creation_form and unicode(c[0]) in mo.creation_form.split(',')]))
 
         ## Краевой бюджет
         # Количество жилых помещений
-        builds = mo.building_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
-        grounds = mo.ground_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
-        reg_flats_amount = 0
-        for build in builds:
-                if build["flats_amount"] and build["contract__budget"] == u"2":
-                    reg_flats_amount += build["flats_amount"]
-        for ground in grounds:
-            if ground["flats_amount"] and build["contract__budget"] == u"2":
-                reg_flats_amount += ground["flats_amount"]
-        sheet.write(row, col + 3, reg_flats_amount)
+        query = mo.departamentagreement_set.filter(**agreement_kwargs)
+        # should be only one subvention with budget for one year
+        agreement = query.filter(agreement_type=0)[0] if query.filter(agreement_type=0).exists() else None
+        reg_subvention_performance = agreement.subvention.reg_budget.subvention_performance if agreement and agreement.subvention.reg_budget else 0
+        sheet.write(row, col + 3, reg_subvention_performance)
 
         # Краевой бюджет сумма с учетом коэф администрирования
         reg_sum_with_k = 0
-        query = mo.departamentagreement_set.all()
         for arg in query.filter(agreement_type=0):
             if arg.subvention.reg_budget:
                 if arg.subvention.reg_budget.sub_sum:
@@ -727,7 +736,7 @@ def xls_work_table(request):
         # Профинансировано министерством ?
 
         # Краевой бюджет кассовый расход
-        reg_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=2) \
+        reg_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=2, **payment_kwargs) \
             .filter(contract__mo=mo).values("amount")])
         sheet.write(row, col + 7, u"%s руб." % reg_spend_amount)
 
@@ -743,20 +752,13 @@ def xls_work_table(request):
 
         ## Федеральный бюджет
         # Количество жилых помещений
-        builds = mo.building_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
-        grounds = mo.ground_set.filter(contract__isnull=False).values("contract__budget", "flats_amount")
-        fed_flats_amount = 0
-        for build in builds:
-            if build["flats_amount"] and build["contract__budget"] == u"1":
-                fed_flats_amount += build["flats_amount"]
-        for ground in grounds:
-            if ground["flats_amount"] and build["contract__budget"] == u"1":
-                fed_flats_amount += ground["flats_amount"]
-        sheet.write(row, col + 10, fed_flats_amount)
+        # should be only one subvention with budget for one year
+        agreement = query.filter(agreement_type=0)[0] if query.filter(agreement_type=0).exists() else None
+        fed_subvention_performance = agreement.subvention.fed_budget.subvention_performance if agreement and agreement.subvention.fed_budget else 0
+        sheet.write(row, col + 10, fed_subvention_performance)
 
         # Федеральный бюджет сумма с учетом коэф администрирования
         fed_sum_with_k = 0
-        query = mo.departamentagreement_set.all()
         for arg in query.filter(agreement_type=0):
             if arg.subvention.fed_budget and arg.subvention.fed_budget.sub_sum:
                 fed_sum_with_k += arg.subvention.fed_budget.sub_sum
@@ -766,7 +768,7 @@ def xls_work_table(request):
 
         # Федеральный бюджет сумма без учета коэф администрирования
         fed_sum_without_k = 0
-        for arg in mo.departamentagreement_set.filter(agreement_type=0):
+        for arg in query.filter(agreement_type=0):
             if arg.subvention.fed_budget:
                 if arg.subvention.fed_budget.adm_coef:
                     fed_sum_without_k = fed_sum_with_k - arg.subvention.fed_budget.adm_coef
@@ -775,7 +777,7 @@ def xls_work_table(request):
         # Профинансировано министерством ?
 
         # Федеральный бюджет кассовый расход
-        fed_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=1)\
+        fed_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=1, **payment_kwargs)\
             .filter(contract__mo=mo).values("amount")])
         sheet.write(row, col + 14, u"%s руб." % fed_spend_amount)
 
@@ -791,7 +793,7 @@ def xls_work_table(request):
 
         ## sums
         # Количество жилых пормещений
-        sum_flats_amount = reg_flats_amount + fed_flats_amount
+        sum_flats_amount = reg_subvention_performance + fed_subvention_performance
         sheet.write(row, col + 17, sum_flats_amount)
         # Сумма с учетом коэффицента администрирования
         sum_sum_with_k = reg_sum_with_k + fed_sum_with_k
@@ -804,21 +806,32 @@ def xls_work_table(request):
         # Количество жилых помещений
         contracts_flats_amount = 0
         contracts_summ = 0
-        query = mo.contract_set.all().values("flats_amount", "summa")
+        contracts_summ_without_mo_money = 0
+        contracts_summ_mo_money = 0
+        query = mo.contract_set.filter(**object_kwargs).values("flats_amount", "summa",
+                                             "summ_without_mo_money", "summ_mo_money")
         for contract in query:
             if contract["flats_amount"]:
                 contracts_flats_amount += contract["flats_amount"]
             # Сумма по заключенным контрактам ИТОГО
             if contract["summa"]:
                 contracts_summ += contract["summa"]
+            # Сумма по заключенным контрактам (без учета средств МО)
+            if contract["summ_without_mo_money"]:
+                contracts_summ_without_mo_money += contract["summ_without_mo_money"]
+            # Сумма муниципальных средств, включенных в сумму контракта
+            if contract["summ_mo_money"]:
+                contracts_summ_mo_money += contract["summ_mo_money"]
 
 
         # Количество жилых помещений
         sheet.write(row, col + 20, contracts_flats_amount)
 
         # Сумма по заключенным контрактам (без учета средств МО)
+        sheet.write(row, col + 21, contracts_summ_without_mo_money)
 
         # Сумма муниципальных средств, включенных в сумму контракта
+        sheet.write(row, col + 22, contracts_summ_mo_money)
 
         # Сумма по заключенным контрактам ИТОГО
         sheet.write(row, col + 23, contracts_summ)
@@ -831,8 +844,8 @@ def xls_work_table(request):
 
         # Экономия по результатам заключенных контрактов
         contracts_economy = 0
-        spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-        contracts_economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+        spent = sum([int(contract.summa) for contract in mo.contract_set.filter(**object_kwargs) if contract.summa])
+        contracts_economy = sum([int(auction.start_price) for auction in mo.auction_set.filter(**object_kwargs) if auction.start_price]) - spent
         sheet.write(row, col + 25, u"%s руб." % contracts_economy)
 
 
@@ -840,7 +853,7 @@ def xls_work_table(request):
         num += 1
 
     end = time.time()
-    #print end - start
+    print end - start
 
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'
