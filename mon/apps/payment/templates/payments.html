@@ -63,7 +63,10 @@
                     <td>{{accounting.spent}}</td>
                     <td>{{accounting.saved}}</td>
                     <td>{{accounting.percent}}</td>
-                    <td>{{accounting.economy}}</td>
+                    <td>{% with economy=accounting.economy %}
+                            {% if economy > 0 %} {{economy}} {% else %} 0 {% endif %}
+                        {% endwith %}
+                    </td>
                 </tr>
             </table>
         </div>
@@ -98,9 +101,12 @@
                             <td>{{obj.accounting.spent}}</td>
                             <td>{{obj.accounting.payment}}</td>
                             <td>{{obj.accounting.percent}}</td>
-                            <td>{{obj.accounting.economy}}</td>
+                            <td>{% with economy=obj.accounting.economy %}
+                                    {% if economy > 0 %} {{economy}} {% else %} 0 {% endif %}
+                                {% endwith %}
+                            </td>
                         {% else %}
-                            <td colspan="6">{% trans 'Нет ни одной субвенции для составления сводки' %}</td>
+                            <td colspan="6">{% trans 'Недостаточно данных для составления сводки' %}</td>
                         {% endif %}
                         </tr>
                     {% endfor %}
@@ -108,6 +114,7 @@
             </table>
             </div>
         {% endif %}
+        <br><br>
         {% if payment_list %}
             <div class="auction-table">
             <table class="table table-condensed table-striped table-hover">
@@ -129,6 +136,10 @@
                 {% endfor %}
             </table>
             </div>
+        {% else %}
+            {% if not accountings %}
+                {% trans 'Выбран ' %} {{user.customuser.get_user_date|date:"Y"}} {% trans ' год. ' %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endblock %}

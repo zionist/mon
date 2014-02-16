@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, date
+from copy import deepcopy
 from django.http import HttpResponse
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
@@ -98,46 +99,60 @@ def get_accounting(request, select=None):
     prefix = 'acc_date'
     mos = MO.objects.all()
     kwargs = {}
+    agr_kwargs = {}
     form = DateForm(prefix=prefix)
     context.update({'date_form': form})
-    from_dt = request.user.customuser.get_user_date()
+    from_dt = request.user.customuser.get_user_date() if hasattr(request.user, 'customuser') else None
     if select and int(select) in [1,2,3,4]:
-        state, dt = int(select), datetime.now()
+        state = int(select)
         if state == 4:
+            dt = datetime(datetime.now().year, 12, 31)
             dt = dt.replace(year=dt.year-1)
-            prev = prev = dt.replace(year=dt.year-1)
+            prev = dt.replace(year=dt.year-1)
         elif state == 3:
+            dt = datetime(datetime.now().year, 12, 31)
             prev = dt.replace(year=dt.year-1)
         elif state == 2:
-            prev = dt.replace(month=dt.month-1) if dt.month > 1 else dt.replace(month=dt.month+11)
+            dt = datetime(datetime.now().year, datetime.now().month, 28)
+            prev = dt.replace(month=dt.month-1) if dt.month > 1 else dt.replace(month=12)
         elif state == 1:
+            dt = datetime.now()
             prev = dt.replace(day=dt.day-1)
-        kwargs.update({'date__lt':dt, 'date__gt':prev})
-    elif request.method == 'POST' and 'date_select' in request.POST:
+        kwargs.update({'date__lt': dt, 'date__gt': prev})
+        agr_kwargs.update({'date__lt': datetime(dt.year, 12, 31), 'date__gt': datetime(dt.year-1, 12, 31)})
+    elif not select and request.method == 'POST' and 'date_select' in request.POST:
         form = DateForm(request.POST, prefix=prefix)
         if form.is_valid():
-            kwargs.update({'date__lt':form.cleaned_data.get('dt'), 'date__gt':form.cleaned_data.get('prev')})
+            dt, prev = form.cleaned_data.get('dt'), form.cleaned_data.get('prev')
+            kwargs.update({'date__lt': dt, 'date__gt': prev})
+            agr_kwargs.update({'date__lt': dt, 'date__gt': prev})
         else:
             context.update({'date_form': form})
-    elif from_dt:
+    elif not select and from_dt:
         to_dt = datetime(from_dt.year + 1, 01, 01)
         kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        agr_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+    all_payments = []
+    c_kwargs = deepcopy(kwargs)
     for mo in mos:
-        accounting = None
-        agreements = mo.departamentagreement_set.filter(**kwargs)
+        accounting = {}
+        agreements = mo.departamentagreement_set.filter(**agr_kwargs)
+        contracts = mo.contract_set.filter(**c_kwargs)
         if agreements:
             amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-            spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-            percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
-            economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
-            payments = []
-            for dep in agreements:
-                payments = payments + (list(dep.subvention.payment_set.all()))
-            payment = sum([int(payment.amount) for payment in payments])
-            accounting = {'payment': payment, 'spent': spent, 'saved': amount - spent,
-                          'percent': percent, 'sub_amount': amount, 'economy': economy}
+            accounting.update({'sub_amount': amount})
+            if contracts:
+                spent = sum([int(contract.summa) for contract in contracts if contract.summa])
+                percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
+                economy = sum([int(auction.start_price) for auction in mo.auction_set.filter(**kwargs) if auction.start_price]) - spent
+                kwargs.update({'contract__in': [contract.id for contract in contracts if contract]})
+                payments = Payment.objects.filter(**kwargs)
+                payment = sum([int(payment.amount) for payment in payments])
+                all_payments = all_payments + list(payments)
+                accounting.update({'payment': payment, 'spent': spent, 'saved': amount - spent,
+                                   'percent': percent, 'economy': economy})
         objects.append({'mo': mo, 'accounting': accounting})
-    context.update({'accountings': objects})
+    context.update({'accountings': objects, 'payment_list': all_payments, 'show_accounting_payments': True})
     return render(request, template, context, context_instance=RequestContext(request))
 
 
