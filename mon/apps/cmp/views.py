@@ -306,23 +306,25 @@ def add_contract_from_auction(request, pk):
 @login_required
 def get_contracts(request, mo=None, all=False):
     template = 'contracts.html'
-    context = {'title': _(u'Контракты')}
+    kwargs = {}
+
+    mo_obj = None
+    if mo:
+        mo_obj = MO.objects.get(pk=mo)
+    elif hasattr(request.user, 'customuser'):
+        mo_obj = request.user.customuser.mo
+
+    if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
+        from_dt = request.user.customuser.get_user_date()
+        kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
+
     if all:
         context = {'title': _(u'Все контракты')}
-    if Contract.objects.all().exists():
-        kwargs = {}
-        mo_obj = None
-        if mo:
-            mo_obj = MO.objects.get(pk=mo)
-            context = {'title': _(u'Контракты %s' % mo_obj.name)}
-        elif hasattr(request.user, 'customuser'):
-            mo_obj = request.user.customuser.mo
-            context = {'title': _(u'Контракты %s' % mo_obj.name)}
-            from_dt = request.user.customuser.get_user_date()
-            if from_dt:
-                kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
-        if mo_obj:
-            kwargs.update({'mo': mo_obj})
+    elif mo_obj:
+        context = {'title': _(u'Контракты %s' % (mo_obj))}
+        kwargs.update({'mo': mo_obj})
+
+    if Contract.objects.filter(**kwargs).exists():
         objects = Contract.objects.filter(**kwargs)
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
@@ -463,23 +465,26 @@ def add_result(request):
 @login_required
 def get_results(request, mo=None, all=False):
     template = 'results.html'
-    context = {'title': _(u'Выезды')}
+    kwargs = {}
+
+    mo_obj = None
+    if mo:
+        mo_obj = MO.objects.get(pk=mo)
+    elif hasattr(request.user, 'customuser'):
+        mo_obj = request.user.customuser.mo
+
+    if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
+        from_dt = request.user.customuser.get_user_date()
+        kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
+
     if all:
         context = {'title': _(u'Все выезды')}
-    if Result.objects.all().exists():
-        kwargs = {}
-        mo_obj = None
-        if mo:
-            mo_obj = MO.objects.get(pk=mo)
-            context = {'title': _(u'Выезды в %s' % mo_obj.name)}
-        elif hasattr(request.user, 'customuser'):
-            mo_obj = request.user.customuser.mo
-            context = {'title': _(u'Выезды в %s' % mo_obj.name)}
-            from_dt = request.user.customuser.get_user_date()
-            if from_dt:
-                kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
-        kwargs.update({'building__mo': mo_obj})
-        objects = Contract.objects.filter(**kwargs)
+    elif mo_obj:
+        context = {'title': _(u'Выезды в %s' % (mo_obj))}
+        kwargs.update({'mo': mo_obj})
+
+    if Result.objects.filter(**kwargs).exists():
+        objects = Result.objects.filter(**kwargs)
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:

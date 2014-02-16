@@ -594,9 +594,9 @@ def copy_building(request, pk):
         new_obj.id = None
         new_obj.pk = None
         return new_obj
-
     form = CopyForm(request.POST)
-    amount = form.cleaned_data["amount"]
+    if form.is_valid():
+        amount = form.cleaned_data["amount"]
     if amount <= 0:
         return HttpResponse(u"Пожалуйста введите положительное целое число")
 
