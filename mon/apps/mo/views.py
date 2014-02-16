@@ -839,7 +839,7 @@ def xls_work_table(request):
         num += 1
 
     end = time.time()
-    print end - start
+    #print end - start
 
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'

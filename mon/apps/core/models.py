@@ -588,9 +588,6 @@ class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImpr
     class Meta:
         abstract = True
 
-    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
-    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
-
     flats_amount = models.IntegerField(help_text=_(u"Количество квартир по номеру заказа"), null=True, verbose_name=_(u"Количество квартир по номеру заказа"), blank=True, )
     area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=True, null=True, choices=AREA_CMP_CHOICES)
     area = models.FloatField(help_text=_(u"Площадь квартир по номеру заказа (кв. м)"), null=True, verbose_name=_(u"Площадь квартир по номеру заказа (кв. м)"), blank=True, )

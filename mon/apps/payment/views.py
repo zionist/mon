@@ -44,7 +44,18 @@ def get_payments(request, mo=None, all=False):
     template = 'payments.html'
     prefix = 'acc_date'
     if Payment.objects.all().exists():
-        if mo or request.user.customuser.mo:
+        if all:
+            context = {'title': _(u'Все платежи')}
+            if hasattr(request.user, 'customuser'):
+                from_dt = request.user.customuser.get_user_date()
+                if from_dt:
+                    to_dt = datetime(from_dt.year + 1, 01, 01)
+                    objects = Payment.objects.filter(date__gt=from_dt, date__lt=to_dt)
+                else:
+                    objects = Payment.objects.all()
+            else:
+                objects = Payment.objects.all()
+        elif hasattr(request.user, 'customuser') or mo:
             mo = request.user.customuser.mo if request.user.customuser.mo else MO.objects.get(pk=mo)
             context = {'title': _(u'Платежи %s') % mo.name}
             from_dt = request.user.customuser.get_user_date()
@@ -65,20 +76,17 @@ def get_payments(request, mo=None, all=False):
                               'sub_amount': amount, 'economy': economy}
                 context.update({'accounting': accounting})
 
-        elif all:
-            objects = Payment.objects.all()
-            context = {'title': _(u'Все платежи')}
         form = DateForm(prefix=prefix)
         context.update({'date_form': form})
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
-            objects = paginator.page(page)
+            objects_list = paginator.page(page)
         except PageNotAnInteger:
-            objects = paginator.page(1)
+            objects_list = paginator.page(1)
         except EmptyPage:
-            objects = paginator.page(paginator.num_pages)
-        context.update({'payment_list': objects})
+            objects_list = paginator.page(paginator.num_pages)
+        context.update({'payment_list': objects_list})
     return render(request, template, context, context_instance=RequestContext(request))
 
 

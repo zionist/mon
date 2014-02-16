@@ -83,7 +83,7 @@ def get_auctions(request, pk=None):
         mos = MO.objects.all().order_by('name')
         objects = []
         for mo in mos:
-            amount_0 = mo.departamentagreement_set.all()[0].subvention_performance if mo.departamentagreement_set.all() else 0
+            amount_0 = sum([int(x.subvention.amount) for x in mo.departamentagreement_set.all() if mo.departamentagreement_set.all() and x.subvention and x.subvention.amount])
             amount_1 = mo.auction_set.filter(stage=0).count() if mo.auction_set.filter(stage=0).exists() else 0
             amount_2 = mo.auction_set.filter(stage=1).count() if mo.auction_set.filter(stage=1).exists() else 0
             amount_3 = mo.auction_set.filter(stage=3).count() if mo.auction_set.filter(stage=3).exists() else 0
