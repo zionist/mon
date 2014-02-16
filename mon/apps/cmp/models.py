@@ -50,6 +50,7 @@ class Result(BaseResult, ):
 
     contract = models.ForeignKey(Contract, help_text=_(u"Реквизиты контракта"), null=True, verbose_name=_(u"Реквизиты контракта"), blank=True, )
     building = models.ForeignKey(Building, null=True, blank=True, help_text=_(u"Осмотренное строение"), verbose_name=_(u"Осмотренное строение"))
+    mo = models.ForeignKey(MO, null=True, blank=False, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     ground = models.ForeignKey(Ground, null=True, blank=True, help_text=_(u"Осмотренный земельный участок"), verbose_name=_(u"Осмотренный земельный участок"))
     cmp_data = models.ForeignKey(CompareData, null=True, blank=True, )
     mo_pers = models.ManyToManyField(Person, help_text=_(u"Участники от муниципального образования"), null=True, verbose_name=_(u"Участники от муниципального образования"), blank=True, related_name='mo_pers')
