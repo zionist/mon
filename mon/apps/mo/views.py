@@ -552,7 +552,7 @@ def get_filter(request, num, extra=None):
         context.update({'payment_list': objects})
     elif num == 20:
         # 20 МО, которые предоставили жилые помещения детям-сиротам
-        objects = MO.objects.filter(pk__in=[mo.pk for mo in MO.objects.filter(home_orphans__gt=0)])
+        objects = MO.objects.filter(pk__in=[mo.pk for mo in MO.objects.filter(home_orphans__gte=0)])
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
         forms = []
@@ -568,9 +568,10 @@ def get_filter(request, num, extra=None):
                     redirect('mos')
         else:
             for mo in objects:
-#                mo.home_orphans = sum([int(dep.subvention_performance) for dep in mo.departamentagreement_set.all()
-#                                       if dep.subvention_performance])
-#                mo.save(update_fields=['home_orphans'])
+                if not mo.home_orphans or mo.home_orphans == 0:
+                    mo.home_orphans = sum([(int(dep.subvention.fed_budget.subvention_performance) + int(dep.subvention.reg_budget.subvention_performance))
+                                           for dep in mo.departamentagreement_set.all()])
+                    mo.save(update_fields=['home_orphans'])
                 forms.append(MOPerformanceForm(instance=mo, prefix='mo_%s' % mo.pk))
         context.update({'formset': forms})
     elif num == 21:
