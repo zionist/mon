@@ -154,6 +154,7 @@ def get_mo(request, pk, extra=None):
     dep_agreements = mo.departamentagreement_set.all()
     hide_menu = True if not request.user.is_superuser else False
     context.update({'hide_menu': hide_menu, 'agreements': dep_agreements})
+#    context.update({'agreements': dep_agreements})
     return render(request, 'mo.html', context, context_instance=RequestContext(request))
 
 
