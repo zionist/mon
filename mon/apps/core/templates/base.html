@@ -145,7 +145,7 @@
                                 <li><a href="{% url 'create-building' %}">{% trans 'Добавить объект рынка жилья' %}</a></li>
                             {% endif %}
                             <li><a href="{% url 'create-monitoring' %}">{% trans 'Добавить объект мониторинга' %}</a></li>
-                            <li><a href="{% url 'manage-developer' dev.id dev.state %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
+                            {# <li><a href="{% url 'manage-developer' dev.id dev.state %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li> #}
                             {% if user.is_staff %}
                             <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
                             <li><a href="{% url 'create-auction' %}">{% trans 'Добавить аукцион' %}</a></li>
