@@ -6,7 +6,6 @@ import mimetypes
 from copy import deepcopy
 from webodt.converters import converter
 from datetime import datetime
-from copy import deepcopy
 
 from django import forms
 from django.http import HttpResponse, HttpResponseNotFound, \

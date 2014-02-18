@@ -53,13 +53,14 @@ class BuildingForm(GroundForm):
     class Meta:
         model = Building
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',
-        'approve_status')
+        'approve_status', 'flats_amount')
 
 
 class CopyBuildingForm(BuildingForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingForm, self).__init__(*args, **kwargs)
+
 
 class CopyForm(forms.Form):
     amount = forms.IntegerField(required=True, initial=1, help_text=_(u"Количество копий"), label=_(u"Количество копий"))

@@ -17,6 +17,14 @@ urlpatterns = patterns(
     url(r'^contracts/$', views.get_contracts, name='contracts'),
     url(r'^contracts/(?P<mo>[0-9]+)/$', views.get_contracts, name='contracts'),
     url(r'^contract/add/$', views.add_contract, name='create-contract'),
+
+    url(r'^contract/copy/(?P<pk>[0-9]+)/$', views.copy_contract, name='copy-contract'),
+    url(r'^contract_copies/$', views.get_contract_copies, name='contract_copies'),
+    url(r'^contract_copies/(?P<mo>[0-9]+)/$', views.get_contract_copies, name='contract_copies'),
+    url(r'^contract_copies/all/$', views.get_contract_copies, {'all': True}, name='contract_copies-all'),
+    url(r'^contract_copy/delete/(?P<pk>[0-9]+)/$', views.delete_contract_copy, name='delete-contract_copy'),
+    url(r'^contract_copy/update/(?P<pk>[0-9]+)/$', views.update_contract_copy, name='update-contract_copy'),
+
     url(r'^contract/(?P<pk>[0-9]+)/$', views.get_contract, name='change-contract'),
     url(r'^contract/update/(?P<pk>[0-9]+)/$', views.update_contract, name='update-contract'),
     url(r'^contract/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_contract, name='pre-delete-contract'),

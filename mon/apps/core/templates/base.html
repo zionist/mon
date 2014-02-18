@@ -126,6 +126,13 @@
                             {% if not hide_menu %}
                             <li><a href="{% url 'auctions' %}">{% trans 'Аукционы' %}</a></li>
                             <li><a href="{% url 'contracts' %}">{% trans 'Контракты' %}</a></li>
+                            <li><a href="{% url 'contract_copies' %}">{% trans 'Копии контрактов' %}</a></li>
+                            {% if user.is_staff %}
+                            <li class="divider"></li>
+                            <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
+                            <li><a href="{% url 'building_copies-all' %}">{% trans 'Все копии объектов' %}</a></li>
+                            <li><a href="{% url 'contract_copies-all' %}">{% trans 'Все копии контрактов' %}</a></li>
+                            {% endif %}
                             <li><a href="{% url 'results' %}">{% trans 'Выезды' %}</a></li>
                             {% endif %}
                             {% endif %}

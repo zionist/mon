@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+from copy import deepcopy
 from django.http import HttpResponse
+from django import forms
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render, get_list_or_404,\
@@ -11,8 +13,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.core.paginator import Paginator, EmptyPage, InvalidPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
-from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
+from django.forms.models import inlineformset_factory, formset_factory, \
+    modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -22,8 +26,8 @@ from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, Perso
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form, set_fields_equal
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
-from apps.build.models import Contract, ContractDocuments
-from apps.build.forms import BuildingShowForm, GroundShowForm
+from apps.build.models import Contract, ContractDocuments, CopyContract
+from apps.build.forms import BuildingShowForm, GroundShowForm, CopyForm
 from apps.imgfile.models import Image
 from apps.mo.models import MO
 
@@ -255,6 +259,64 @@ def add_contract(request):
         return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required()
+def copy_contract(request, pk):
+
+    def _copy_object(obj):
+        new_obj = deepcopy(obj)
+        new_obj.id = None
+        new_obj.pk = None
+        return new_obj
+
+    form = CopyForm(request.POST)
+    if form.is_valid():
+        amount = form.cleaned_data["amount"]
+    if amount <= 0:
+        return HttpResponse(u"Пожалуйста введите положительное целое число")
+
+    try:
+        contract = Contract.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound('Not found')
+
+    contract_dict = forms.model_to_dict(contract)
+
+    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id', 'developer',
+              'docs']:
+        contract_dict.pop(n)
+
+    for copy in xrange(amount):
+        # fks
+        copy = CopyContract(**contract_dict)
+        copy.mo = contract.mo
+        copy.developer = contract.developer
+
+        # create new fk related objects
+        copy.room = _copy_object(contract.room)
+        copy.room.save()
+        copy.room_id = copy.room.id
+        copy.hallway = _copy_object(contract.hallway)
+        copy.hallway.save()
+        copy.hallway_id = copy.hallway.id
+        copy.wc = _copy_object(contract.wc)
+        copy.wc.save()
+        copy.wc_id = copy.wc.id
+        copy.kitchen = _copy_object(contract.kitchen)
+        copy.kitchen.save()
+        copy.kitchen_id = copy.kitchen.id
+        copy.save()
+    print contract_dict
+    return get_contract_copies(request)
+
+
+@login_required
+def get_building_copies(request, mo=None, all=False):
+    template = 'copies.html'
+    title = u' копий'
+    return get_contracts(request, mo, all=all, template=template, title=title,
+                         copies=True)
+
+
 @login_required
 def add_contract_from_auction(request, pk):
     template = 'contract_creation.html'
@@ -304,8 +366,8 @@ def add_contract_from_auction(request, pk):
 
 
 @login_required
-def get_contracts(request, mo=None, all=False):
-    template = 'contracts.html'
+def get_contracts(request, mo=None, all=False, template='contracts.html',
+                  copies=False):
     kwargs = {}
 
     mo_obj = None
@@ -319,23 +381,83 @@ def get_contracts(request, mo=None, all=False):
         kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
 
     if all:
-        context = {'title': _(u'Все контракты')}
+        if copies:
+            context = {'title': _(u'Все копии контрактов')}
+        else:
+            context = {'title': _(u'Все контракты')}
     elif mo_obj:
-        context = {'title': _(u'Контракты %s' % (mo_obj))}
+        if copies:
+            context = {'title': _(u'Копии контрактов %s' % (mo_obj))}
+        else:
+            context = {'title': _(u'Контракты %s' % (mo_obj))}
         kwargs.update({'mo': mo_obj})
 
-    if Contract.objects.filter(**kwargs).exists():
-        objects = Contract.objects.filter(**kwargs)
-        page = request.GET.get('page', '1')
-        paginator = Paginator(objects, 50)
-        try:
-            objects = paginator.page(page)
-        except PageNotAnInteger:
-            objects = paginator.page(1)
-        except EmptyPage:
-            objects = paginator.page(paginator.num_pages)
-        context.update({'contract_list': objects})
+    objects = []
+    if copies:
+        if CopyContract.objects.filter(**kwargs).exists():
+            objects = CopyContract.objects.filter(**kwargs).order_by('num')
+    else:
+        if Contract.objects.filter(**kwargs).exists():
+            objects = Contract.objects.filter(**kwargs)
+            page = request.GET.get('page', '1')
+            paginator = Paginator(objects, 50)
+            try:
+                objects = paginator.page(page)
+            except PageNotAnInteger:
+                objects = paginator.page(1)
+            except EmptyPage:
+                objects = paginator.page(paginator.num_pages)
+    context.update({'contract_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def get_contract_copies(request, mo=None, all=False):
+    template = 'contracts_copies.html'
+    return get_contracts(request, mo, all=all, template=template,
+                         copies=True)
+
+
+@login_required()
+def delete_contract_copy(request, pk):
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        copy = CopyContract.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    copy.room.delete()
+    copy.hallway.delete()
+    copy.wc.delete()
+    copy.kitchen.delete()
+    copy.delete()
+    return redirect("contract_copies")
+
+
+@login_required()
+def update_contract_copy(request, pk):
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        copy = CopyContract.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    template = 'contract_creation.html'
+    context = {'title': _(u'Добавление контракта')}
+    prefix, images_prefix = 'contract', 'contract_images'
+    form = ContractForm(prefix=prefix, instance=copy)
+    image_form = ContractDocumentsForm(prefix=images_prefix)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
+    context.update({'object': copy, 'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': [
+                        BaseRoom._meta.verbose_name,
+                        BaseHallway._meta.verbose_name,
+                        BaseWC._meta.verbose_name,
+                        BaseKitchen._meta.verbose_name,
+                        ]})
+    delete_contract_copy(request, copy.pk)
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
 
 
 @login_required
@@ -350,7 +472,7 @@ def get_contract(request, pk, extra=None):
         image_form = ContractDocumentsForm(prefix=images_prefix, instance=contract.docs)
         form = ContractShowForm(instance=contract)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
-        context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f], 'images': image_form,
+        context.update({'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f], 'images': image_form,
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,
