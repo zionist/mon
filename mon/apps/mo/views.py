@@ -570,7 +570,7 @@ def get_filter(request, num, extra=None):
             for mo in objects:
                 if not mo.home_orphans or mo.home_orphans == 0:
                     mo.home_orphans = sum([(int(dep.subvention.fed_budget.subvention_performance) + int(dep.subvention.reg_budget.subvention_performance))
-                                           for dep in mo.departamentagreement_set.all()])
+                                           for dep in mo.departamentagreement_set.filter(agreement_type=0)])
                     mo.save(update_fields=['home_orphans'])
                 forms.append(MOPerformanceForm(instance=mo, prefix='mo_%s' % mo.pk))
         context.update({'formset': forms})
