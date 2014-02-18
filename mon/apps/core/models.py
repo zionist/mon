@@ -374,10 +374,11 @@ class BaseWC(BaseDevices, ):
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.IntegerField(help_text=_(u"Ванна"), default=0, blank=True, null=True, verbose_name=_(u"Ванна"), choices=BATH_CHOICES)
     sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
+    wc_switches = models.NullBooleanField(help_text=_(u"Выключатели в туалете"), verbose_name=_(u"Выключатели в туалете"), blank=True, )
 
     class Meta:
         app_label = "core"
-        verbose_name = "Ванная комната"
+        verbose_name = "Санузел"
 
     def __unicode__(self):
         return '%s' % self.id
@@ -439,6 +440,9 @@ class Kitchen(BaseMaterials, BaseKitchen):
 
 class WC(BaseMaterials, BaseWC, ):
     separate = models.IntegerField(default=0, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"), choices=SEPARATE_CHOICES)
+    wc_floor = models.IntegerField(help_text=_(u"Материал отделки пола в туалете"), default=0, blank=True, verbose_name=_(u"Материал отделки пола в туалете"), )
+    wc_wall = models.IntegerField(help_text=_(u"Материал отделки стен в туалете"), default=0, blank=True, verbose_name=_(u"Материал отделки стен в туалете") )
+    wc_ceiling = models.IntegerField(help_text=_(u"Материал отделки потолка в туалете"), default=0, blank=True, verbose_name=_(u"Материал отделки потолка в туалете"), )
 
     class Meta:
         verbose_name = u"Ванная комната"
@@ -563,6 +567,9 @@ class AuctionKitchen(BaseMultiMaterials, BaseKitchen):
 
 class AuctionWC(BaseMultiMaterials, BaseWC):
     separate = models.CommaSeparatedIntegerField(max_length=16, null=True, blank=True, help_text=_(u"Санузел"), verbose_name=_(u"Санузел"))
+    wc_floor = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки пола в туалете"), null=True, blank=True, verbose_name=_(u"Материал отделки пола в туалете"), )
+    wc_wall = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки стен в туалете"), null=True, blank=True, verbose_name=_(u"Материал отделки стен в туалете") )
+    wc_ceiling = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал отделки потолка в туалете"), null=True, blank=True, verbose_name=_(u"Материал отделки потолка в туалете"), )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)

@@ -123,10 +123,13 @@ class WCForm(forms.ModelForm):
         self.verbose_name = _(u"Санузел")
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['floor'] = forms.ChoiceField(label=u"Материал отделки пола", choices=choices, )
+        self.fields['wc_floor'] = forms.ChoiceField(label=u"Материал отделки пола в туалете", choices=choices, )
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['wall'] = forms.ChoiceField(label=u"Материал отделки стен", choices=choices, )
+        self.fields['wc_wall'] = forms.ChoiceField(label=u"Материал отделки стен в туалете", choices=choices, )
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
+        self.fields['wc_ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка в туалете", choices=choices, )
 
 
 class KitchenForm(forms.ModelForm):
@@ -251,6 +254,18 @@ class AuctionWCForm(BaseAuctionRoomForm):
 
     class Meta:
         model = AuctionWC
+
+    def __init__(self, *args, **kwargs):
+        super(AuctionWCForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wc_floor'] = CSIMultipleChoiceField(label=_(u"Материал отделки пола в туалете"), required=False,
+            widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wc_wall'] = CSIMultipleChoiceField(label=_(u"Материал отделки стен в туалете"), required=False,
+            widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wc_ceiling'] = CSIMultipleChoiceField(label=_(u"Материал отделки потолка в туалете"), required=False,
+            widget=CSICheckboxSelectMultiple, choices=choices)
 
 
 class AuctionKitchenForm(BaseAuctionRoomForm):

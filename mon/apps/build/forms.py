@@ -31,6 +31,12 @@ class GroundForm(forms.ModelForm):
         self.fields['contract'] = forms.ModelChoiceField(queryset=Contract.objects.all(),
            label=_(u"Контракт"), help_text=_(u"Контракт"), required=True)
 
+        mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
+        if mo:
+            self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
+                required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
+            self.fields['mo'].widget.attrs['readonly'] = 'readonly'
+
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
@@ -45,6 +51,17 @@ class GroundForm(forms.ModelForm):
                    'state', 'approve_status')
 
 
+class GroundUpdateForm(GroundForm):
+
+    def __init__(self, *args, **kwargs):
+        super(GroundUpdateForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Ground
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state',
+                   'approve_status', 'flats_amount')
+
+
 class BuildingForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
@@ -53,6 +70,17 @@ class BuildingForm(GroundForm):
     class Meta:
         model = Building
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',
+        'approve_status', 'flats_amount')
+
+
+class BuildingUpdateForm(GroundForm):
+
+    def __init__(self, *args, **kwargs):
+        super(BuildingUpdateForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Building
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state',
         'approve_status', 'flats_amount')
 
 

@@ -34,12 +34,12 @@ from django.conf import settings
 from apps.build.models import Building, Ground, CopyBuilding
 from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
     GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, CopyBuildingForm, \
-    GroundMonitoringForm, BuildingSelectMonitoringForm
+    GroundMonitoringForm, BuildingSelectMonitoringForm, BuildingUpdateForm, GroundUpdateForm, \
+    CopyForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
 from apps.user.models import CustomUser
-from apps.build.forms import CopyForm
 from apps.cmp.models import Contract
 from apps.mo.models import MO
 
@@ -121,10 +121,13 @@ def add_building(request, dev_pk=None, state=None):
             context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
         if select and int(select) == 2:
-            form = GroundForm(prefix=prefix)
+            form = GroundForm(prefix=prefix, initial=initial_kw)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(prefix=prefix)
+            form = BuildingForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
         if not request.user.is_staff:
@@ -458,9 +461,9 @@ def update_building(request, pk, state=None, extra=None):
     prefix, room_p, hallway_p, wc_p, kitchen_p = 'build', 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     if request.method == "POST":
         if state and int(state) == 2:
-            form = GroundForm(request.POST, request.FILES, prefix=prefix, instance=build)
+            form = GroundUpdateForm(request.POST, request.FILES, prefix=prefix, instance=build)
         else:
-            form = BuildingForm(request.POST, request.FILES, prefix=prefix, instance=build)
+            form = BuildingUpdateForm(request.POST, request.FILES, prefix=prefix, instance=build)
         # check access rules. Add approve_status from object to form
         if not request.user.is_staff:
             form.fields.pop('approve_status')
@@ -489,9 +492,9 @@ def update_building(request, pk, state=None, extra=None):
             return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
     else:
         if state and int(state) == 2:
-            form = GroundForm(prefix=prefix, instance=build)
+            form = GroundUpdateForm(prefix=prefix, instance=build)
         else:
-            form = BuildingForm(prefix=prefix, instance=build)
+            form = BuildingUpdateForm(prefix=prefix, instance=build)
         # remove approve_status field from view if not admin
         if not request.user.is_staff:
             form.fields.pop('approve_status')
