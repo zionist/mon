@@ -72,8 +72,25 @@ def get_mos(request, pk=None):
     title = _(u'Муниципальные образования')
     template = 'mos.html'
     context = {'title': title}
+    agreement_kwargs = {}
+    if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
+        from_dt = request.user.customuser.get_user_date()
+        to_dt = datetime(from_dt.year + 1, 01, 01)
+        agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
     if MO.objects.all().exists():
         objects = MO.objects.all().order_by('name')
+        for obj in objects:
+            query = obj.departamentagreement_set.filter(**agreement_kwargs)
+            agreement = query.filter(agreement_type=0)[0] if query.filter(agreement_type=0).exists() else None
+            reg_subvention_performance = agreement.subvention.reg_budget.subvention_performance if agreement and agreement.subvention.reg_budget else 0
+            fed_subvention_performance = agreement.subvention.fed_budget.subvention_performance if agreement and agreement.subvention.fed_budget else 0
+            sum_flats_amount = reg_subvention_performance + fed_subvention_performance
+            setattr(obj, "home_orphans", sum_flats_amount)
+            amount_sum = 0
+            for arg in query.filter(agreement_type=0):
+                if arg.subvention.amount:
+                    amount_sum += arg.subvention.amount
+            setattr(obj, "common_amount", amount_sum)
         if pk:
             mo_object = MO.objects.get(pk=pk)
             context.update({'object': mo_object})
