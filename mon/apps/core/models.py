@@ -131,7 +131,7 @@ class BaseBuilding(models.Model):
     start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
     finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
 
-    approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
+    approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
     state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
     address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
@@ -187,7 +187,7 @@ class BasePayment(models.Model):
     class Meta:
         abstract = True
 
-    approve_status = models.IntegerField(default=0, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки платежа"), help_text=_(u"Статус проверки платежа"))
+    approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки платежа"), help_text=_(u"Статус проверки платежа"))
     num = models.CharField(max_length=2048, help_text=_(u"Номер документа, подтверждающего платеж"), verbose_name=_(u"Номер документа, подтверждающего платеж"),)
     date = models.DateField(db_index=True, help_text=_(u"Дата совершения платежа"), verbose_name=_(u"Дата совершения платежа"),)
     amount = models.FloatField(null=True, blank=True, help_text=_(u"Сумма платежа (руб.)"), verbose_name=_(u"Сумма платежа (руб.)"),)

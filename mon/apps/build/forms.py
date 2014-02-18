@@ -41,7 +41,8 @@ class GroundForm(autocomplete_light.ModelForm):
 
     class Meta:
         model = Ground
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer',
+                   'state', 'approve_status')
 
 
 class BuildingForm(GroundForm):
@@ -51,7 +52,8 @@ class BuildingForm(GroundForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',
+        'approve_status')
 
 
 class CopyBuildingForm(BuildingForm):

@@ -168,6 +168,9 @@ def add_monitoring(request, dev_pk=None, state=None):
             form.fields.pop('mo')
         if form.is_valid():
             building = form.save(commit=False)
+            # set deafult approve status - required check
+            if not request.user.is_staff:
+                building.approve_status = 0
             if not request.user.is_staff:
                 building.mo = request.user.customuser.mo
             building.state = state_int
