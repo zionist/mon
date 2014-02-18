@@ -43,6 +43,7 @@
                         {% trans 'Платежи' %}</a>
             </div>
         </div><br />
+        {% if user.is_staff %}
             {% if agreement %}
                 <div class="row">
                     <div class="span5"><a class="btn btn-info" href="{% url 'update-mo' object.id %}">
@@ -58,6 +59,7 @@
                         {% trans 'Удалить' %}</a></div>
                 </div><br />
             {% endif %}
+        {% endif %}
             <p class="blue"><b>{% trans 'Общие параметры' %}</b></p>
             {% include "view_table.html" %}
             {% if agreement %}
