@@ -18,7 +18,7 @@ from apps.mo.models import MO
 
 
 
-class GroundForm(autocomplete_light.ModelForm):
+class GroundForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(GroundForm, self).__init__(*args, **kwargs)

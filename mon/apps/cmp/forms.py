@@ -33,7 +33,7 @@ class CompareDataForm(forms.ModelForm):
         self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, )
 
 
-class ContractForm(autocomplete_light.ModelForm):
+class ContractForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContractForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -61,7 +61,7 @@ class ContractForm(autocomplete_light.ModelForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
 
 
-class ResultForm(autocomplete_light.ModelForm):
+class ResultForm(forms.ModelForm):
 
     class Meta:
         model = Result
@@ -209,7 +209,7 @@ class CompareDataShowForm(forms.ModelForm):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'
 
 
-class ResultShowForm(autocomplete_light.ModelForm):
+class ResultShowForm(forms.ModelForm):
 
     class Meta:
         model = Result
