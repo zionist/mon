@@ -3,7 +3,7 @@
 
 {% block content %}
     <h4>{{title}}</h4>
-    {% if user.is_staff %}
+    {% if user.is_superuser %}
         <a class="btn btn-small" href="{% url 'create-mo' %}">
             {% trans 'Добавить муниципальное образование' %}</a><br><br>
     {% endif %}

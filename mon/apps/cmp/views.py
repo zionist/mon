@@ -55,7 +55,10 @@ def add_auction(request):
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         image_form = AuctionDocumentsForm(prefix=images_prefix)
-        form = AuctionForm(prefix=prefix)
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
+        form = AuctionForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
         # move text_area fields to another form
         context.update({'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
@@ -247,7 +250,10 @@ def add_contract(request):
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix)
-        form = ContractForm(prefix=prefix)
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
+        form = ContractForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
@@ -574,7 +580,10 @@ def add_result(request):
             context.update({'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
-        form = ResultForm(prefix=prefix)
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
+        form = ResultForm(prefix=prefix, initial=initial_kw)
         cmp_form = CompareDataForm(prefix=cmp_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)

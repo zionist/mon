@@ -15,6 +15,7 @@ from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES,
     HEATING_CHOICES, ELECTRIC_SUPPLY_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple, cmp_single, cmp_multi
 from apps.core.models import Choices
+from apps.mo.models import MO
 
 
 class CompareDataForm(forms.ModelForm):
@@ -43,6 +44,11 @@ class ContractForm(forms.ModelForm):
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
 
+        mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
+        if mo:
+            self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
+                required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
+            self.fields['mo'].widget.attrs['readonly'] = 'readonly'
 
     electric_supply = forms.ChoiceField(label=_(u"Электроснабжение"), required=False,
         widget=forms.Select, choices=ELECTRIC_SUPPLY_CHOICES)
@@ -62,13 +68,21 @@ class ContractForm(forms.ModelForm):
 
 
 class ResultForm(forms.ModelForm):
+    recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), required=False,
+        widget=forms.Textarea(attrs={'rows': 4 }))
 
     class Meta:
         model = Result
         exclude = ('cmp_data', )
 
-    recommend = forms.CharField(help_text=_(u"Рекомендации"), label=_(u'Рекомендации'), required=False,
-                                widget=forms.Textarea(attrs={'rows': 4 }))
+    def __init__(self, *args, **kwargs):
+        super(ResultForm, self).__init__(*args, **kwargs)
+        mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
+        if mo:
+            self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
+                required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
+            self.fields['mo'].widget.attrs['readonly'] = 'readonly'
+
 
 
 class AuctionDocumentsForm(forms.ModelForm):
@@ -95,6 +109,12 @@ class AuctionForm(forms.ModelForm):
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
                                                   widget=CSICheckboxSelectMultiple, choices=choices)
+
+        mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
+        if mo:
+            self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
+                required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
+            self.fields['mo'].widget.attrs['readonly'] = 'readonly'
 
     electric_supply = CSIMultipleChoiceField(label=_(u"Электроснабжение"), required=False,
                                            widget=CSICheckboxSelectMultiple, choices=ELECTRIC_SUPPLY_CHOICES)

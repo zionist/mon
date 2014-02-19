@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 
 from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
@@ -29,6 +29,7 @@ from apps.core.models import CREATION_FORM_CHOICES
 from apps.payment.models import Payment
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def add_mo(request):
     template = 'mo_creation.html'
     context = {'title': _(u'Добавление муниципального образования')}
@@ -140,6 +141,7 @@ def mos_select(request, pk=None, ):
     return render(request, template, context, context_instance=RequestContext(request))
 
 
+@login_required
 def select_mo(request, pk=None):
     if not request.user.is_staff:
         return HttpResponseForbidden('Forbidden')
@@ -175,7 +177,7 @@ def get_mo(request, pk, extra=None):
     return render(request, 'mo.html', context, context_instance=RequestContext(request))
 
 
-@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def update_mo(request, pk, extra=None):
     context = {'title': _(u'Параметры муниципального образования')}
     mo = MO.objects.get(pk=pk)
@@ -235,7 +237,7 @@ def update_mo(request, pk, extra=None):
     return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
 
 
-@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def pre_delete_mo(request, pk):
     context = {'title': _(u'Удаление муниципального образования')}
     mo = MO.objects.get(pk=pk)
@@ -243,7 +245,7 @@ def pre_delete_mo(request, pk):
     return render_to_response("mo_deleting.html", context, context_instance=RequestContext(request))
 
 
-@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def delete_mo(request, pk):
     context = {'title': _(u'Удаление муниципального образования')}
     mo = MO.objects.get(pk=pk)
@@ -381,6 +383,7 @@ def update_agreement(request, pk, extra=None, state=None):
     return render(request, 'mo_updating.html', context, context_instance=RequestContext(request))
 
 
+@login_required
 def update_dop_agreement(request, pk, state):
     agreement_type = int(state)
     title = _(u'Редактирование дополнительного соглашения с министерством') if agreement_type == 1\
