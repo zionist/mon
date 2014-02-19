@@ -79,10 +79,10 @@ class Contract(BaseContract, BaseCompareData):
         return '%s' % self.num
 
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), verbose_name=_(u"Застройщик"), null=True, blank=True, )
-    summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
-    summ_mo_money = models.IntegerField(help_text=_(u"Сумма муниципальных средств, включенных в сумму контракта"), null=True, 
+    summa = models.FloatField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
+    summ_mo_money = models.FloatField(help_text=_(u"Сумма муниципальных средств, включенных в сумму контракта"), null=True,
         verbose_name=_(u"Сумма муниципальных средств, включенных в сумму контракта"), blank=True, )
-    summ_without_mo_money = models.IntegerField(help_text=_(u"Сумма заключенного контракта, без учета средств МО"), null=True, 
+    summ_without_mo_money = models.FloatField(help_text=_(u"Сумма заключенного контракта, без учета средств МО"), null=True,
         verbose_name=_(u"Сумма заключенного контракта, без учета средств МО"), blank=True, )
     date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
     period_of_payment = models.DateField(help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
@@ -91,16 +91,15 @@ class Contract(BaseContract, BaseCompareData):
         blank=True, null=True, choices=CREATION_FORM_CHOICES)
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
-    budget = models.IntegerField(help_text=u"Бюджет", verbose_name=u"Бюджет",
-                              null=True, blank=False, max_length=1024, choices=BUDGET_CHOICES)
+    budget = models.SmallIntegerField(help_text=u"Бюджет", verbose_name=u"Бюджет", null=True, blank=False, choices=BUDGET_CHOICES)
 
 
 class CopyContract(BaseContract, BaseCompareData):
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик"), verbose_name=_(u"Застройщик"), null=True, blank=True, )
-    summa = models.IntegerField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
-    summ_mo_money = models.IntegerField(help_text=_(u"Сумма муниципальных средств, включенных в сумму контракта"), null=True,
+    summa = models.FloatField(help_text=_(u"Сумма заключенного контракта"), null=True, verbose_name=_(u"Сумма заключенного контракта"), blank=True, )
+    summ_mo_money = models.FloatField(help_text=_(u"Сумма муниципальных средств, включенных в сумму контракта"), null=True,
                                         verbose_name=_(u"Сумма муниципальных средств, включенных в сумму контракта"), blank=True, )
-    summ_without_mo_money = models.IntegerField(help_text=_(u"Сумма заключенного контракта, без учета средств МО"), null=True,
+    summ_without_mo_money = models.FloatField(help_text=_(u"Сумма заключенного контракта, без учета средств МО"), null=True,
                                                 verbose_name=_(u"Сумма заключенного контракта, без учета средств МО"), blank=True, )
     date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
     period_of_payment = models.DateField(help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
@@ -109,8 +108,7 @@ class CopyContract(BaseContract, BaseCompareData):
                                              blank=True, null=True, choices=CREATION_FORM_CHOICES)
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     # docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
-    budget = models.IntegerField(help_text=u"Бюджет", verbose_name=u"Бюджет",
-                                 null=True, blank=False, max_length=1024, choices=BUDGET_CHOICES)
+    budget = models.SmallIntegerField(help_text=u"Бюджет", verbose_name=u"Бюджет", null=True, blank=False, choices=BUDGET_CHOICES)
 
     class Meta:
         app_label = "build"
