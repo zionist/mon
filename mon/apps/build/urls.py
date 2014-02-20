@@ -38,8 +38,14 @@ urlpatterns = patterns(
     url(r'^building/developer/(?P<state>[0-9]?)/$', views.manage_developer, name='manage-developer'),
     url(r'^building/developer/delete/(?P<pk>[0-9]*)/$', views.delete_developer, name='delete-developer'),
     url(r'^building/developer/add/(?P<state>[0-9]?)/$', views.manage_developer, name='add-building-developer'),
+
     url(r'^monitoring/developer/add/(?P<state>[0-9]?)/$',
         views.manage_monitoring_developer, name='add-monitoring-developer'),
+    url(r'^monitoring/developer/(?P<state>[0-9]?)/$', views.manage_developer, name='manage-monitoring-developer'),
+    url(r'^monitoring/developer/$', views.manage_developer, name='manage-monitoring-developer'),
+
+
     url(r'^monitoring/developer/(?P<pk>[0-9]*)/(?P<state>[0-9]?)/$', views.manage_monitoring_developer, name='manage-monitoring-developer'),
+
     url(r'^building/developers/$', views.get_developers, name='developers'),
 )
