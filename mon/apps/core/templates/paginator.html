@@ -1,0 +1,16 @@
+{% load i18n %}
+<div class="pagination">
+    <ul class="pagination">
+        {% if objects_list.has_previous %}
+            <li><a href="./?page={{ objects_list.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><a>&laquo;</a></li>
+        {% endif %}
+        <li class="active"><a href="#">{{ objects_list.number }} {% trans 'из' %} {{ objects_list.paginator.num_pages }}</a></li>
+        {% if objects_list.has_next %}
+            <li><a href="./?page={{ objects_list.next_page_number }}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a>&raquo;</a></li>
+        {% endif %}
+    </ul>
+</div>
