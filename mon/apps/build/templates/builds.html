@@ -1,5 +1,6 @@
 {% extends "base_site.html" %}
 {% load i18n staticfiles %}
+{% load extras %}
 
 {% block content %}
     <h4>{{title}}</h4>
@@ -19,24 +20,25 @@
                     <th> {% trans 'Муниципальное образование' %}</th> <th>{% trans 'Застройщик' %}</th>
                     <th>{% trans 'Количество жилых помещений' %}</th> <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr>
                     {% for state in objects_list %}
-                            {% if state.grouper == 0 %}
-                                <tr><th colspan="6"> <strong>{% trans 'Сданные объекты' %}</strong></th></tr>
-                            {% elif state.grouper == 1 %}
-                                <tr><th colspan="6"> <strong>{% trans 'Строящиеся объекты' %}</strong></th></tr>
-                            {% elif state.grouper == 2 %}
-                                <tr><th colspan="6"> <strong>{% trans 'Участки под строительство' %}</strong></th></tr>
-                            {% endif %}
-                            {% for item in state.list %}
-                              <tr onclick="location.href = '{% url 'change-building' item.id item.state %}'">
-                                    <td> <a href="{% url 'change-building' item.id item.state %}"> {{ item.address|truncatechars:50 }} </a> </td>
-                                  <td> {# item.cad_num #} </td><td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
-                                  <td> {{ item.flats_amount }} </td><td> {{ item.complete_date }} </td>
-                              </tr>
-                            {% endfor %}
+                        {% if state.grouper == 0 %}
+                            <tr><th colspan="6"> <strong>{% trans 'Сданные объекты' %}</strong></th></tr>
+                        {% elif state.grouper == 1 %}
+                            <tr><th colspan="6"> <strong>{% trans 'Строящиеся объекты' %}</strong></th></tr>
+                        {% elif state.grouper == 2 %}
+                            <tr><th colspan="6"> <strong>{% trans 'Участки под строительство' %}</strong></th></tr>
+                        {% endif %}
+                        {% for item in state.list %}
+                          <tr onclick="location.href = '{% url 'change-building' item.id item.state %}'">
+                                <td> <a href="{% url 'change-building' item.id item.state %}"> {{ item.address|truncatechars:50 }} </a> </td>
+                              <td> {# item.cad_num #} </td><td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
+                              <td> {{ item.flats_amount }} </td><td> {{ item.complete_date }} </td>
+                          </tr>
+                        {% endfor %}
                     {% endfor %}
-                {% for obj in building_list %}
-                {% endfor %}
             </table>
+            {% with objects_list=building_list %}
+                {% include "paginator.html" %}
+            {% endwith %}
         {% endif %}
     {% endif %}
 {% endblock %}

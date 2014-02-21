@@ -136,6 +136,9 @@
                 {% endfor %}
             </table>
             </div>
+            {% with objects_list=payment_list %}
+                {% include "paginator.html" %}
+            {% endwith %}
         {% else %}
             {% if not accountings %}
                 {% trans 'Выбран ' %} {{user.customuser.get_user_date|date:"Y"}} {% trans ' год. ' %}

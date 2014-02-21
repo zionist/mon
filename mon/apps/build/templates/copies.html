@@ -36,6 +36,9 @@
                 {% for obj in building_list %}
                 {% endfor %}
             </table>
+        {% with objects_list=building_list %}
+            {% include "paginator.html" %}
+        {% endwith %}
         {% endif %}
     {% endif %}
 {% endblock %}

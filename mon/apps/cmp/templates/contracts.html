@@ -31,6 +31,9 @@
                 {% endfor %}
             </table>
             </div>
+        {% with objects_list=contract_list %}
+            {% include "paginator.html" %}
+        {% endwith %}
         {% endif %}
     {% endif %}
 {% endblock %}

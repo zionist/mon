@@ -17,20 +17,22 @@
                 <tr><th> {% trans 'Наименование' %}</th><th> {% trans 'Контактный телефон' %}</th>
                     <th> {% trans 'Физическое / Юридическое лицо' %}</th> <th> {% trans 'Фактический адрес' %}</th><th> {% trans 'Удаление' %} </th></tr>
                 {% for obj in developer_list %}
-                        <tr>
-                            <td><a href="{% url 'manage-developer' obj.id state %}">{{obj.name}}</a></td>
-                            <td>{{ obj.phone }}</td>
-                            {% if obj.face_list == 0 %}
+                    <tr>
+                        <td><a href="{% url 'manage-developer' obj.id state %}">{{obj.name}}</a></td>
+                        <td>{{ obj.phone }}</td>
+                        {% if obj.face_list == 0 %}
                             <td> Юридическое лицо</td>
-                            {% endif %}
-                            {% if obj.face_list == 1 %}
+                        {% elif obj.face_list == 1 %}
                             <td> Физическое лицо</td>
-                            {% endif %}
-                            <td>{{ obj.address }}</td>
-                            <td> <a class="btn btn-danger btn-small" href="{% url 'delete-developer' obj.id %}">{% trans "Удалить" %}</a> </td>
-                        </tr>
+                        {% endif %}
+                        <td>{{ obj.address }}</td>
+                        <td> <a class="btn btn-danger btn-small" href="{% url 'delete-developer' obj.id %}">{% trans "Удалить" %}</a> </td>
+                    </tr>
                 {% endfor %}
             </table>
+            {% with objects_list=developer_list %}
+                {% include "paginator.html" %}
+            {% endwith %}
         {% endif %}
     {% endif %}
 {% endblock %}

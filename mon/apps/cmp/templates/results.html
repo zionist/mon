@@ -42,6 +42,9 @@
                 {% endfor %}
             </table>
             </div>
+            {% with objects_list=result_list %}
+                {% include "paginator.html" %}
+            {% endwith %}
         {% endif %}
     {% endif %}
 {% endblock %}

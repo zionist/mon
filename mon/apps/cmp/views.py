@@ -375,7 +375,7 @@ def add_contract_from_auction(request, pk):
 def get_contracts(request, mo=None, all=False, template='contracts.html',
                   copies=False):
     kwargs = {}
-
+    context = {'title': _(u'Контракты')}
     mo_obj = None
     if mo:
         mo_obj = MO.objects.get(pk=mo)
@@ -405,14 +405,14 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
     else:
         if Contract.objects.filter(**kwargs).exists():
             objects = Contract.objects.filter(**kwargs)
-            page = request.GET.get('page', '1')
-            paginator = Paginator(objects, 50)
-            try:
-                objects = paginator.page(page)
-            except PageNotAnInteger:
-                objects = paginator.page(1)
-            except EmptyPage:
-                objects = paginator.page(paginator.num_pages)
+    page = request.GET.get('page', '1')
+    paginator = Paginator(objects, 50)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
     context.update({'contract_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
 
