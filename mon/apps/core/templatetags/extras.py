@@ -26,15 +26,15 @@ def get_choice_or_value(form, field_name):
                 # get multichoice from form
                 if isinstance(form.fields[field_name].widget, CSICheckboxSelectMultiple):
                     choices = dict(form.fields[field_name].choices)
+                    print('    choices', choices, form.initial[field_name].split(","))
                     val = ""
                     for v in form.initial[field_name].split(","):
                         # skip "Not set"
                         try:
-                            if int(v) == 0:
-                                continue
+                            choice = choices.get(int(v))
                         except ValueError:
                             return None
-                        val += " %s " % choices.get(int(v))
+                        val += " %s " % choice
                     return val
                 elif isinstance(form.fields[field_name].widget, SelectMultiple):
                     choices = list(form.fields[field_name].choices)

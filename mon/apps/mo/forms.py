@@ -82,6 +82,9 @@ class PeopleAmountForm(forms.ModelForm):
 
 
 class MOShowForm(forms.ModelForm):
+    creation_form = CSIMultipleChoiceField(label=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
+        required=False, widget=CSICheckboxSelectMultiple, choices=CREATION_FORM_CHOICES)
+
     class Meta:
         model = MO
         fields = ('name', 'creation_form',)

@@ -158,7 +158,7 @@ class AuctionShowForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'open_date', 'public_date', 'stage', 'proposal_count',
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'open_date', 'date', 'stage', 'proposal_count',
                    'contract', 'name', 'num',  'docs', 'has_trouble_docs', 'start_price')
 
     def __init__(self, *args, **kwargs):
