@@ -69,10 +69,10 @@ def get_payments(request, mo=None, all=False):
                 agreements = mo.departamentagreement_set.all()
                 objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
             if agreements:
-                amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-                spent = sum([int(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+                amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+                spent = sum([float(contract.summa) for contract in mo.contract_set.all() if contract.summa])
                 percent = round(((float(spent)/amount) * 100), 3)
-                economy = sum([int(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+                economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
                 accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
                               'sub_amount': amount, 'economy': economy}
                 context.update({'accounting': accounting})
@@ -139,15 +139,15 @@ def get_accounting(request, select=None):
         agreements = mo.departamentagreement_set.filter(**agr_kwargs)
         contracts = mo.contract_set.filter(**c_kwargs)
         if agreements:
-            amount = sum([int(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+            amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
             accounting.update({'sub_amount': amount})
             if contracts:
-                spent = sum([int(contract.summa) for contract in contracts if contract.summa])
+                spent = sum([float(contract.summa) for contract in contracts if contract.summa])
                 percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
-                economy = sum([int(auction.start_price) for auction in mo.auction_set.filter(**kwargs) if auction.start_price]) - spent
+                economy = sum([float(auction.start_price) for auction in mo.auction_set.filter(**kwargs) if auction.start_price]) - spent
                 kwargs.update({'contract__in': [contract.id for contract in contracts if contract]})
                 payments = Payment.objects.filter(**kwargs)
-                payment = sum([int(payment.amount) for payment in payments])
+                payment = sum([float(payment.amount) for payment in payments])
                 all_payments = all_payments + list(payments)
                 accounting.update({'payment': payment, 'spent': spent, 'saved': amount - spent,
                                    'percent': percent, 'economy': economy})

@@ -151,10 +151,16 @@ class PersonForm(forms.ModelForm):
 
 
 class AuctionShowForm(forms.ModelForm):
+    electric_supply = CSIMultipleChoiceField(label=_(u"Электроснабжение"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=ELECTRIC_SUPPLY_CHOICES)
+    water_removal = CSIMultipleChoiceField(label=_(u"Водоотведение"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=WATER_REMOVAL_CHOICES)
     water_settlement = CSIMultipleChoiceField(label=_(u"Водоподведение"), required=False,
-                                              widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
+        widget=CSICheckboxSelectMultiple, choices=WATER_SETTLEMENT_CHOICES)
     hot_water_supply = CSIMultipleChoiceField(label=_(u"Горячее водоснабжение"), required=False,
-                                              widget=CSICheckboxSelectMultiple, choices=HOT_WATER_SUPPLY_CHOICES)
+        widget=CSICheckboxSelectMultiple, choices=HOT_WATER_SUPPLY_CHOICES)
+    heating = CSIMultipleChoiceField(label=_(u"Отопление"), required=False,
+        widget=CSICheckboxSelectMultiple, choices=HEATING_CHOICES)
 
     class Meta:
         model = Auction
@@ -166,13 +172,13 @@ class AuctionShowForm(forms.ModelForm):
         super(AuctionShowForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['internal_doors'] = CSIMultipleChoiceField(label=_(u"Материал межкомнатных дверей"), required=False,
-                                                               widget=CSICheckboxSelectMultiple, choices=choices)
+            widget=CSICheckboxSelectMultiple, choices=choices)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['entrance_door'] = CSIMultipleChoiceField(label=_(u"Материал входной двери"), required=False,
-                                                              widget=CSICheckboxSelectMultiple, choices=choices)
+            widget=CSICheckboxSelectMultiple, choices=choices)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = CSIMultipleChoiceField(label=_(u"Материал оконных конструкций"), required=False,
-                                                                     widget=CSICheckboxSelectMultiple, choices=choices)
+            widget=CSICheckboxSelectMultiple, choices=choices)
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):

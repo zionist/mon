@@ -82,11 +82,8 @@ def get_mos(request, pk=None):
         objects = MO.objects.all().order_by('name')
         for obj in objects:
             query = obj.departamentagreement_set.filter(**agreement_kwargs)
-            agreement = query.filter(agreement_type=0)[0] if query.filter(agreement_type=0).exists() else None
-            reg_subvention_performance = agreement.subvention.reg_budget.subvention_performance if agreement and agreement.subvention.reg_budget else 0
-            fed_subvention_performance = agreement.subvention.fed_budget.subvention_performance if agreement and agreement.subvention.fed_budget else 0
-            sum_flats_amount = reg_subvention_performance + fed_subvention_performance
-            setattr(obj, "home_orphans", sum_flats_amount)
+            sum_flats_amount = sum([int(contract.flats_amount) for contract in obj.contract_set.all() if contract.flats_amount])
+            setattr(obj, "flats_amount", sum_flats_amount)
             amount_sum = 0
             for arg in query.filter(agreement_type=0):
                 if arg.subvention.amount:

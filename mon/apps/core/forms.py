@@ -28,7 +28,11 @@ def cmp_multi(obj, cmp_obj):
     for field in obj.fields:
         if hasattr(obj.fields[field], 'widget') and not hasattr(obj.fields[field].widget.attrs, 'hidden'):
             if isinstance(obj.fields[field].widget, CSICheckboxSelectMultiple):
-                if getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
+                if getattr(obj.instance, field) and not getattr(cmp_obj, field):
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+                elif not getattr(obj.instance, field) and getattr(cmp_obj, field):
+                    obj.fields[field].widget.attrs['style'] = 'background-color: red;'
+                elif getattr(cmp_obj, field) and str(getattr(cmp_obj, field)) not in getattr(obj.instance, field):
                     obj.fields[field].widget.attrs['style'] = 'background-color: red;'
 
             elif hasattr(obj.instance, field) and hasattr(cmp_obj, field)\
@@ -336,6 +340,16 @@ class AuctionWCShowForm(BaseAuctionRoomShowForm):
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(AuctionWCShowForm, self).__init__(*args, **kwargs)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="FLOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wc_floor'] = CSIMultipleChoiceField(label=_(u"Материал отделки пола в туалете"), required=False,
+            widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WALL_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wc_wall'] = CSIMultipleChoiceField(label=_(u"Материал отделки стен в туалете"), required=False,
+            widget=CSICheckboxSelectMultiple, choices=choices)
+        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="CEILING_CHOICES").choice_set.order_by("num").values('num', 'value')]
+        self.fields['wc_ceiling'] = CSIMultipleChoiceField(label=_(u"Материал отделки потолка в туалете"), required=False,
+            widget=CSICheckboxSelectMultiple, choices=choices)
+
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
                 self.fields[field].widget.attrs['disabled'] = 'disabled'

@@ -331,6 +331,7 @@ def get_buildings(request, mo=None, all=False, template=None,
                   title=None, null_contract=False, copies=False):
     template = 'builds.html' if not template else template
     title = title if title else u' рынка жилья'
+    context = {'title': _(u'Объекты %s' % (title))}
     objects, build_objects, ground_objects = [], [], []
     kwargs = {}
     kwargs.update({'contract__isnull': null_contract})

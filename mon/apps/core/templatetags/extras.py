@@ -26,7 +26,6 @@ def get_choice_or_value(form, field_name):
                 # get multichoice from form
                 if isinstance(form.fields[field_name].widget, CSICheckboxSelectMultiple):
                     choices = dict(form.fields[field_name].choices)
-                    print('    choices', choices, form.initial[field_name].split(","))
                     val = ""
                     for v in form.initial[field_name].split(","):
                         # skip "Not set"
@@ -34,7 +33,7 @@ def get_choice_or_value(form, field_name):
                             choice = choices.get(int(v))
                         except ValueError:
                             return None
-                        val += " %s " % choice
+                        val += " %s; " % choice
                     return val
                 elif isinstance(form.fields[field_name].widget, SelectMultiple):
                     choices = list(form.fields[field_name].choices)
@@ -103,7 +102,7 @@ def get_field_for_cmp(form, field_name):
                             continue
                     except ValueError:
                         return None
-                    val += " %s " % choices.get(int(v))
+                    val += " %s; " % choices.get(int(v))
                 # set error style for text
                 field = form.fields[field_name]
                 if field.widget.attrs.get("style"):
