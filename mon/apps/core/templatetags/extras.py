@@ -61,9 +61,9 @@ def yes_no_rus(value):
                 return re.sub("True", u"Да", value)
             if "False" in m.group(1):
                 return re.sub("False", u"Нет", value)
-    if value == True:
+    if isinstance(value, bool) and value == True :
         return u"Да"
-    elif value == False:
+    elif isinstance(value, bool) and value == False:
         return u"Нет"
     else:
         return value

@@ -354,12 +354,12 @@ def get_buildings(request, mo=None, all=False, template=None,
 
     if copies:
         if CopyBuilding.objects.filter(**kwargs).exists():
-            build_objects = CopyBuilding.objects.filter(**kwargs).order_by('state')
+            build_objects = CopyBuilding.objects.filter(**kwargs).order_by('address')
     else:
         if Building.objects.filter(**kwargs).exists():
-            build_objects = Building.objects.filter(**kwargs).order_by('state')
+            build_objects = Building.objects.filter(**kwargs).order_by('address')
         if Ground.objects.filter(**kwargs).exists():
-            ground_objects = Ground.objects.filter(**kwargs).order_by('state')
+            ground_objects = Ground.objects.filter(**kwargs).order_by('address')
 
     objects = [x for x in build_objects] + [x for x in ground_objects]
     page = request.GET.get('page', '1')
