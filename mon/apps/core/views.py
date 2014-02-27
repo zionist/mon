@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from copy import deepcopy
 
 from django.http import HttpResponse
 from django.views.generic import ListView
@@ -157,3 +158,10 @@ def download_file(request, name):
     response = HttpResponse(wrapper, content_type='text/plain')
     response['Content-Length'] = os.path.getsize(name)
     return response
+
+
+def copy_object(obj):
+    new_obj = deepcopy(obj)
+    new_obj.id = None
+    new_obj.pk = None
+    return new_obj

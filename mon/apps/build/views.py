@@ -595,11 +595,6 @@ def update_monitoring(request, pk, state=None, extra=None):
 @login_required()
 def copy_building(request, pk):
 
-    def _copy_object(obj):
-        new_obj = deepcopy(obj)
-        new_obj.id = None
-        new_obj.pk = None
-        return new_obj
     form = CopyForm(request.POST)
     if form.is_valid():
         amount = form.cleaned_data["amount"]
@@ -630,16 +625,16 @@ def copy_building(request, pk):
         copy.developer = building.developer
 
         # create new fk related objects
-        copy.room = _copy_object(building.room)
+        copy.room = copy_object(building.room)
         copy.room.save()
         copy.room_id = copy.room.id
-        copy.hallway = _copy_object(building.hallway)
+        copy.hallway = copy_object(building.hallway)
         copy.hallway.save()
         copy.hallway_id = copy.hallway.id
-        copy.wc = _copy_object(building.wc)
+        copy.wc = copy_object(building.wc)
         copy.wc.save()
         copy.wc_id = copy.wc.id
-        copy.kitchen = _copy_object(building.kitchen)
+        copy.kitchen = copy_object(building.kitchen)
         copy.kitchen.save()
         copy.kitchen_id = copy.kitchen.id
         copy.save()

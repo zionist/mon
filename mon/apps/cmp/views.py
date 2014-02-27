@@ -20,11 +20,11 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
-from .models import Result, AuctionDocuments, Auction, Person, CompareData
+from .models import Result, AuctionDocuments, Auction, Person, CompareData, CopyAuction
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
-from apps.core.views import split_form, set_fields_equal
+from apps.core.views import split_form, set_fields_equal, copy_object
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
 from apps.build.models import Contract, ContractDocuments, CopyContract
 from apps.build.forms import BuildingShowForm, GroundShowForm, CopyForm
@@ -71,6 +71,85 @@ def add_auction(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+@login_required
+def update_auction_copy(request, pk):
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        copy = CopyAuction.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    template = 'auction_creation.html'
+    context = {'title': _(u'Добавление аукциона')}
+    prefix, images_prefix = 'auction', 'auction_images'
+    image_form = AuctionDocumentsForm(prefix=images_prefix, instance=copy)
+    initial_kw = {}
+    if hasattr(request.user, 'customuser'):
+        initial_kw.update({'mo': request.user.customuser.mo})
+    form = AuctionForm(prefix=prefix, initial=initial_kw)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True, parent=copy)
+    # move text_area fields to another form
+    context.update({'form': form, 'images': image_form, 'prefix': prefix,
+                    'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                    'titles': [
+                        BaseRoom._meta.verbose_name,
+                        BaseHallway._meta.verbose_name,
+                        BaseWC._meta.verbose_name,
+                        BaseKitchen._meta.verbose_name,
+                        ]})
+    return render_to_response(template, context,
+                              context_instance=RequestContext(request))
+
+@login_required()
+def copy_auction(request, pk):
+
+    form = CopyForm(request.POST)
+    if form.is_valid():
+        amount = form.cleaned_data["amount"]
+    if amount <= 0:
+        return HttpResponse(u"Пожалуйста введите положительное целое число")
+
+    try:
+        auction = Auction.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound('Not found')
+
+    auction_dict = forms.model_to_dict(auction)
+
+    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id', 'developer',
+              'docs']:
+        auction_dict.pop(n)
+
+    for copy in xrange(amount):
+        # fks
+        copy = CopyAuction(**auction_dict)
+        copy.mo = auction.mo
+        copy.contract = auction.contract
+
+        # create new fk related objects
+        copy.room = copy_object(auction.room)
+        copy.room.save()
+        copy.room_id = copy.room.id
+        copy.hallway = copy_object(auction.hallway)
+        copy.hallway.save()
+        copy.hallway_id = copy.hallway.id
+        copy.wc = copy_object(auction.wc)
+        copy.wc.save()
+        copy.wc_id = copy.wc.id
+        copy.kitchen = copy_object(auction.kitchen)
+        copy.kitchen.save()
+        copy.kitchen_id = copy.kitchen.id
+        copy.save()
+    return get_contract_copies(request)
+
+
+@login_required
+def get_auction_copies(request, mo=None, all=False):
+    template = 'auction_copies.html'
+    return get_mo_auctions(request, mo, all=all, copies=True,
+                           template=template)
+
+
 def count_flats(obj_set, vals, **kwargs):
     amount = 0
     val = ', '.join(vals) if len(vals) > 1 else vals[0]
@@ -114,35 +193,45 @@ def get_auctions(request, pk=None):
 
 
 @login_required
-def get_mo_auctions(request, pk=None):
+def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auctions.html'):
     context = {'title': _(u'Аукционы')}
-    template = 'mo_auctions.html'
-    if Auction.objects.all().exists():
-        kwargs = {}
-        mo_obj = None
-        if pk:
-            mo_obj = MO.objects.get(pk=pk)
-            context = {'title': _(u'Аукционы %s' % mo_obj.name)}
-        elif hasattr(request.user, 'customuser'):
-            mo_obj = request.user.customuser.mo
-            context = {'title': _(u'Аукционы %s' % mo_obj.name)}
-            from_dt = request.user.customuser.get_user_date()
-            if from_dt:
-                kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
+    kwargs = {}
+    mo_obj = None
+    if pk:
+        mo_obj = MO.objects.get(pk=pk)
+        context = {'title': _(u'Аукционы %s' % mo_obj.name)}
+    elif hasattr(request.user, 'customuser'):
+        mo_obj = request.user.customuser.mo
+        context = {'title': _(u'Аукционы %s' % mo_obj.name)}
+        from_dt = request.user.customuser.get_user_date()
+        if from_dt:
+            kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
+    if all:
+        if copies:
+            context = {'title': _(u'Все копии аукционов')}
         else:
             context = {'title': _(u'Все аукционы')}
+    elif mo_obj:
+        if copies:
+            context = {'title': _(u'Копии аукционов %s' % (mo_obj))}
+        else:
+            context = {'title': _(u'Аукционы %s' % (mo_obj))}
         context.update({'object': mo_obj})
         kwargs.update({'mo': mo_obj})
+    objects = None
+    if copies:
+        objects = CopyAuction.objects.filter(**kwargs).order_by('stage')
+    else:
         objects = Auction.objects.filter(**kwargs).order_by('stage')
-        page = request.GET.get('page', '1')
-        paginator = Paginator(objects, 50)
-        try:
-            objects = paginator.page(page)
-        except PageNotAnInteger:
-            objects = paginator.page(1)
-        except EmptyPage:
-            objects = paginator.page(paginator.num_pages)
-        context.update({'auction_list': objects})
+    page = request.GET.get('page', '1')
+    paginator = Paginator(objects, 50)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+    context.update({'auction_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
 
 
@@ -238,11 +327,11 @@ def add_contract(request):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             contract = form.save()
-            contract.docs = image_form.save()
             contract.room = room_f.save()
             contract.hallway = hallway_f.save()
             contract.wc = wc_f.save()
             contract.kitchen = kitchen_f.save()
+            contract.docs = image_form.save()
             contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
             return redirect('contracts')
         else:
@@ -268,12 +357,6 @@ def add_contract(request):
 @login_required()
 def copy_contract(request, pk):
 
-    def _copy_object(obj):
-        new_obj = deepcopy(obj)
-        new_obj.id = None
-        new_obj.pk = None
-        return new_obj
-
     form = CopyForm(request.POST)
     if form.is_valid():
         amount = form.cleaned_data["amount"]
@@ -298,20 +381,19 @@ def copy_contract(request, pk):
         copy.developer = contract.developer
 
         # create new fk related objects
-        copy.room = _copy_object(contract.room)
+        copy.room = copy_object(contract.room)
         copy.room.save()
         copy.room_id = copy.room.id
-        copy.hallway = _copy_object(contract.hallway)
+        copy.hallway = copy_object(contract.hallway)
         copy.hallway.save()
         copy.hallway_id = copy.hallway.id
-        copy.wc = _copy_object(contract.wc)
+        copy.wc = copy_object(contract.wc)
         copy.wc.save()
         copy.wc_id = copy.wc.id
-        copy.kitchen = _copy_object(contract.kitchen)
+        copy.kitchen = copy_object(contract.kitchen)
         copy.kitchen.save()
         copy.kitchen_id = copy.kitchen.id
         copy.save()
-    print contract_dict
     return get_contract_copies(request)
 
 
