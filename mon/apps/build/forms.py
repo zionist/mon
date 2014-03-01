@@ -91,7 +91,9 @@ class CopyBuildingForm(BuildingForm):
 
 
 class CopyForm(forms.Form):
-    amount = forms.IntegerField(required=True, initial=1, help_text=_(u"Количество копий"), label=_(u"Количество копий"))
+    amount = forms.IntegerField(required=True, max_value=50,
+                                initial=1, help_text=_(u"Количество копий"),
+                                label=_(u"Количество копий"))
 
 
 class BuildingMonitoringForm(forms.ModelForm):

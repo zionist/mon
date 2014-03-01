@@ -13,6 +13,14 @@ urlpatterns = patterns(
     url(r'^auction/update/(?P<pk>[0-9]+)/$', views.update_auction, name='update-auction'),
     url(r'^auction/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_auction, name='pre-delete-auction'),
     url(r'^auction/delete/(?P<pk>[0-9]+)/$', views.delete_auction, name='delete-auction'),
+
+    url(r'^auction/copy/(?P<pk>[0-9]+)/$', views.copy_auction, name='copy-auction'),
+    url(r'^auction_copies/$', views.get_auction_copies, name='auction_copies'),
+    url(r'^auction_copies/(?P<mo>[0-9]+)/$', views.get_auction_copies, name='auction_copies'),
+    url(r'^auction_copies/all/$', views.get_auction_copies, {'all': True}, name='auction_copies-all'),
+    url(r'^auction_copy/delete/(?P<pk>[0-9]+)/$', views.delete_auction_copy, name='delete-auction_copy'),
+    url(r'^auction_copy/update/(?P<pk>[0-9]+)/$', views.update_auction_copy, name='update-auction_copy'),
+
     url(r'^contracts/all/$', views.get_contracts, {'all': True}, name='contracts-all'),
     url(r'^contracts/$', views.get_contracts, name='contracts'),
     url(r'^contracts/(?P<mo>[0-9]+)/$', views.get_contracts, name='contracts'),

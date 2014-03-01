@@ -70,6 +70,21 @@ def add_auction(request):
                             ]})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
+@login_required()
+def delete_auction_copy(request, pk):
+    if request.method != "GET":
+        return HttpResponseNotFound("Not found")
+    try:
+        copy = CopyAuction.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        return HttpResponseNotFound("Not found")
+    copy.room.delete()
+    copy.hallway.delete()
+    copy.wc.delete()
+    copy.kitchen.delete()
+    copy.delete()
+    return redirect("auction_copies")
+
 
 @login_required
 def update_auction_copy(request, pk):
@@ -97,6 +112,7 @@ def update_auction_copy(request, pk):
                         BaseWC._meta.verbose_name,
                         BaseKitchen._meta.verbose_name,
                         ]})
+    delete_auction_copy(request, copy.pk)
     return render_to_response(template, context,
                               context_instance=RequestContext(request))
 
@@ -116,7 +132,7 @@ def copy_auction(request, pk):
 
     auction_dict = forms.model_to_dict(auction)
 
-    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id', 'developer',
+    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id',
               'docs']:
         auction_dict.pop(n)
 
@@ -140,7 +156,7 @@ def copy_auction(request, pk):
         copy.kitchen.save()
         copy.kitchen_id = copy.kitchen.id
         copy.save()
-    return get_contract_copies(request)
+    return get_auction_copies(request)
 
 
 @login_required
@@ -218,7 +234,7 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
             context = {'title': _(u'Аукционы %s' % (mo_obj))}
         context.update({'object': mo_obj})
         kwargs.update({'mo': mo_obj})
-    objects = None
+    objects = []
     if copies:
         objects = CopyAuction.objects.filter(**kwargs).order_by('stage')
     else:
@@ -247,7 +263,7 @@ def get_auction(request, pk, extra=None):
         form = AuctionShowForm(prefix=prefix, instance=auction)
         image_form = AuctionDocumentsForm(prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction, multi=True)
-        context.update({'form': form, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'images': image_form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
                                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name,]})
     context.update({'object': auction})

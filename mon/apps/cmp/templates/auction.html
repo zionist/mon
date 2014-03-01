@@ -5,14 +5,20 @@
 {% block content %}
     <h4>{{ title }}</h4>
         <div class="row">
-            <div class="span5"><a class="btn btn-info" href="{% url 'update-auction' object.id %}">
+            <div class="span2"><a class="btn btn-info" href="{% url 'update-auction' object.id %}">
                 {% trans 'Редактировать' %}</a></div>
             {% if object.stage == 4 %}
                 <div class="span5"><a class="btn btn-small" href="{% url 'add-auction-contract' object.id %}">
                             {% trans 'Заполнить контракт' %}</a></div>
             {% endif %}
+            <form method="POST" enctype="multipart/form-data" action="{% url 'copy-auction' object.id %}"> {% csrf_token %}
+                <div class="span1"> Количество </div>
+                <div class="span1"> {{ copyform.amount }} </div>
+                <div class="span1"><button class="btn" type="submit" >
+                    {% trans 'Скопировать' %} </button></div>
             <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-auction' object.id %}">
                 {% trans 'Удалить' %}</a></div>
+            </form>
         </div><br />
         <h4 class="blue">{% trans 'Аукцион' %} № {{object.num}}</h4>
         {% if form or formsets %}
