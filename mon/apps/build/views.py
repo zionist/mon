@@ -367,7 +367,8 @@ def get_buildings(request, mo=None, all=False, template=None,
     objects = [x for x in build_objects] + [x for x in ground_objects]
     # return xls list
     if xls:
-        return to_xls(request,  objects={BuildingForm: build_objects})
+        return to_xls(request,  objects={BuildingForm: build_objects,
+                                         GroundForm: ground_objects})
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -407,6 +408,8 @@ def to_xls(request, objects={}):
                 u'Кухня': kitchen_f, u'Комната': room_f}
     row = 0
     for form, objs in objects.iteritems():
+        if not objs:
+            break
         # make headers
         header_form = form()
         col = 0

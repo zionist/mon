@@ -8,10 +8,11 @@ urlpatterns = patterns(
     'apps.build.views',
 
     url(r'^buildings/$', views.get_buildings, name='buildings'),
+    url(r'^buildings/xls/$', views.get_buildings, {'xls': True}, name='buildings-xls'),
     url(r'^buildings/(?P<mo>[0-9]+)/$', views.get_buildings, name='buildings'),
+    url(r'^buildings/(?P<mo>[0-9]+)/xls/$', views.get_buildings, {'xls': True}, name='buildings-xls'),
 
     url(r'^buildings/all/$', views.get_buildings, {'all': True}, name='buildings-all'),
-
     url(r'^buildings/all/xls/$', views.get_buildings, {'all': True, 'xls':True }, name='buildings-all-xls'),
     url(r'^building/add/$', views.select_building_state, name='create-building'),
     url(r'^building/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/$', views.add_building, name='add-building'),
