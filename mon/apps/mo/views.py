@@ -605,8 +605,8 @@ def get_filter(request, num, extra=None):
 @login_required
 def xls_work_table(request):
 
-    import time
-    start = time.time()
+    # import time
+    # start = time.time()
 
     # create
     book = xlwt.Workbook(encoding='utf8')
@@ -870,8 +870,8 @@ def xls_work_table(request):
         row += 1
         num += 1
 
-    end = time.time()
-    print end - start
+    # end = time.time()
+    # print end - start
 
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'

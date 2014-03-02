@@ -220,8 +220,8 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
         mo_obj = request.user.customuser.mo
         context = {'title': _(u'Аукционы %s' % mo_obj.name)}
         from_dt = request.user.customuser.get_user_date()
-        if from_dt:
-            kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
+    if from_dt:
+        kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
     if all:
         if copies:
             context = {'title': _(u'Все копии аукционов')}
