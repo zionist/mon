@@ -18,10 +18,12 @@
             {% if object %}
                 <strong>{% trans 'Наменование МО: ' %}</strong>{{ object.name }}<br>
                 <strong>{% trans 'СРЗ: ' %}</strong>
-                {% with object.creation_form as form %}
-                    {% if form == 0 %}П{% elif form == 1%}ДС{% elif form == 2%}С{% endif %}
+                {% with creation_form=object.creation_form %}
+                    {% if '0' in creation_form %}/ П {% endif %}
+                    {% if '1' in creation_form %}/ ДС {% endif %}
+                    {% if '2' in creation_form %}/ С {% endif %}
                 {% endwith %}<br>
-                <strong>{% trans 'Выделенных квартир на текущий год: ' %}</strong>{{ object.departamentagreement_set.all.0.flats_amount }}<br>
+                <strong>{% trans 'Выделенных квартир на текущий год: ' %}</strong>{{ object.home_orphans }}<br>
             {% endif %}
             <br><table class="table table-striped table-condensed table-hover">
                 {% regroup auction_list by stage as objects_list %}
@@ -40,7 +42,7 @@
                 {% elif stage.grouper == 3 %}
                 <tr><th colspan="7"> <strong>{% trans 'Аукционы на этапе завершения работы (не подана ни одна заявка)' %}</strong></th></tr>
                 {% elif stage.grouper == 4 %}
-                <tr><th colspan="7"> <strong>{% trans 'Аукционы на этапе заключения контракта' %}</strong></th></tr>
+                <tr><th colspan="7"> <strong>{% trans 'Заключен контракт' %}</strong></th></tr>
                 {% elif stage.grouper == 5 %}
                 <tr><th colspan="7"> <strong>{% trans 'Аукционы на этапе отмены размещения' %}</strong></th></tr>
                 {% endif %}
@@ -53,9 +55,8 @@
                     <td>{{ item.contract.summa }}</td>
                     {% if item.stage == 4 %}
                         {% if item.contract %}
-                            <td> {{ item.contract.building.address|truncatechars:50 }} </td>
-                            <td> {{ item.contract.building.developer|truncatechars:50 }} </td>
-
+                            <td> {{ item.contract.building.address }} </td>
+                            <td> {{ item.contract.building.developer }} </td>
                         {% endif %}
                     {% endif %}
                 </tr>

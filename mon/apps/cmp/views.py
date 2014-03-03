@@ -213,6 +213,7 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
     context = {'title': _(u'Аукционы')}
     kwargs = {}
     mo_obj = None
+    from_dt = None
     if pk:
         mo_obj = MO.objects.get(pk=pk)
         context = {'title': _(u'Аукционы %s' % mo_obj.name)}
