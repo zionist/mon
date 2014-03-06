@@ -39,19 +39,88 @@ def add_payment(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+def recount_accounting(mo, user=None, context=None, accounting=None, update=None, dates=None, payment_dates=None):
+    '''
+        dates - {'date__range': (timestamp, timestamp)}, from which get mo agreements
+        payment_dates - {'date__range': (timestamp, timestamp)}, from which get mo payments by agreements
+        user - request.user, if we don`t have from_dt
+        update - True if we need to update mo accounting(each 00:00 by cron)
+    '''
+    objects = []
+    accounting = accounting if accounting else {}
+    context = context if context else {}
+
+    if isinstance(mo, MO):
+        agreements = mo.departamentagreement_set.all()
+        if not update:
+            objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
+
+        kw = {}
+        if dates:
+            kw = dates
+        if not dates and user and hasattr(user, 'customuser'):
+            from_dt = user.customuser.get_user_date()
+            to_dt = datetime(from_dt.year + 1, 1, 1)
+            kw = {'date__range': (from_dt, to_dt)}
+
+        agreements = agreements.filter(**kw)
+        if not update:
+            if not payment_dates:
+                objects = objects.filter(**kw)
+            else:
+                objects = objects.filter(**payment_dates)
+
+        if agreements:
+            amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+            spent = sum([float(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+            percent = round(((float(spent)/amount) * 100), 3)
+            economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+            accounting.update({'spent': spent, 'saved': amount - spent, 'percent': percent,
+                               'sub_amount': amount, 'economy': economy})
+            context.update({'accounting': accounting})
+        if update and accounting:
+            mo.update(**accounting)
+    else:
+        all_payments = []
+        c_kwargs = deepcopy(payment_dates)
+        for one_mo in mo:
+            accounting = {}
+            agreements = one_mo.departamentagreement_set.filter(**dates)
+            contracts = one_mo.contract_set.filter(**c_kwargs)
+
+            if agreements:
+                amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
+                accounting.update({'sub_amount': amount})
+                if contracts:
+                    spent = sum([float(contract.summa) for contract in contracts if contract.summa])
+                    percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
+                    economy = sum([float(auction.start_price) for auction in one_mo.auction_set.filter(**payment_dates)
+                                   if auction.start_price]) - spent
+                    payment_dates.update({'contract__in': [contract.id for contract in contracts if contract]})
+                    payments = Payment.objects.filter(**payment_dates)
+                    payment = sum([float(payment.amount) for payment in payments])
+                    all_payments = all_payments + list(payments)
+                    accounting.update({'payment': payment, 'spent': spent, 'saved': amount - spent,
+                                       'percent': percent, 'economy': economy})
+            objects.append({'mo': one_mo, 'accounting': accounting})
+            context.update({'accountings': objects, 'payment_list': all_payments, 'show_accounting_payments': True})
+    return objects
+
+
 @login_required
 def get_payments(request, mo=None, all=False):
     context = {'title': _(u'Платежи')}
     template = 'payments.html'
     prefix = 'acc_date'
+    objects = []
     if Payment.objects.all().exists():
         if all:
             context = {'title': _(u'Все платежи')}
             if hasattr(request.user, 'customuser'):
                 from_dt = request.user.customuser.get_user_date()
                 if from_dt:
-                    to_dt = datetime(from_dt.year + 1, 01, 01)
-                    objects = Payment.objects.filter(date__gt=from_dt, date__lt=to_dt)
+                    to_dt = datetime(from_dt.year + 1, 1, 1)
+                    objects = Payment.objects.filter(date__range=(from_dt, to_dt))
                 else:
                     objects = Payment.objects.all()
             else:
@@ -59,23 +128,7 @@ def get_payments(request, mo=None, all=False):
         elif hasattr(request.user, 'customuser') or mo:
             mo = request.user.customuser.mo if request.user.customuser.mo else MO.objects.get(pk=mo)
             context = {'title': _(u'Платежи %s') % mo.name}
-            from_dt = request.user.customuser.get_user_date()
-            if from_dt:
-                to_dt = datetime(from_dt.year + 1, 01, 01)
-                agreements = mo.departamentagreement_set.filter(date__gt=from_dt, date__lt=to_dt)
-                objects = Payment.objects.filter(date__gt=from_dt, date__lt=to_dt,
-                    subvention__in=[dep.subvention for dep in agreements])
-            else:
-                agreements = mo.departamentagreement_set.all()
-                objects = Payment.objects.filter(subvention__in=[dep.subvention for dep in agreements])
-            if agreements:
-                amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-                spent = sum([float(contract.summa) for contract in mo.contract_set.all() if contract.summa])
-                percent = round(((float(spent)/amount) * 100), 3)
-                economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
-                accounting = {'spent': spent, 'saved': amount - spent, 'percent': percent,
-                              'sub_amount': amount, 'economy': economy}
-                context.update({'accounting': accounting})
+            objects = recount_accounting(mo, user=request.user, context=context)
 
         form = DateForm(prefix=prefix)
         context.update({'date_form': form})
@@ -95,7 +148,6 @@ def get_payments(request, mo=None, all=False):
 def get_accounting(request, select=None):
     template = 'payments.html'
     context = {'title': _(u'Платежи')}
-    objects = []
     prefix = 'acc_date'
     mos = MO.objects.all()
     kwargs = {}
@@ -103,7 +155,7 @@ def get_accounting(request, select=None):
     form = DateForm(prefix=prefix)
     context.update({'date_form': form})
     from_dt = request.user.customuser.get_user_date() if hasattr(request.user, 'customuser') else None
-    if select and int(select) in [1,2,3,4]:
+    if select and int(select) in [1, 2, 3, 4]:
         state = int(select)
         if state == 4:
             dt = datetime(datetime.now().year, 12, 31)
@@ -118,41 +170,23 @@ def get_accounting(request, select=None):
         elif state == 1:
             dt = datetime.now()
             prev = dt.replace(day=dt.day-1)
-        kwargs.update({'date__lt': dt, 'date__gt': prev})
-        agr_kwargs.update({'date__lt': datetime(dt.year, 12, 31), 'date__gt': datetime(dt.year-1, 12, 31)})
+        kwargs.update({'date__range': (prev, dt)})
+        agr_kwargs.update({'date__range': (datetime(dt.year-1, 12, 31), datetime(dt.year, 12, 31))})
     elif not select and request.method == 'POST' and 'date_select' in request.POST:
         form = DateForm(request.POST, prefix=prefix)
         if form.is_valid():
             dt, prev = form.cleaned_data.get('dt'), form.cleaned_data.get('prev')
-            kwargs.update({'date__lt': dt, 'date__gt': prev})
-            agr_kwargs.update({'date__lt': dt, 'date__gt': prev})
+            kwargs.update({'date__range': (prev, dt)})
+            agr_kwargs.update({'date__range': (prev, dt)})
         else:
             context.update({'date_form': form})
     elif not select and from_dt:
-        to_dt = datetime(from_dt.year + 1, 01, 01)
-        kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
-        agr_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
-    all_payments = []
-    c_kwargs = deepcopy(kwargs)
-    for mo in mos:
-        accounting = {}
-        agreements = mo.departamentagreement_set.filter(**agr_kwargs)
-        contracts = mo.contract_set.filter(**c_kwargs)
-        if agreements:
-            amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-            accounting.update({'sub_amount': amount})
-            if contracts:
-                spent = sum([float(contract.summa) for contract in contracts if contract.summa])
-                percent = round(((float(spent)/amount) * 100), 3) if spent and amount else 0
-                economy = sum([float(auction.start_price) for auction in mo.auction_set.filter(**kwargs) if auction.start_price]) - spent
-                kwargs.update({'contract__in': [contract.id for contract in contracts if contract]})
-                payments = Payment.objects.filter(**kwargs)
-                payment = sum([float(payment.amount) for payment in payments])
-                all_payments = all_payments + list(payments)
-                accounting.update({'payment': payment, 'spent': spent, 'saved': amount - spent,
-                                   'percent': percent, 'economy': economy})
-        objects.append({'mo': mo, 'accounting': accounting})
-    context.update({'accountings': objects, 'payment_list': all_payments, 'show_accounting_payments': True})
+        to_dt = datetime(from_dt.year + 1, 1, 1)
+        kwargs.update({'date__range': (from_dt, to_dt)})
+        agr_kwargs.update({'date__range': (from_dt, to_dt)})
+
+    recount_accounting(mos, context=context, dates=agr_kwargs, payment_dates=kwargs)
+    context.update({'hide_paginator': True})
     return render(request, template, context, context_instance=RequestContext(request))
 
 

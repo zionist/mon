@@ -84,6 +84,7 @@ class DepartamentAgreement(BaseDepartamentAgreement, ):
     agreement_type= models.SmallIntegerField(help_text=_(u"Тип соглашения"), blank=True, verbose_name=_(u"Тип соглашения"),
         choices=AGREEMENT_TYPE_CHOICES, default=0)
 
+
 class Orphan(BaseOrphan, ):
 
     class Meta:
