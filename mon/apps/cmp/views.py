@@ -140,7 +140,8 @@ def copy_auction(request, pk):
         # fks
         copy = CopyAuction(**auction_dict)
         copy.mo = auction.mo
-        copy.contract = auction.contract
+        if copy.contract:
+            copy.contract = auction.contract
 
         # create new fk related objects
         copy.room = copy_object(auction.room)
