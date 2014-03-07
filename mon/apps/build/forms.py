@@ -17,7 +17,6 @@ from apps.core.models import Choices
 from apps.mo.models import MO
 
 
-
 class GroundForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
@@ -33,9 +32,11 @@ class GroundForm(forms.ModelForm):
 
         mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
         if mo:
-            self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
-                required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
+            self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'), required=True,
+                                                       queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'
+            self.fields['contract'] = forms.ModelChoiceField(label=_(u'Контракт'), required=True,
+                                                             queryset=mo.contract_set.all())
 
     water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
         widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
@@ -114,7 +115,6 @@ class BuildingMonitoringForm(forms.ModelForm):
 
 
 class GroundMonitoringForm(forms.ModelForm):
-
 
     def __init__(self, *args, **kwargs):
         super(GroundMonitoringForm, self).__init__(*args, **kwargs)

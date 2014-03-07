@@ -34,7 +34,9 @@
                             {% if mo_contracts %}
                                 <br><br><strong>{% trans 'Контракты: ' %} </strong>
                                 {% for contract in obj.contract_set.all %}
-                                    <a href="{% url 'change-contract' contract.id %}">{{contract.num}}; </a>
+                                    {% if contract.summa > 0 %}
+                                        <a href="{% url 'change-contract' contract.id %}">{{contract.num}}; </a>
+                                    {% endif %}
                                 {% endfor %}
                             {% endif %}
                             </td>

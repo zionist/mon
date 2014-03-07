@@ -513,7 +513,7 @@ def get_filter(request, num, extra=None):
         context.update({'mo_list': objects})
     elif num == 6:
         # 6 Фильтр всех муниципальных образований, которые заключили контракты с возможностью просмотра подробных сведений по каждому контракту (4.7)
-        objects = MO.objects.filter(contract__summa__gt=0)
+        objects = MO.objects.filter(contract__summa__gt=0).distinct()
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects, 'mo_contracts': True})
     elif num == 7:

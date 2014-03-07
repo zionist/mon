@@ -92,6 +92,7 @@ def add_building(request, dev_pk=None, state=None):
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
     context.update({'state': state})
     select = state
+    state_int = None
     form = None
     dev = Developer.objects.get(pk=dev_pk)
     context.update({'state': select, 'dev': dev_pk})
@@ -108,9 +109,9 @@ def add_building(request, dev_pk=None, state=None):
             form.fields.pop('mo')
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             building = form.save(commit=False)
-            if not request.user.is_staff:
+            if not request.user.is_staff and hasattr(request.user, 'customuser'):
                 building.mo = request.user.customuser.mo
-            building.state = state_int
+            building.state = state_int if state_int else 0
             building.developer = dev
             building.save()
             building.room = room_f.save()
@@ -154,6 +155,7 @@ def add_monitoring(request, dev_pk=None, state=None):
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
     context.update({'state': state})
     select = state
+    state_int = None
     form = None
     dev = Developer.objects.get(pk=dev_pk)
     context.update({'state': select, 'dev': dev_pk})
@@ -178,7 +180,7 @@ def add_monitoring(request, dev_pk=None, state=None):
                 building.approve_status = 0
             if not request.user.is_staff:
                 building.mo = request.user.customuser.mo
-            building.state = state_int
+            building.state = state_int if state_int else 0
             building.developer = dev
             building.save()
             return redirect('monitorings')
@@ -379,6 +381,7 @@ def get_buildings(request, mo=None, all=False, template=None,
         objects = paginator.page(paginator.num_pages)
     context.update({'building_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
+
 
 # object instance: form for display
 def to_xls(request, objects={}):
@@ -586,10 +589,11 @@ def update_building(request, pk, state=None, extra=None):
                                 ]})
             return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
     else:
+        initial_kw = {'mo': build.mo}
         if state and int(state) == 2:
-            form = GroundUpdateForm(prefix=prefix, instance=build)
+            form = GroundUpdateForm(prefix=prefix, instance=build, initial=initial_kw)
         else:
-            form = BuildingUpdateForm(prefix=prefix, instance=build)
+            form = BuildingUpdateForm(prefix=prefix, instance=build, initial=initial_kw)
         # remove approve_status field from view if not admin
         if not request.user.is_staff:
             form.fields.pop('approve_status')

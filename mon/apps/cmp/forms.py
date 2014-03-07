@@ -61,7 +61,6 @@ class ContractForm(forms.ModelForm):
     heating = forms.ChoiceField(label=_(u"Отопление"), required=False,
         widget=forms.Select, choices=HEATING_CHOICES)
 
-
     class Meta:
         model = Contract
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')

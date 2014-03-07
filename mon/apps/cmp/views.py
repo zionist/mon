@@ -833,9 +833,9 @@ def manage_person(request, pk=None):
 
 @login_required
 def cmp_contract(request, pk):
-    context = {'title': _(u'Сравнение параметров'),
-               'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Строительный объект')}
     contract = Contract.objects.get(pk=pk)
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Контракт %s' % contract.num)}
 
     contract_form = ContractShowForm(instance=contract)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
@@ -849,6 +849,8 @@ def cmp_contract(request, pk):
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    context.update({'cmp_object_title': _(u'Строительный объект %s' % cmp_obj.address)})
 
     object_update_url = reverse('update-contract', args=[contract.id, ])
     object_pre_delete_url = reverse('pre-delete-contract', args=[contract.id, ])
@@ -880,9 +882,9 @@ def cmp_contract(request, pk):
 
 @login_required
 def cmp_contract_auction(request, pk):
-    context = {'title': _(u'Сравнение параметров'),
-               'object_title': _(u'Контракт'), 'cmp_object_title': _(u'Аукцион')}
     contract = Contract.objects.get(pk=pk)
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Контракт %s' % contract.num)}
 
     contract_form = ContractShowForm(instance=contract)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
@@ -893,6 +895,8 @@ def cmp_contract_auction(request, pk):
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    context.update({'cmp_object_title': _(u'Аукцион %s' % cmp_obj.num)})
 
     room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=contract, multi=True)
     auction_form, contract_form = set_fields_equal(auction_form, contract_form)
@@ -923,9 +927,8 @@ def cmp_contract_auction(request, pk):
 
 @login_required
 def cmp_result_building(request, pk):
-    context = {'title': _(u'Сравнение параметров'),
-               'object_title': _(u'Результат'), 'cmp_object_title': _(u'Строительный объект')}
     res = Result.objects.get(pk=pk)
+    context = {'title': _(u'Сравнение параметров'), 'object_title': _(u'Результат')}
     result = res.cmp_data
 
     form = CompareDataShowForm(instance=result)
@@ -941,6 +944,8 @@ def cmp_result_building(request, pk):
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    context.update({'cmp_object_title': _(u'Строительный объект %s' % cmp_obj.address)})
 
     object_update_url = reverse('update-result', args=[res.id, ])
     object_pre_delete_url = reverse('pre-delete-result', args=[res.id, ])
@@ -973,7 +978,7 @@ def cmp_result_building(request, pk):
 @login_required
 def cmp_result_contract(request, pk):
     context = {'title': _(u'Сравнение параметров'),
-               'object_title': _(u'Результат'), 'cmp_object_title': _(u'Контракт')}
+               'object_title': _(u'Результат'), }
     res = Result.objects.get(pk=pk)
     result = res.cmp_data
     contract = res.contract
@@ -988,6 +993,8 @@ def cmp_result_contract(request, pk):
     else:
         context.update({'errorlist': _('No one matched object')})
         return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    context.update({'cmp_object_title': _(u'Контракт %s' % cmp_obj.num)})
 
     object_update_url = reverse('update-result', args=[res.id, ])
     object_pre_delete_url = reverse('pre-delete-result', args=[res.id, ])
