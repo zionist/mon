@@ -66,7 +66,7 @@ class MO(models.Model):
     common_percentage = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общий процент освоения субвенции"), verbose_name=_(u"Общий процент освоения субвенции"))
     common_spent = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая сумма потраченной субвенции"), verbose_name=_(u"Общая сумма потраченной субвенции"))
     common_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая сумма субвенции"), verbose_name=_(u"Общая сумма субвенции"))
-    flats_amount = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Количество квартир по заключенным контрактам"), verbose_name=_(u"Количество квартир по заключенным контрактам"))
+    flats_amount = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Количество жилых помещений по заключенным контрактам"), verbose_name=_(u"Количество жилых помещений по заключенным контрактам"))
 
 
 class DepartamentAgreement(BaseDepartamentAgreement, ):

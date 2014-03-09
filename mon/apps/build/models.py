@@ -145,7 +145,7 @@ class Building(BaseBuilding, BaseCompareData, BaseFile):
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
-    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
+    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер жилого помещения", verbose_name=u"Номер жилого помещения")
 
     class Meta:
         app_label = "build"
@@ -168,7 +168,7 @@ class CopyBuilding(BaseBuilding, BaseCompareData, BaseFile):
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), blank=True, null=True, verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=False, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
-    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер квартиры", verbose_name=u"Номер квартиры")
+    flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер жилого помещения", verbose_name=u"Номер жилого помещения")
 
     class Meta:
         app_label = "build"

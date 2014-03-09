@@ -17,8 +17,8 @@
         {% if auction_list %}
             <br><table class="table table-striped table-condensed table-hover">
                 {% regroup auction_list by stage as objects_list %}
-                <tr><th>{% trans '№ заказа' %}</th><th>{% trans 'Количество квартир' %}</th>
-                    <th>{% trans 'Площадь квартир' %}</th><th>{% trans 'Начальная цена' %}</th>
+                <tr><th>{% trans '№ заказа' %}</th><th>{% trans 'Количество жилых помещений' %}</th>
+                    <th>{% trans 'Площадь жилых помещений' %}</th><th>{% trans 'Начальная цена' %}</th>
                     <th>{% trans 'Дата опубликования заказа' %}</th><th>{% trans 'Дата и время проведения аукциона' %}</th>
                     <th>{% trans 'Сумма заключенного контракта' %}</th>
                     <th> </th>
