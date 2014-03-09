@@ -412,7 +412,7 @@ def to_xls(request, objects={}):
     row = 0
     for form, objs in objects.iteritems():
         if not objs:
-            break
+            continue
         # make headers
         header_form = form()
         col = 0

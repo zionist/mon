@@ -133,7 +133,7 @@ def copy_auction(request, pk):
     auction_dict = forms.model_to_dict(auction)
 
     for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id',
-              'docs']:
+              'docs', 'contract']:
         auction_dict.pop(n)
 
     for copy in xrange(amount):
@@ -141,8 +141,7 @@ def copy_auction(request, pk):
         copy = CopyAuction(**auction_dict)
         copy.mo = auction.mo
         if copy.contract:
-            copy.contract = auction.contract
-
+            copy.contract = Contract.objects.get(pk=auction.contract)
         # create new fk related objects
         copy.room = copy_object(auction.room)
         copy.room.save()
