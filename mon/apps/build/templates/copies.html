@@ -26,7 +26,7 @@
                             {% endif %}
                             {% for item in state.list %}
                               <tr onclick="location.href = '{% url 'update-building_copy' item.id %}'">
-                                    <td> <a href="{% url 'update-building_copy' item.id %}"> {{ item.address|truncatechars:50 }} </a> </td>
+                                    <td> <a href="{% url 'update-building_copy' item.id %}"> {{ item.address|truncatechars:200 }} </a> </td>
                                   <td> {# item.cad_num #} </td><td> {{ item.mo.name }} </td> <td> {{ item.developer|truncatechars:50 }} </td>
                                   <td> {{ item.flats_amount }} </td><td> {{ item.complete_date }} </td>
                                   <td> <a class="btn btn-danger" href="{% url 'delete-building_copy' item.id %}"> Удалить</a> </td>
