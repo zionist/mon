@@ -38,7 +38,7 @@ from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
     GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, CopyBuildingForm, \
     GroundMonitoringForm, BuildingSelectMonitoringForm, BuildingUpdateForm, GroundUpdateForm, \
     CopyForm
-from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
+from apps.core.views import get_fk_forms, get_fk_show_forms, split_form, copy_object
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
 from apps.user.models import CustomUser
