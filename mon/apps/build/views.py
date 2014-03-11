@@ -86,7 +86,7 @@ def select_building_state(request):
 
 
 @login_required
-def add_building(request, dev_pk=None, state=None):
+def add_building(request, auction=None, dev_pk=None, state=None):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'

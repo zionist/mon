@@ -101,7 +101,7 @@ def update_auction_copy(request, pk):
     initial_kw = {}
     if hasattr(request.user, 'customuser'):
         initial_kw.update({'mo': request.user.customuser.mo})
-    form = AuctionForm(prefix=prefix, initial=initial_kw)
+    form = AuctionForm(prefix=prefix, initial=initial_kw, instance=copy)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True, parent=copy)
     # move text_area fields to another form
     context.update({'form': form, 'images': image_form, 'prefix': prefix,
@@ -237,9 +237,9 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
         kwargs.update({'mo': mo_obj})
     objects = []
     if copies:
-        objects = CopyAuction.objects.filter(**kwargs).order_by('stage')
+        objects = CopyAuction.objects.filter(**kwargs).order_by('num')
     else:
-        objects = Auction.objects.filter(**kwargs).order_by('stage')
+        objects = Auction.objects.filter(**kwargs).order_by('num')
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -506,7 +506,7 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
             objects = CopyContract.objects.filter(**kwargs).order_by('num')
     else:
         if Contract.objects.filter(**kwargs).exists():
-            objects = Contract.objects.filter(**kwargs)
+            objects = Contract.objects.filter(**kwargs).order_by('num')
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
