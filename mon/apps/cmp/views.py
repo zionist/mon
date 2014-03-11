@@ -299,7 +299,10 @@ def update_auction(request, pk, extra=None):
             return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
     else:
         image_form = AuctionDocumentsForm(instance=auction.docs, prefix=images_prefix)
-        form = AuctionForm(instance=auction, prefix=prefix)
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
+        form = AuctionForm(instance=auction, prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, multi=True)
         context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,

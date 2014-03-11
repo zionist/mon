@@ -114,6 +114,8 @@ class AuctionForm(forms.ModelForm):
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
                 required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'
+            self.fields['contract'] = forms.ModelChoiceField(label=_(u'Данные по заключенному контракту'),
+                                                             required=True, queryset=mo.contract_set.all())
 
     electric_supply = CSIMultipleChoiceField(label=_(u"Электроснабжение"), required=False,
                                            widget=CSICheckboxSelectMultiple, choices=ELECTRIC_SUPPLY_CHOICES)
