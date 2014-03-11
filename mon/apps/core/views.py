@@ -39,6 +39,11 @@ def main(request):
         return redirect("change-mo", pk=request.user.customuser.mo.pk)
 
 
+def generate_fonts_css(request):
+    return render_to_response('fonts.css', locals(),
+                              context_instance=RequestContext(request))
+
+
 def get_fk_forms(parent=None, request=None, multi=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     forms = [RoomForm, HallwayForm, WCForm, KitchenForm] if not multi else [AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm]

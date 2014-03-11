@@ -139,6 +139,10 @@ class BuildingSelectForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(BuildingSelectForm, self).__init__(*args, **kwargs)
+        contract = kwargs.get('initial').get('contract') if 'initial' in kwargs else None
+        self.fields['contract'] = forms.IntegerField(initial=contract,
+                                                     label=u"Презаполненый контракт",
+                                                     required=False, widget=forms.HiddenInput())
         self.verbose_name = _(u"Выбор типа объекта рынка жилья и застройщика(владельца)")
 
 
