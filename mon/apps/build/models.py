@@ -85,7 +85,7 @@ class Contract(BaseContract, BaseCompareData):
     summ_without_mo_money = models.FloatField(help_text=_(u"Сумма заключенного контракта, без учета средств МО"), null=True,
         verbose_name=_(u"Сумма заключенного контракта, без учета средств МО"), blank=True, )
     date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
-    period_of_payment = models.DateField(help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
+    period_of_payment = models.CharField(max_length=2048, help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
     creation_form = models.SmallIntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
         blank=True, null=True, choices=CREATION_FORM_CHOICES)
@@ -102,7 +102,7 @@ class CopyContract(BaseContract, BaseCompareData):
     summ_without_mo_money = models.FloatField(help_text=_(u"Сумма заключенного контракта, без учета средств МО"), null=True,
                                                 verbose_name=_(u"Сумма заключенного контракта, без учета средств МО"), blank=True, )
     date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
-    period_of_payment = models.DateField(help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
+    period_of_payment = models.CharField(max_length=2048, help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
     creation_form = models.SmallIntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                              verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                              blank=True, null=True, choices=CREATION_FORM_CHOICES)

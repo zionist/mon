@@ -44,6 +44,9 @@ class ContractForm(forms.ModelForm):
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
         self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
 
+        if self.fields.get('name'):
+            self.fields['name'].label = u"Предмет контракта"
+
         mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
         if mo:
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
@@ -81,7 +84,6 @@ class ResultForm(forms.ModelForm):
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
                 required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'
-
 
 
 class AuctionDocumentsForm(forms.ModelForm):
@@ -199,7 +201,6 @@ class ContractShowForm(ContractForm):
 
         self.cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ContractShowForm, self).__init__(*args, **kwargs)
-
 
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') and not hasattr(self.fields[field].widget.attrs, 'hidden'):
