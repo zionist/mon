@@ -256,3 +256,21 @@ class ResultShowForm(forms.ModelForm):
                 if hasattr(self.instance, field) and hasattr(cmp_initial, field):
                     if getattr(self.instance, field) != getattr(cmp_initial, field):
                         self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+class FilterAuctionForm(forms.Form):
+    num = forms.IntegerField(label=_(u'Номер для поиска '), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(FilterAuctionForm, self).__init__(*args, **kwargs)
+        self.fields['num'].widget.attrs['class'] = "span3 search-query"
+        self.fields['num'].widget.attrs['style'] = "height: 26px;"
+
+    def clean(self):
+        cd = super(FilterAuctionForm, self).clean()
+        serial = cd.get('num')
+        if serial and len(str(serial)) < 3:
+            msg = _('Only from 3 digits search is allowed.')
+            self._errors["num"] = self.error_class([msg])
+            del cd["num"]
+        return cd

@@ -3,16 +3,30 @@
 
 {% block content %}
     <h4>{{title}}</h4>
-    {% if user.is_staff %}
-        <a class="btn btn-small" href="{% url 'create-auction' %}">
-            {% trans 'Добавить аукцион' %}</a><br><br>
-    {% endif %}
+
     {% if error %}
         <div class="error">{{ error }}</div><br>
     {% endif %}
     {% if errorlist %}
         <div class="error">{{ errorlist }}</div>
     {% else %}
+        {% if filter_form  %}
+            <form class="form-search" method="post" action="{% url 'auctions'%}" enctype="multipart/form-data">{% csrf_token %}
+                <div class="row" style="margin-left: 5px;">
+                    {% if user.is_staff %}
+                        <a class="btn btn-small" href="{% url 'create-auction' %}"> {% trans 'Добавить аукцион' %}</a>
+                    {% endif %}
+                    <div class="input-append">
+                        {% for field in filter_form %}
+                            {{ field.errors }}{{ field }}
+                        {% endfor %}
+                        <button style="height: 26px;" class="btn btn-mini" type="submit" name="fnum" value="{% url 'auctions' %}">
+                            {% trans 'Поиск' %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
 
         {% if auction_list %}
             {% if object %}

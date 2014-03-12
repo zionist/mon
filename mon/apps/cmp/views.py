@@ -22,7 +22,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 
 from .models import Result, AuctionDocuments, Auction, Person, CompareData, CopyAuction
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
-    ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm
+    ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm, FilterAuctionForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form, set_fields_equal, copy_object
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
@@ -240,6 +240,15 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
         objects = CopyAuction.objects.filter(**kwargs).order_by('num')
     else:
         objects = Auction.objects.filter(**kwargs).order_by('num')
+    f_pref = 'auc_filter'
+    if request.method == 'POST':
+        filter_form = FilterAuctionForm(request.POST, prefix=f_pref)
+        if filter_form.is_valid():
+            search_num = filter_form.cleaned_data.get('num')
+            if search_num:
+                objects = objects.filter(num__icontains=search_num)
+    else:
+        filter_form = FilterAuctionForm(prefix=f_pref)
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -248,7 +257,7 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
         objects = paginator.page(1)
     except EmptyPage:
         objects = paginator.page(paginator.num_pages)
-    context.update({'auction_list': objects})
+    context.update({'auction_list': objects, 'filter_form': filter_form})
     return render(request, template, context, context_instance=RequestContext(request))
 
 
