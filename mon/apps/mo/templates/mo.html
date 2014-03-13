@@ -69,6 +69,8 @@
                     <tr><th> {% trans 'Номер' %}</th>
                         <th> {% trans 'Дата' %}</th>
                         <th> {% trans 'Общая сумма выделенной субвенции (руб.)' %}</th>
+                        <th> {% trans 'Размер субвенции федерального бюджета (руб.)' %}</th>
+                        <th> {% trans 'Размер субвенции краевого бюджета (руб.)' %}</th>
                         <th> {% trans 'Тип соглашения' %}</th>
                     </tr>
                     {% for object in agreements %}
@@ -76,6 +78,8 @@
                         <td><a href="{% url 'change-agreement' object.id %}">{{object.num}}</a></td>
                         <td>{{object.date}}</td>
                         <td>{{object.subvention.amount}}</td>
+                        <td>{{object.subvention.fed_budget.sub_sum}}</td>
+                        <td>{{object.subvention.reg_budget.sub_sum}}</td>
                         <td>{% with typ=object.agreement_type %}
                                 {% if typ == 0 %}{% trans 'Соглашение с министерством' %}
                                 {% elif typ == 1 %}{% trans 'Дополнительное соглашение с министерством' %}
