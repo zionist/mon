@@ -25,6 +25,7 @@ urlpatterns = patterns(
     url(r'^contracts/$', views.get_contracts, name='contracts'),
     url(r'^contracts/(?P<mo>[0-9]+)/$', views.get_contracts, name='contracts'),
     url(r'^contract/add/$', views.add_contract, name='create-contract'),
+    url(r'^contract/add/(?P<auction_for_update>[0-9]+)/$', views.add_contract, name='create-contract'),
 
     url(r'^contract/copy/(?P<pk>[0-9]+)/$', views.copy_contract, name='copy-contract'),
     url(r'^contract_copies/$', views.get_contract_copies, name='contract_copies'),

@@ -53,6 +53,11 @@ class ContractForm(forms.ModelForm):
                 required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'
 
+        auction_for_update = kwargs.get('initial').get('auction_for_update') if 'initial' in kwargs else None
+        self.fields['auction_for_update'] = forms.IntegerField(initial=auction_for_update,
+                                                     label=u"Контракт для обновления аукциона",
+                                                     required=False, widget=forms.HiddenInput())
+
     electric_supply = forms.ChoiceField(label=_(u"Электроснабжение"), required=False,
         widget=forms.Select, choices=ELECTRIC_SUPPLY_CHOICES)
     water_removal = forms.ChoiceField(label=_(u"Водоотведение"), required=False,

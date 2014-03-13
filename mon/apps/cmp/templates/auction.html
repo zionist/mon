@@ -8,8 +8,8 @@
             <div class="span2"><a class="btn btn-info" href="{% url 'update-auction' object.id %}">
                 {% trans 'Редактировать' %}</a></div>
             {% if object.stage == 4 %}
-                <div class="span5"><a class="btn btn-small" href="{% url 'add-auction-contract' object.id %}">
-                            {% trans 'Заполнить контракт' %}</a></div>
+                <!-- <div class="span5"><a class="btn btn-small" href="{% url 'add-auction-contract' object.id %}">
+                            {% trans 'Заполнить контракт' %}</a></div> -->
             {% endif %}
             <form method="POST" enctype="multipart/form-data" action="{% url 'copy-auction' object.id %}"> {% csrf_token %}
                 <div class="span1"> Количество </div>
@@ -20,6 +20,26 @@
                 {% trans 'Удалить' %}</a></div>
             </form>
         </div><br />
+        {% if object.contract %}
+            <div class="row">
+                <div class="span6">  <h4>{% trans 'Связанный контракт' %}</h4> </div>
+                <div class="right"> <a class="btn" href="{% url 'create-contract' object.id %}">Добавить связанный контракт</a> </div>
+            </div>
+            <table class="table table-condensed">
+            <tr><th> {% trans '№ контракта' %}</th><th> {% trans 'МО' %}</th><th>{% trans 'Количество жилых помещений' %}</th>
+                <th>{% trans 'Адрес жилых помещений' %}</th><th>{% trans 'Сумма' %}</th><th>{% trans 'Продавец/застройщик' %}</th>
+                <th>{% trans 'Срок сдачи объекта в эксплуатацию' %}</th></tr>
+            <tr>
+                <td><a href="{% url 'change-contract' object.contract.id %}">{{object.contract.num|truncatechars:30}}</a></td>
+                <td>{{object.contract.mo.name}}</td><td>{{object.contract.flats_amount}}</td><td>{{object.contract.building_set.all.0.address}}</td>
+                <td>{{object.contract.summa}}</td><td>{{object.contract.developer.name}}</td><td>{{object.contract.building_set.all.0.complete_date}}</td>
+            </tr>
+            </table>
+        {% else %}
+            <div class="row">
+                <div class="right"> <a class="btn" href="{% url 'create-contract' object.id %}"> Добавить контракт </a> </div>
+            </div>
+        {% endif  %}
         <h4 class="blue">{% trans 'Аукцион' %} № {{object.num}}</h4>
         {% if form or formsets %}
             {% if form %}
