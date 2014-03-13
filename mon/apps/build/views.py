@@ -72,21 +72,25 @@ def select_building_state(request, contract=None):
     context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix = 'select_build'
     if request.method == "POST":
+        print request.POST
         select_form = BuildingSelectForm(request.POST, prefix=prefix)
         if select_form.is_valid():
             cd = select_form.cleaned_data
             if not cd.get('developer'):
-                return redirect('add-building-developer', state=int(cd.get('state')))
+                return redirect('add-building-developer', state=int(cd.get('state')), contract=cd.get('contract') or 0)
             dev_pk = cd.get('developer').pk
-            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk)
+            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk, contract=cd.get('contract') or 0)
     else:
-        form = BuildingSelectForm(prefix=prefix)
+        initial = {}
+        if contract:
+            initial.update({"contract": contract})
+        form = BuildingSelectForm(prefix=prefix, initial=initial)
     context.update({'select_form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
 @login_required
-def add_building(request, dev_pk=None, state=None):
+def add_building(request, dev_pk=None, state=None, contract=0):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
@@ -128,6 +132,8 @@ def add_building(request, dev_pk=None, state=None):
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
+        if contract:
+            initial_kw.update({'contract': contract})
         if select and int(select) == 2:
             form = GroundForm(prefix=prefix, initial=initial_kw)
         elif select and int(select) in [0, 1]:
@@ -213,23 +219,32 @@ def add_monitoring(request, dev_pk=None, state=None):
 
 @login_required
 def manage_developer(request, pk=None, state=None,
-                     template='developer_creation.html',  monitoring=False):
+                     template='developer_creation.html',  monitoring=False,
+                     contract=0):
     context = {'title': _(u'Добавление застройщика(владельца) объекта')}
+    initial = {}
+    if contract:
+        initial.update({"contract": contract})
     if state:
         context.update({'state': int(state)})
     if not pk:
-        form = DeveloperForm(request.POST or {})
-        if form.is_valid() and 'dev' in request.POST:
-            dev = form.save()
-            if state:
+        if request.method == "POST":
+            form = DeveloperForm(request.POST)
+            if form.is_valid() and 'dev' in request.POST:
+                cd = form.cleaned_data
+                dev = form.save()
+                if state:
+                    if monitoring:
+                        return redirect('add-monitoring', state, dev.id)
+                    else:
+                        return redirect('add-building', state=state, dev_pk=dev.id,
+                                        contract=cd.get("contract") or 0)
                 if monitoring:
-                    return redirect('add-monitoring', state, dev.id)
+                    return redirect('monitorings')
                 else:
-                    return redirect('add-building', state, dev.id)
-            if monitoring:
-                return redirect('monitorings')
-            else:
-                return redirect('buildings')
+                    return redirect('buildings')
+        else:
+            form = DeveloperForm(initial=initial)
     else:
         developer = Developer.objects.get(pk=pk)
         context.update({'object': developer})
@@ -467,7 +482,6 @@ def to_xls(request, objects={}):
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'
     book.save(response)
-    # return HttpResponse("Ok")
     return response
 
 

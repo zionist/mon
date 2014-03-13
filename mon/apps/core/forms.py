@@ -76,6 +76,7 @@ class DeveloperForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(DeveloperForm, self).__init__(*args, **kwargs)
+        contract = kwargs.get('initial').get('contract') if 'initial' in kwargs else None
         self.verbose_name = _(u"Добавление застройщика(владельца)")
         for field in self.fields:
             if hasattr(self.fields[field], 'widget') \
@@ -83,6 +84,9 @@ class DeveloperForm(forms.ModelForm):
                 and not isinstance(self.fields[field].widget, forms.Textarea):
                 self.fields[field].widget.attrs['class'] = 'span5'
                 self.fields[field].widget.attrs['style'] = 'height:26px;'
+        self.fields['contract'] = forms.IntegerField(initial=contract,
+                                                     label=u"Презаполненый контракт",
+                                                     required=False, widget=forms.HiddenInput())
 
 
 class RoomForm(forms.ModelForm):

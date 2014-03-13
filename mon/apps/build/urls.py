@@ -11,11 +11,12 @@ urlpatterns = patterns(
     url(r'^buildings/xls/$', views.get_buildings, {'xls': True}, name='buildings-xls'),
     url(r'^buildings/(?P<mo>[0-9]+)/$', views.get_buildings, name='buildings'),
     url(r'^buildings/(?P<mo>[0-9]+)/xls/$', views.get_buildings, {'xls': True}, name='buildings-xls'),
-
     url(r'^buildings/all/$', views.get_buildings, {'all': True}, name='buildings-all'),
     url(r'^buildings/all/xls/$', views.get_buildings, {'all': True, 'xls':True }, name='buildings-all-xls'),
     url(r'^building/add/$', views.select_building_state, name='create-building'),
+    url(r'^building/add/(?P<contract>[0-9]*)/$', views.select_building_state, name='create-building'),
     url(r'^building/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/$', views.add_building, name='add-building'),
+    url(r'^building/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/(?P<contract>[0-9]*)/$', views.add_building, name='add-building'),
     url(r'^monitorings/$', views.get_monitorings, name='monitorings'),
     url(r'^monitorings/(?P<mo>[0-9]+)/$', views.get_monitorings, name='monitorings'),
     url(r'^monitorings/all/$', views.get_monitorings, {'all': True}, name='monitorings-all'),
@@ -42,14 +43,12 @@ urlpatterns = patterns(
     url(r'^building/developer/(?P<state>[0-9]?)/$', views.manage_developer, name='manage-developer'),
     url(r'^building/developer/delete/(?P<pk>[0-9]*)/$', views.delete_developer, name='delete-developer'),
     url(r'^building/developer/add/(?P<state>[0-9]?)/$', views.manage_developer, name='add-building-developer'),
-
+    url(r'^building/developer/add/(?P<state>[0-9]?)/(?P<contract>[0-9]*)/$',
+        views.manage_developer, name='add-building-developer'),
     url(r'^monitoring/developer/add/(?P<state>[0-9]?)/$',
         views.manage_monitoring_developer, name='add-monitoring-developer'),
     url(r'^monitoring/developer/(?P<state>[0-9]?)/$', views.manage_developer, name='manage-monitoring-developer'),
     url(r'^monitoring/developer/$', views.manage_developer, name='manage-monitoring-developer'),
-
-
     url(r'^monitoring/developer/(?P<pk>[0-9]*)/(?P<state>[0-9]?)/$', views.manage_monitoring_developer, name='manage-monitoring-developer'),
-
     url(r'^building/developers/$', views.get_developers, name='developers'),
 )
