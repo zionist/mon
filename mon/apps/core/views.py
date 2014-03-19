@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import xlwt
 from copy import deepcopy
 
 from django.http import HttpResponse
@@ -23,6 +24,7 @@ from django.http.request import QueryDict
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.core.servers.basehttp import FileWrapper
+from apps.core.templatetags.extras import get_choice_or_value
 
 from .forms import RoomForm, HallwayForm, WCForm, KitchenForm, \
     RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm, \
@@ -170,3 +172,89 @@ def copy_object(obj):
     new_obj.id = None
     new_obj.pk = None
     return new_obj
+
+# object instance: form for display
+def to_xls(request, objects={}):
+    # create
+    book = xlwt.Workbook(encoding='utf8')
+    sheet = book.add_sheet('untitled')
+
+    # styles
+    style_plain = xlwt.easyxf(
+        "font: height 180;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    style_bold = xlwt.easyxf(
+        "font: bold 1, height 180;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
+
+
+    # object fields should be same as form fields
+    # get all types of objects
+
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
+    fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
+                u'Кухня': kitchen_f, u'Комната': room_f}
+    row = 0
+    for form, objs in objects.iteritems():
+        if not objs:
+            continue
+            # make headers
+        header_form = form()
+        col = 0
+        for field in header_form:
+            sheet.write(row, col, field.label if field.label else field.name,
+                        style_bold)
+            col += 1
+        for fk_name, fk_form in fk_forms.iteritems():
+            for field in fk_form:
+                sheet.write(row, col, u"%s %s" % (fk_name, field.label)
+                if field.label else u"%s %s" % (fk_name, field.name),
+                            style_bold)
+                col += 1
+            # write values
+        row += 1
+        for obj in objs:
+            col = 0
+            obj_form = form(instance=obj)
+            for field in obj_form:
+                value = obj_form.initial.get(field.name)
+                if isinstance(value, bool) and value:
+                    value = u"Да"
+                elif isinstance(value, bool) and not value:
+                    value = u"Нет"
+                elif not value:
+                    value = u''
+                else:
+                    value = u"%s" % get_choice_or_value(obj_form, field.name)
+                sheet.write(row, col, value)
+                col += 1
+
+            # write fk forms values
+            room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=obj)
+            fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
+                        u'Кухня': kitchen_f, u'Комната': room_f}
+            for fk_name, fk_form in fk_forms.iteritems():
+                for field in fk_form:
+                    value = fk_form.initial.get(field.name)
+                    if isinstance(value, bool) and value:
+                        value = u"Да"
+                    elif isinstance(value, bool) and not value:
+                        value = u"Нет"
+                    elif not value:
+                        value = u''
+                    else:
+                        value = u"%s" % get_choice_or_value(fk_form,
+                                                            field.name)
+                    sheet.write(row, col, value)
+                    col += 1
+            row += 1
+
+    response = HttpResponse(mimetype='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=list.xls'
+    book.save(response)
+    return response

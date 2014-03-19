@@ -22,7 +22,10 @@ urlpatterns = patterns(
     url(r'^auction_copy/update/(?P<pk>[0-9]+)/$', views.update_auction_copy, name='update-auction_copy'),
 
     url(r'^contracts/all/$', views.get_contracts, {'all': True}, name='contracts-all'),
+    url(r'^contracts/all/xls/$', views.get_contracts,
+        {'xls': True, 'all': True}, name='contracts-all-xls'),
     url(r'^contracts/$', views.get_contracts, name='contracts'),
+    url(r'^contracts/xls/$', views.get_contracts, {'xls': True}, name='contracts-xls'),
     url(r'^contracts/(?P<mo>[0-9]+)/$', views.get_contracts, name='contracts'),
     url(r'^contract/add/$', views.add_contract, name='create-contract'),
     url(r'^contract/add/(?P<auction_for_update>[0-9]+)/$', views.add_contract, name='create-contract'),

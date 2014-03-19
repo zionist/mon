@@ -24,7 +24,7 @@ from .models import Result, AuctionDocuments, Auction, Person, CompareData, Copy
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm, FilterAuctionForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
-from apps.core.views import split_form, set_fields_equal, copy_object
+from apps.core.views import split_form, set_fields_equal, copy_object, to_xls
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
 from apps.build.models import Contract, ContractDocuments, CopyContract
 from apps.build.forms import BuildingShowForm, GroundShowForm, CopyForm
@@ -504,7 +504,7 @@ def add_contract_from_auction(request, pk):
 
 @login_required
 def get_contracts(request, mo=None, all=False, template='contracts.html',
-                  copies=False):
+                  copies=False, xls=False):
     kwargs = {}
     context = {'title': _(u'Контракты')}
     mo_obj = None
@@ -536,6 +536,8 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
     else:
         if Contract.objects.filter(**kwargs).exists():
             objects = Contract.objects.filter(**kwargs).order_by('num')
+    if xls:
+        return to_xls(request,  objects={ContractForm: objects})
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -585,7 +587,8 @@ def update_contract_copy(request, pk):
     form = ContractForm(prefix=prefix, instance=copy)
     image_form = ContractDocumentsForm(prefix=images_prefix)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
-    context.update({'object': copy, 'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+    context.update({'object': copy, 'form': form, 'prefix': prefix,
+                    'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [
                         BaseRoom._meta.verbose_name,
                         BaseHallway._meta.verbose_name,
