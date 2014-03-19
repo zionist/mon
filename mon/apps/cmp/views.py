@@ -346,7 +346,7 @@ def delete_auction(request, pk):
 
 
 @login_required
-def add_contract(request):
+def add_contract(request, auction_for_update=0):
     template = 'contract_creation.html'
     context = {'title': _(u'Добавление контракта')}
     prefix, images_prefix = 'contract', 'contract_images'
@@ -355,6 +355,13 @@ def add_contract(request):
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+            cd = form.cleaned_data
+            auction = None
+            if cd.get('auction_for_update'):
+                try:
+                    auction = Auction.objects.get(pk=cd.get('auction_for_update'))
+                except ObjectDoesNotExist:
+                    return HttpResponseNotFound("Aucton not found")
             contract = form.save()
             contract.room = room_f.save()
             contract.hallway = hallway_f.save()
@@ -362,6 +369,17 @@ def add_contract(request):
             contract.kitchen = kitchen_f.save()
             contract.docs = image_form.save()
             contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
+            if auction:
+                if auction.contract:
+                    return HttpResponse(u"Вы не можете привязать созданный контракт к аукциону %s. "
+                                        u"Аукцион уже имеет привязку к контракту %s" % (auction.num, auction.contract)
+                                        + u". Новый контракт %s был создан, но привязка для аукциона "
+                                          u"%s к этому контракту не была создана."  % (contract, auction.num))
+
+                auction.contract = contract
+                auction.contract_id = contract.pk
+                auction.save()
+            # update Auction after contract save. Set contract field to this Contract object
             return redirect('contracts')
         else:
             context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
@@ -369,6 +387,8 @@ def add_contract(request):
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix)
         initial_kw = {}
+        if auction_for_update:
+            initial_kw.update({"auction_for_update": auction_for_update})
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
         form = ContractForm(prefix=prefix, initial=initial_kw)
@@ -589,7 +609,9 @@ def get_contract(request, pk, extra=None):
         image_form = ContractDocumentsForm(prefix=images_prefix, instance=contract.docs)
         form = ContractShowForm(instance=contract)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
+        objects = list(contract.building_set.all()) + list(contract.ground_set.all())
         context.update({'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f], 'images': image_form,
+                        'building_list': objects,
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,

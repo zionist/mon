@@ -20,6 +20,41 @@
                 {% trans 'Удалить' %}</a></div>
             </form>
         </div><br />
+        {% if building_list %}
+            <div class="row">
+                <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
+                <div class="right"> <a class="btn" href="{% url 'create-building' object.id %}"> Добавить связанный объект </a> </div>
+            </div>
+            <table class="table table-condensed table-hover">
+                {% regroup building_list by state as objects_list %}
+                <tr><th> {% trans 'Адрес' %}</th><th> </th>
+                    <th> {% trans 'Муниципальное образование' %}</th>
+                    <th>{% trans 'Застройщик' %}</th>
+                    <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr>
+                {% for state in objects_list %}
+                {% if state.grouper == 0 %}
+                <tr><th colspan="6"> <strong>{% trans 'Сданные объекты' %}</strong></th></tr>
+                {% elif state.grouper == 1 %}
+                <tr><th colspan="6"> <strong>{% trans 'Строящиеся объекты' %}</strong></th></tr>
+                {% elif state.grouper == 2 %}
+                <tr><th colspan="6"> <strong>{% trans 'Участки под строительство' %}</strong></th></tr>
+                {% endif %}
+                {% for item in state.list %}
+                <tr onclick="location.href = '{% url 'change-building' item.id item.state %}'">
+                    <td> <a href="{% url 'change-building' item.id item.state %}"> {{ item.address|truncatechars:200 }} </a> </td>
+                    <td> {# item.cad_num #} </td>
+                    <td> {{ item.mo.name }} </td>
+                    <td> {{ item.developer|truncatechars:50 }} </td>
+                    <td> {{ item.complete_date }} </td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </table>
+        {% else %}
+            <div class="row">
+                <div class="right"> <a class="btn" href="{% url 'create-building' object.id %}"> Добавить объект </a> </div>
+            </div>
+        {% endif %}
         <h4 class="blue">{% trans 'Контракт' %} № {{object.num}}</h4>
         {% if form or formsets %}
             {% if form %}
