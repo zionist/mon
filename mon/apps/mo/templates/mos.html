@@ -4,8 +4,10 @@
 {% block content %}
     <h4>{{title}}</h4>
     {% if user.is_superuser %}
-        <a class="btn btn-small" href="{% url 'create-mo' %}">
-            {% trans 'Добавить муниципальное образование' %}</a><br><br>
+        <a class="btn btn-small" href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a><br><br>
+    {% elif show_recount and user.is_staff %}
+        <a class="btn btn-small" href="{% url 'recount-mo' user.customuser.mo.id %}">{% trans 'Рассчитать данные муниципального образования' %}
+            {{user.customuser.mo.name}} {% trans 'за выбранный год' %}</a><br><br>
     {% endif %}
     {% if error %}
         <div class="error">{{ error }}</div><br>

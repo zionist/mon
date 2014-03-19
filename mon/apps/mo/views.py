@@ -2,6 +2,7 @@
 
 import xlwt
 from datetime import datetime
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, \
     HttpResponseForbidden
 from django.views.generic import ListView
@@ -68,30 +69,52 @@ def add_mo(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
+def recount_mos(mos=[], kwargs=None):
+    cur_year = datetime.today().replace(month=1, day=1)
+    kwargs = kwargs if kwargs else {'date__range': [cur_year, cur_year.replace(year=cur_year.year+1)]}
+    for mo in mos:
+        sum_flats_amount = sum([int(contract.flats_amount) for contract in mo.contract_set.filter(**kwargs) if contract.flats_amount])
+        mo.flats_amount = sum_flats_amount
+        amount_sum = sum([int(agr.subvention.amount) for agr in mo.departamentagreement_set.filter(**kwargs).filter(agreement_type=0) if agr.subvention.amount])
+        mo.common_amount = amount_sum
+        mo.save(update_fields=['flats_amount', 'common_amount'])
+    return True
+
+
 @login_required
-def get_mos(request, pk=None):
+def get_recount_mo(request, pk=None):
+    agreement_kwargs = {}
+    if MO.objects.all().exists():
+        if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
+            from_dt = request.user.customuser.get_user_date()
+            to_dt = datetime(from_dt.year + 1, 1, 1)
+            agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        if pk:
+            recount_mos(MO.objects.filter(pk=pk), kwargs=agreement_kwargs)
+    return get_mos(request, pk=pk, recount=False)
+
+
+@login_required
+def get_mos(request, pk=None, recount=True):
     title = _(u'Муниципальные образования')
     template = 'mos.html'
-    context = {'title': title}
+    context = {'title': title, 'show_recount': True}
     agreement_kwargs = {}
     if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
         from_dt = request.user.customuser.get_user_date()
-        to_dt = datetime(from_dt.year + 1, 01, 01)
+        to_dt = datetime(from_dt.year + 1, 1, 1)
         agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
     if MO.objects.all().exists():
-        objects = MO.objects.all().order_by('name')
-        for obj in objects:
-            query = obj.departamentagreement_set.filter(**agreement_kwargs)
-            sum_flats_amount = sum([int(contract.flats_amount) for contract in obj.contract_set.all() if contract.flats_amount])
-            setattr(obj, "flats_amount", sum_flats_amount)
-            amount_sum = 0
-            for arg in query.filter(agreement_type=0):
-                if arg.subvention.amount:
-                    amount_sum += arg.subvention.amount
-            setattr(obj, "common_amount", amount_sum)
+        if recount:
+            recounts = MO.objects.filter(Q(flats_amount=0) | Q(common_amount=0))
+            if recounts:
+                recount_mos(recounts)
         if pk:
-            mo_object = MO.objects.get(pk=pk)
-            context.update({'object': mo_object})
+            objects = MO.objects.filter(pk=pk)
+            if objects:
+                context.update({'object': objects[0]})
+        else:
+            objects = MO.objects.all().order_by('name')
         page = request.GET.get('page', '1')
         paginator = Paginator(objects, 50)
         try:
@@ -565,9 +588,9 @@ def get_filter(request, num, extra=None):
         context.update({'mo_list': objects})
     elif num == 19:
         # 19 МО, которые освоили выделенную субвенцию в полном объеме
-        objects = MO.objects.filter(has_trouble=True)
-        template = '../../payment/templates/payments.html'
-        context.update({'payment_list': objects})
+        objects = MO.objects.filter(common_percentage__gt=99)
+        template = '../../mo/templates/mos.html'
+        context.update({'mo_list': objects})
     elif num == 20:
         # 20 МО, которые предоставили жилые помещения детям-сиротам
         objects = MO.objects.filter(pk__in=[mo.pk for mo in MO.objects.filter(home_orphans__gte=0)])
@@ -594,7 +617,7 @@ def get_filter(request, num, extra=None):
         context.update({'formset': forms})
     elif num == 21:
         # 21 МО, которые имеют перспективы освоения дополнительных денежных средств на текущий год.
-        objects = MO.objects.filter(has_trouble=True)
+        objects = MO.objects.filter(common_percentage__lte=99)
         template = '../../mo/templates/mos.html'
         context.update({'mo_list': objects})
     if not objects:
