@@ -386,6 +386,8 @@ def get_buildings(request, mo=None, all=False, template=None,
     if xls:
         return to_xls(request,  objects={BuildingForm: build_objects,
                                          GroundForm: ground_objects})
+    for obj in objects:
+        setattr(obj, "index_number", objects.index(obj))
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
