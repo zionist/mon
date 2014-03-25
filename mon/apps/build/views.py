@@ -291,10 +291,14 @@ def delete_building_copy(request, pk):
         copy = CopyBuilding.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    copy.room.delete()
-    copy.hallway.delete()
-    copy.wc.delete()
-    copy.kitchen.delete()
+    if copy.room:
+        copy.room.delete()
+    if copy.hallway:
+        copy.hallway.delete()
+    if copy.wc:
+        copy.wc.delete()
+    if copy.kitchen:
+        copy.kitchen.delete()
     copy.delete()
     return redirect("building_copies")
 
@@ -707,10 +711,14 @@ def delete_building(request, pk, state=None):
         if build.mo != request.user.customuser.pk:
             return HttpResponseForbidden("Forbidden")
     if build and 'delete' in request.POST:
-        build.room.delete()
-        build.hallway.delete()
-        build.wc.delete()
-        build.kitchen.delete()
+        if build.room:
+            build.room.delete()
+        if build.hallway:
+            build.hallway.delete()
+        if build.wc:
+            build.wc.delete()
+        if build.kitchen:
+            build.kitchen.delete()
         build.delete()
         return redirect('buildings')
     elif 'cancel' in request.POST:

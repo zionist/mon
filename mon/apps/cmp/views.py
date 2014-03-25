@@ -78,11 +78,14 @@ def delete_auction_copy(request, pk):
         copy = CopyAuction.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    copy.room.delete()
-    copy.hallway.delete()
-    copy.wc.delete()
-    copy.kitchen.delete()
-    copy.delete()
+    if copy.room:
+        copy.room.delete()
+    if copy.hallway:
+        copy.hallway.delete()
+    if copy.wc:
+        copy.wc.delete()
+    if copy.kitchen:
+        copy.kitchen.delete()
     return redirect("auction_copies")
 
 
@@ -335,10 +338,14 @@ def delete_auction(request, pk):
     context = {'title': _(u'Удаление заказа')}
     auction = Auction.objects.get(pk=pk)
     if auction and 'delete' in request.POST:
-        auction.room.delete()
-        auction.hallway.delete()
-        auction.wc.delete()
-        auction.kitchen.delete()
+        if auction.room:
+            auction.room.delete()
+        if auction.hallway:
+            auction.hallway.delete()
+        if auction.wc:
+            auction.wc.delete()
+        if auction.kitchen:
+            auction.kitchen.delete()
         auction.delete()
         return redirect('auctions')
     elif 'cancel' in request.POST:
@@ -571,10 +578,14 @@ def delete_contract_copy(request, pk):
         copy = CopyContract.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    copy.room.delete()
-    copy.hallway.delete()
-    copy.wc.delete()
-    copy.kitchen.delete()
+    if copy.room:
+        copy.room.delete()
+    if copy.hallway:
+        copy.hallway.delete()
+    if copy.wc:
+        copy.wc.delete()
+    if copy.kitchen:
+        copy.kitchen.delete()
     copy.delete()
     return redirect("contract_copies")
 
@@ -685,10 +696,14 @@ def delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
     contract = Contract.objects.get(pk=pk)
     if contract and 'delete' in request.POST:
-        contract.room.delete()
-        contract.hallway.delete()
-        contract.wc.delete()
-        contract.kitchen.delete()
+        if contract.room:
+            contract.room.delete()
+        if contract.hallway:
+            contract.hallway.delete()
+        if contract.wc:
+            contract.wc.delete()
+        if contract.kitchen:
+            contract.kitchen.delete()
         contract.delete()
         return redirect('contracts')
     elif 'cancel' in request.POST:
