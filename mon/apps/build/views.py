@@ -38,7 +38,7 @@ from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
     GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, CopyBuildingForm, \
     GroundMonitoringForm, BuildingSelectMonitoringForm, BuildingUpdateForm, GroundUpdateForm, \
     CopyForm
-from apps.core.views import get_fk_forms, get_fk_show_forms, split_form, copy_object
+from apps.core.views import get_fk_forms, get_fk_show_forms, split_form, copy_object, to_xls
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
 from apps.user.models import CustomUser
@@ -291,10 +291,14 @@ def delete_building_copy(request, pk):
         copy = CopyBuilding.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    copy.room.delete()
-    copy.hallway.delete()
-    copy.wc.delete()
-    copy.kitchen.delete()
+    if copy.room:
+        copy.room.delete()
+    if copy.hallway:
+        copy.hallway.delete()
+    if copy.wc:
+        copy.wc.delete()
+    if copy.kitchen:
+        copy.kitchen.delete()
     copy.delete()
     return redirect("building_copies")
 
@@ -386,6 +390,8 @@ def get_buildings(request, mo=None, all=False, template=None,
     if xls:
         return to_xls(request,  objects={BuildingForm: build_objects,
                                          GroundForm: ground_objects})
+    for obj in objects:
+        setattr(obj, "index_number", objects.index(obj))
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -396,93 +402,6 @@ def get_buildings(request, mo=None, all=False, template=None,
         objects = paginator.page(paginator.num_pages)
     context.update({'building_list': objects})
     return render(request, template, context, context_instance=RequestContext(request))
-
-
-# object instance: form for display
-def to_xls(request, objects={}):
-    # create
-    book = xlwt.Workbook(encoding='utf8')
-    sheet = book.add_sheet('untitled')
-
-    # styles
-    style_plain = xlwt.easyxf(
-        "font: height 180;"
-        "border: left thin, right thin, top thin, bottom thin;"
-        "align: vertical center, horizontal center, wrap True;"
-    )
-    style_bold = xlwt.easyxf(
-        "font: bold 1, height 180;"
-        "border: left thin, right thin, top thin, bottom thin;"
-        "align: vertical center, horizontal center, wrap True;"
-    )
-    date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
-
-
-    # object fields should be same as form fields
-    # get all types of objects
-
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
-    fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
-                u'Кухня': kitchen_f, u'Комната': room_f}
-    row = 0
-    for form, objs in objects.iteritems():
-        if not objs:
-            continue
-        # make headers
-        header_form = form()
-        col = 0
-        for field in header_form:
-            sheet.write(row, col, field.label if field.label else field.name,
-                        style_bold)
-            col += 1
-        for fk_name, fk_form in fk_forms.iteritems():
-            for field in fk_form:
-                sheet.write(row, col, u"%s %s" % (fk_name, field.label)
-                    if field.label else u"%s %s" % (fk_name, field.name),
-                            style_bold)
-                col += 1
-        # write values
-        row += 1
-        for obj in objs:
-            col = 0
-            obj_form = form(instance=obj)
-            for field in obj_form:
-                value = obj_form.initial.get(field.name)
-                if isinstance(value, bool) and value:
-                    value = u"Да"
-                elif isinstance(value, bool) and not value:
-                    value = u"Нет"
-                elif not value:
-                    value = u''
-                else:
-                    value = u"%s" % get_choice_or_value(obj_form, field.name)
-                sheet.write(row, col, value)
-                col += 1
-
-            # write fk forms values
-            room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=obj)
-            fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
-                        u'Кухня': kitchen_f, u'Комната': room_f}
-            for fk_name, fk_form in fk_forms.iteritems():
-                for field in fk_form:
-                    value = fk_form.initial.get(field.name)
-                    if isinstance(value, bool) and value:
-                        value = u"Да"
-                    elif isinstance(value, bool) and not value:
-                        value = u"Нет"
-                    elif not value:
-                        value = u''
-                    else:
-                        value = u"%s" % get_choice_or_value(fk_form,
-                                                            field.name)
-                    sheet.write(row, col, value)
-                    col += 1
-            row += 1
-
-    response = HttpResponse(mimetype='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=list.xls'
-    book.save(response)
-    return response
 
 
 @login_required
@@ -792,10 +711,14 @@ def delete_building(request, pk, state=None):
         if build.mo != request.user.customuser.pk:
             return HttpResponseForbidden("Forbidden")
     if build and 'delete' in request.POST:
-        build.room.delete()
-        build.hallway.delete()
-        build.wc.delete()
-        build.kitchen.delete()
+        if build.room:
+            build.room.delete()
+        if build.hallway:
+            build.hallway.delete()
+        if build.wc:
+            build.wc.delete()
+        if build.kitchen:
+            build.kitchen.delete()
         build.delete()
         return redirect('buildings')
     elif 'cancel' in request.POST:

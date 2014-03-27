@@ -24,7 +24,7 @@ from .models import Result, AuctionDocuments, Auction, Person, CompareData, Copy
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
     ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm, FilterAuctionForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
-from apps.core.views import split_form, set_fields_equal, copy_object
+from apps.core.views import split_form, set_fields_equal, copy_object, to_xls
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
 from apps.build.models import Contract, ContractDocuments, CopyContract
 from apps.build.forms import BuildingShowForm, GroundShowForm, CopyForm
@@ -78,11 +78,14 @@ def delete_auction_copy(request, pk):
         copy = CopyAuction.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    copy.room.delete()
-    copy.hallway.delete()
-    copy.wc.delete()
-    copy.kitchen.delete()
-    copy.delete()
+    if copy.room:
+        copy.room.delete()
+    if copy.hallway:
+        copy.hallway.delete()
+    if copy.wc:
+        copy.wc.delete()
+    if copy.kitchen:
+        copy.kitchen.delete()
     return redirect("auction_copies")
 
 
@@ -249,6 +252,9 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
                 objects = objects.filter(num__icontains=search_num)
     else:
         filter_form = FilterAuctionForm(prefix=f_pref)
+    objects = list(objects)
+    for obj in objects:
+        setattr(obj, "index_number", objects.index(obj))
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -332,10 +338,14 @@ def delete_auction(request, pk):
     context = {'title': _(u'Удаление заказа')}
     auction = Auction.objects.get(pk=pk)
     if auction and 'delete' in request.POST:
-        auction.room.delete()
-        auction.hallway.delete()
-        auction.wc.delete()
-        auction.kitchen.delete()
+        if auction.room:
+            auction.room.delete()
+        if auction.hallway:
+            auction.hallway.delete()
+        if auction.wc:
+            auction.wc.delete()
+        if auction.kitchen:
+            auction.kitchen.delete()
         auction.delete()
         return redirect('auctions')
     elif 'cancel' in request.POST:
@@ -504,7 +514,7 @@ def add_contract_from_auction(request, pk):
 
 @login_required
 def get_contracts(request, mo=None, all=False, template='contracts.html',
-                  copies=False):
+                  copies=False, xls=False):
     kwargs = {}
     context = {'title': _(u'Контракты')}
     mo_obj = None
@@ -536,6 +546,11 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
     else:
         if Contract.objects.filter(**kwargs).exists():
             objects = Contract.objects.filter(**kwargs).order_by('num')
+    if xls:
+        return to_xls(request,  objects={ContractForm: objects})
+    objects = list(objects)
+    for obj in objects:
+        setattr(obj, "index_number", objects.index(obj))
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -563,10 +578,14 @@ def delete_contract_copy(request, pk):
         copy = CopyContract.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    copy.room.delete()
-    copy.hallway.delete()
-    copy.wc.delete()
-    copy.kitchen.delete()
+    if copy.room:
+        copy.room.delete()
+    if copy.hallway:
+        copy.hallway.delete()
+    if copy.wc:
+        copy.wc.delete()
+    if copy.kitchen:
+        copy.kitchen.delete()
     copy.delete()
     return redirect("contract_copies")
 
@@ -585,7 +604,8 @@ def update_contract_copy(request, pk):
     form = ContractForm(prefix=prefix, instance=copy)
     image_form = ContractDocumentsForm(prefix=images_prefix)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
-    context.update({'object': copy, 'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+    context.update({'object': copy, 'form': form, 'prefix': prefix,
+                    'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [
                         BaseRoom._meta.verbose_name,
                         BaseHallway._meta.verbose_name,
@@ -680,10 +700,14 @@ def delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
     contract = Contract.objects.get(pk=pk)
     if contract and 'delete' in request.POST:
-        contract.room.delete()
-        contract.hallway.delete()
-        contract.wc.delete()
-        contract.kitchen.delete()
+        if contract.room:
+            contract.room.delete()
+        if contract.hallway:
+            contract.hallway.delete()
+        if contract.wc:
+            contract.wc.delete()
+        if contract.kitchen:
+            contract.kitchen.delete()
         contract.delete()
         return redirect('contracts')
     elif 'cancel' in request.POST:
