@@ -47,6 +47,9 @@ class ContractForm(forms.ModelForm):
         if self.fields.get('name'):
             self.fields['name'].label = u"Предмет контракта"
 
+        if self.fields.get('summa'):
+            self.fields['summa'].required = True
+
         mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
         if mo:
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
