@@ -618,8 +618,12 @@ def get_contract(request, pk, extra=None):
                             BaseWC._meta.verbose_name,
                             BaseKitchen._meta.verbose_name,
                             ]})
-
-    context.update({'object': contract})
+    payment_amount = sum(payment.amount for payment in contract.payment_set.all())
+    remainder = contract.summa - payment_amount if contract.summa else 0
+    context.update({
+        'object': contract,
+        'contract_payment_amount': payment_amount,
+        'contract_remainder': remainder})
     return render(request, 'contract.html', context, context_instance=RequestContext(request))
 
 

@@ -5,14 +5,14 @@
     <h4>{{ title }}</h4>
         <div class="row">
             <div class="span2"><a class="btn btn-info" href="{% url 'update-contract' object.id %}">
-                {% trans 'редактировать' %}</a></div>
+                {% trans 'Редактировать' %}</a></div>
             <div class="span5"><a class="btn btn-small" href="{% url 'cmp-contract' object.id %}">
                         {% trans 'Сравнить с объектом' %}</a>
             <a class="btn btn-small" href="{% url 'cmp-contract-auction' object.id %}">
                         {% trans 'Сравнить с аукционом' %}</a></div>
 
             <form method="POST" enctype="multipart/form-data" action="{% url 'copy-contract' object.id %}"> {% csrf_token %}
-                <div class="span1"> Количество </div>
+                <div class="span1"> {% trans 'Количество' %} </div>
                 <div class="span1"> {{ copyform.amount }} </div>
                 <div class="span1"><button class="btn" type="submit" >
                     {% trans 'Скопировать' %} </button></div>
@@ -56,6 +56,10 @@
             </div>
         {% endif %}
         <h4 class="blue">{% trans 'Контракт' %} № {{object.num}}</h4>
+        <div class="right"> <p style="color: #0077b3; text-align: right">
+            {% trans 'Сумма оплаченных средств по контракту' %} <b>{{contract_payment_amount}}</b> {% trans ' руб.' %}<br />
+            {% trans 'Остаток неоплаченных средств по контракту ' %} <b>{{contract_remainder}}</b> {% trans ' руб.' %}
+        </p></div>
         {% if form or formsets %}
             {% if form %}
                 {% include "view_table.html" %}
