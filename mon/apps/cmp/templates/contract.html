@@ -56,10 +56,12 @@
             </div>
         {% endif %}
         <h4 class="blue">{% trans 'Контракт' %} № {{object.num}}</h4>
-        <div class="right"> <p style="color: #0077b3; text-align: right">
-            {% trans 'Сумма оплаченных средств по контракту' %} <b>{{contract_payment_amount}}</b> {% trans ' руб.' %}<br />
-            {% trans 'Остаток неоплаченных средств по контракту ' %} <b>{{contract_remainder}}</b> {% trans ' руб.' %}
-        </p></div>
+        <div>
+            <p class="blue">
+            {% trans 'Сумма оплаченных средств по контракту' %} <strong>{{contract_payment_amount}}</strong> {% trans ' руб.' %}<br />
+            {% trans 'Остаток неоплаченных средств по контракту ' %} <strong>{{contract_remainder}}</strong> {% trans ' руб.' %}
+            </p>
+        </div>
         {% if form or formsets %}
             {% if form %}
                 {% include "view_table.html" %}
