@@ -72,11 +72,25 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
 
         if agreements:
             amount = sum([float(dep.subvention.amount) for dep in agreements if dep.subvention.amount])
-            spent = sum([float(contract.summa) for contract in mo.contract_set.all() if contract.summa])
+            home_amount = 0.0
+            adm_amount = 0.0
+            for dep in agreements:
+                if dep.subvention.reg_budget.sub_orph_home:
+                    home_amount += dep.subvention.reg_budget.sub_orph_home
+                if dep.subvention.fed_budget.sub_orph_home:
+                    home_amount += dep.subvention.fed_budget.sub_orph_home
+                if dep.subvention.reg_budget.adm_coef:
+                    adm_amount += dep.subvention.reg_budget.adm_coef
+                if dep.subvention.fed_budget.adm_coef:
+                    adm_amount += dep.subvention.fed_budget.adm_coef
+
+            spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1) if payment.amount])
+            adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2) if payment.amount])
             percent = round(((float(spent)/amount) * 100), 3)
             economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
-            accounting.update({'spent': spent, 'saved': amount - spent, 'percent': percent,
-                               'sub_amount': amount, 'economy': economy})
+            accounting.update({'mo': mo, 'spent': spent, 'saved': amount - spent, 'percent': percent,
+                               'sub_amount': amount, 'economy': economy, 'home_amount': home_amount,
+                               'adm_amount': adm_amount, 'adm_spent': adm_spent})
             context.update({'accounting': accounting})
         if update and accounting:
             mo.update(**accounting)
@@ -171,7 +185,7 @@ def get_accounting(request, select=None):
             dt = datetime.now()
             prev = dt.replace(day=dt.day-1)
         kwargs.update({'date__range': (prev, dt)})
-        agr_kwargs.update({'date__range': (datetime(dt.year-1, 12, 31), datetime(dt.year, 12, 31))})
+        agr_kwargs.update({'date__range': (datetime(dt.year, 1, 1), datetime(dt.year, 12, 31))})
     elif not select and request.method == 'POST' and 'date_select' in request.POST:
         form = DateForm(request.POST, prefix=prefix)
         if form.is_valid():
@@ -181,7 +195,7 @@ def get_accounting(request, select=None):
         else:
             context.update({'date_form': form})
     elif not select and from_dt:
-        to_dt = datetime(from_dt.year + 1, 1, 1)
+        to_dt = datetime(from_dt.year, 12, 31)
         kwargs.update({'date__range': (from_dt, to_dt)})
         agr_kwargs.update({'date__range': (from_dt, to_dt)})
 

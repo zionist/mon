@@ -15,7 +15,7 @@ from apps.mo.models import Subvention
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
-        fields = ('num', 'date', 'amount', 'contract', 'subvention', 'pay_order', 'approve_status')
+        fields = ('num', 'date', 'amount', 'contract', 'subvention', 'pay_order', 'approve_status', 'payment_state')
 
     def __init__(self, *args, **kwargs):
         user_mo = kwargs.get('initial').get('user_mo') if 'initial' in kwargs else None
