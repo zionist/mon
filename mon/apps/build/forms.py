@@ -89,8 +89,6 @@ class BuildingUpdateForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingUpdateForm, self).__init__(*args, **kwargs)
-        for f in self.fields:
-            print f + " -> " + self.fields[f].label
 
     class Meta:
         model = Building
