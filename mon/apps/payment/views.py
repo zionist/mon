@@ -75,18 +75,20 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
             home_amount = 0.0
             adm_amount = 0.0
             for dep in agreements:
-                if dep.subvention.reg_budget.sub_orph_home:
-                    home_amount += dep.subvention.reg_budget.sub_orph_home
-                if dep.subvention.fed_budget.sub_orph_home:
-                    home_amount += dep.subvention.fed_budget.sub_orph_home
-                if dep.subvention.reg_budget.adm_coef:
-                    adm_amount += dep.subvention.reg_budget.adm_coef
-                if dep.subvention.fed_budget.adm_coef:
-                    adm_amount += dep.subvention.fed_budget.adm_coef
+                if dep.subvention.reg_budget:
+                    if dep.subvention.reg_budget.sub_orph_home:
+                        home_amount += dep.subvention.reg_budget.sub_orph_home
+                    if dep.subvention.reg_budget.adm_coef:
+                        adm_amount += dep.subvention.reg_budget.adm_coef
+                if dep.subvention.fed_budget:
+                    if dep.subvention.fed_budget.sub_orph_home:
+                        home_amount += dep.subvention.fed_budget.sub_orph_home
+                    if dep.subvention.fed_budget.adm_coef:
+                        adm_amount += dep.subvention.fed_budget.adm_coef
 
             spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1) if payment.amount])
             adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2) if payment.amount])
-            percent = round(((float(spent)/amount) * 100), 3)
+            percent = round(((float(spent)/amount) * 100), 3) if amount else 0
             economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
             accounting.update({'mo': mo, 'spent': spent, 'saved': amount - spent, 'percent': percent,
                                'sub_amount': amount, 'economy': economy, 'home_amount': home_amount,
