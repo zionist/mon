@@ -642,12 +642,6 @@ def copy_building(request, pk):
     for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'contract', 'id', 'developer']:
         build_dict.pop(n)
 
-    # does not work https://docs.djangoproject.com/en/dev/ref/models/querysets/ (bulk_create)
-    # copies = []
-    # for c in xrange(amount):
-    #    copies.append(CopyBuilding(**build_dict))
-    # CopyBuilding.objects.bulk_create(copies)
-
     for copy in xrange(amount):
         # fks
         copy = CopyBuilding(**build_dict)

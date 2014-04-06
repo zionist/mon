@@ -79,18 +79,18 @@ class Contract(BaseContract, BaseCompareData):
         return '%s' % self.num
 
     developer = models.ForeignKey(Developer, help_text=_(u"Застройщик/Владелец"), verbose_name=_(u"Застройщик/Владелец"), null=True, blank=True, )
-    summa = models.FloatField(help_text=_(u"Сумма заключенного контракта, всего, руб."), null=True, verbose_name=_(u"Сумма заключенного контракта, всего, руб."), blank=True, )
-    summa_fed = models.FloatField(help_text=_(u"Сумма федеральных средств, руб."), null=True, verbose_name=_(u"Сумма федеральных средств, руб."), blank=True, )
-    summa_reg = models.FloatField(help_text=_(u"Сумма краевых средств, руб."), null=True, verbose_name=_(u"Сумма краевых средств, руб."), blank=True, )
+    summa = models.FloatField(help_text=_(u"Сумма заключенного контракта, всего, руб."), null=True, verbose_name=_(u"Сумма заключенного контракта, всего, руб."), blank=False, )
+    summa_fed = models.FloatField(help_text=_(u"Сумма федеральных средств, руб."), null=True, verbose_name=_(u"Сумма федеральных средств, руб."), blank=False, )
+    summa_reg = models.FloatField(help_text=_(u"Сумма краевых средств, руб."), null=True, verbose_name=_(u"Сумма краевых средств, руб."), blank=False, )
     summ_mo_money = models.FloatField(help_text=_(u"Сумма муниципальных средств, включенных в сумму контракта, руб."), null=True,
-        verbose_name=_(u"Сумма муниципальных средств, включенных в сумму контракта, руб."), blank=True, )
+        verbose_name=_(u"Сумма муниципальных средств, включенных в сумму контракта, руб."), blank=False, )
     summ_without_mo_money = models.FloatField(help_text=_(u"Сумма заключенного контракта без учета средств МО, руб."), null=True,
-        verbose_name=_(u"Сумма заключенного контракта без учета средств МО, руб."), blank=True, )
-    date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=True, )
-    period_of_payment = models.CharField(max_length=2048, help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=True, )
+        verbose_name=_(u"Сумма заключенного контракта без учета средств МО, руб."), blank=False, )
+    date = models.DateField(help_text=_(u"Дата заключения контракта"), null=True, verbose_name=_(u"Дата заключения контракта"), blank=False, )
+    period_of_payment = models.CharField(max_length=2048, help_text=_(u"Срок оплаты по условиям контракта"), null=True, verbose_name=_(u"Срок оплаты по условиям контракта"), blank=False, )
     creation_form = models.SmallIntegerField(help_text=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
-        blank=True, null=True, choices=CREATION_FORM_CHOICES)
+        blank=False, null=True, choices=CREATION_FORM_CHOICES)
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     docs = models.ForeignKey(ContractDocuments, null=True, blank=True, help_text=_(u"Контрактная документация"), verbose_name=_(u"Контрактная документация"), )
     budget = models.SmallIntegerField(help_text=u"Бюджет", verbose_name=u"Бюджет", null=True, blank=False, choices=BUDGET_CHOICES)

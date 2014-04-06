@@ -77,7 +77,7 @@ class BuildingForm(GroundForm):
             'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
             'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
             'internal_doors', 'entrance_door', 'window_constructions',
-            # ask
+            # for remove
             'complete_date', 'comment', 'payment_perspective', 'offer', 'permission', 'cad_passport',
             'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
             'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways', 'cad_num',

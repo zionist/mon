@@ -61,6 +61,7 @@ class ContractForm(forms.ModelForm):
                                                      label=u"Контракт для обновления аукциона",
                                                      required=False, widget=forms.HiddenInput())
 
+
     electric_supply = forms.ChoiceField(label=_(u"Электроснабжение"), required=False,
         widget=forms.Select, choices=ELECTRIC_SUPPLY_CHOICES)
     water_removal = forms.ChoiceField(label=_(u"Водоотведение"), required=False,
@@ -75,6 +76,20 @@ class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
+        fields = [
+           'name', 'start_year', 'finish_year', 'date', 'num',
+           'flats_amount', 'developer', 'summa', 'summa_fed',
+           'summa_reg', 'summ_mo_money', 'summ_without_mo_money',
+           'period_of_payment', 'creation_form', 'mo',
+            # for remove
+           'has_trouble_docs', 'gas_supply', 'water_removal', 'water_settlement',
+           'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
+           'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+           'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
+           'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
+           'entrance_door', 'window_constructions', 'floors', 'driveways',
+           'area_cmp', 'area', 'budget',
+        ]
 
 
 class ResultForm(forms.ModelForm):
@@ -127,6 +142,9 @@ class AuctionForm(forms.ModelForm):
             self.fields['contract'] = forms.ModelChoiceField(label=_(u'Данные по заключенному контракту'),
                                                              required=True, queryset=mo.contract_set.all())
 
+        for f in self.fields:
+            print f + " -> " + self.fields[f].label
+
     electric_supply = CSIMultipleChoiceField(label=_(u"Электроснабжение"), required=False,
                                            widget=CSICheckboxSelectMultiple, choices=ELECTRIC_SUPPLY_CHOICES)
     water_removal = CSIMultipleChoiceField(label=_(u"Водоотведение"), required=False,
@@ -141,6 +159,20 @@ class AuctionForm(forms.ModelForm):
     class Meta:
         model = Auction
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
+
+        fields = [
+            'start_year', 'finish_year', 'name', 'num', 'flats_amount',
+            'area_cmp', 'area', 'start_price', 'date', 'open_date',
+            'proposal_count', 'mo', 'stage', 'contract', 'electric_supply',
+            'water_settlement', 'water_removal', 'hot_water_supply', 'heating',
+            'internal_doors', 'is_water_boiler', 'is_loggia', 'is_balcony',
+            # to remove. Why gas_supply here?
+            'has_trouble_docs', 'gas_supply', 'public_transport', 'market',
+            'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
+            'driveways', 'is_heat_boiler', 'is_intercom', 'entrance_door',
+            'window_constructions',
+        ]
 
     def clean(self):
         cd = super(AuctionForm, self).clean()
