@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 FACE_LIST_CHOICES = ((0, _(u'Юридическое лицо')),  (1, _(u'Физическое лицо')),)
 STATE_CHOICES = ((0, _(u'Сданный объект')),  (1, _(u'Строящийся объект')), (2, _(u'Участок под строительство')))
-READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж в комментариях)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')))
+READINESS_CHOICES = ((0, _(u'Фундаментные работы')),  (1, _(u'Строительно-монтажные работы (указать этаж в комментариях)')), (2, _(u'Санитарно-технические работы')), (3, _(u'Отделочные работы')),   (4, _(u'Работы по благоустройству территории')), (5, _(u'Cдан в эксплуатацию')))
 WATER_SETTLEMENT_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 HOT_WATER_SUPPLY_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
 WATER_REMOVAL_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное')))
@@ -137,7 +137,7 @@ class BaseBuilding(models.Model):
     address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
     complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
     comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
-    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=False, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
+    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
     offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
