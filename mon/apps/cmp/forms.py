@@ -142,9 +142,6 @@ class AuctionForm(forms.ModelForm):
             self.fields['contract'] = forms.ModelChoiceField(label=_(u'Данные по заключенному контракту'),
                                                              required=True, queryset=mo.contract_set.all())
 
-        for f in self.fields:
-            print f + " -> " + self.fields[f].label
-
     electric_supply = CSIMultipleChoiceField(label=_(u"Электроснабжение"), required=False,
                                            widget=CSICheckboxSelectMultiple, choices=ELECTRIC_SUPPLY_CHOICES)
     water_removal = CSIMultipleChoiceField(label=_(u"Водоотведение"), required=False,
