@@ -489,7 +489,7 @@ class BaseCompareData(BaseCommonChars, ):
 
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
-    flats_amount = models.IntegerField(help_text=_(u"Количество однокомнатных жилых помещений (площадью не менее 33 кв. м)"), null=True, verbose_name=_(u"Количество однокомнатных жилых помещений (площадью не менее 33 кв. м)"), blank=True, )
+    flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений"), null=True, verbose_name=_(u"Количество жилых помещений"), blank=True, )
     area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
     area = models.FloatField(help_text=_(u"Общая площадь (кв. м)"), null=True, verbose_name=_(u"Общая площадь (кв. м)"), blank=False, )
 

@@ -78,7 +78,7 @@ class Contract(BaseContract, BaseCompareData):
     def __unicode__(self):
         return '%s' % self.num
 
-    developer = models.ForeignKey(Developer, help_text=_(u"Застройщик/Владелец"), verbose_name=_(u"Застройщик/Владелец"), null=True, blank=True, )
+    developer = models.ForeignKey(Developer, help_text=_(u"Поставщик"), verbose_name=_(u"Поставщик"), null=True, blank=True, )
     summa = models.FloatField(help_text=_(u"Сумма заключенного контракта, всего, руб."), null=True, verbose_name=_(u"Сумма заключенного контракта, всего, руб."), blank=False, )
     summa_fed = models.FloatField(help_text=_(u"Сумма федеральных средств, руб."), null=True, verbose_name=_(u"Сумма федеральных средств, руб."), blank=False, )
     summa_reg = models.FloatField(help_text=_(u"Сумма краевых средств, руб."), null=True, verbose_name=_(u"Сумма краевых средств, руб."), blank=False, )

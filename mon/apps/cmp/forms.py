@@ -78,7 +78,7 @@ class ContractForm(forms.ModelForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
         fields = [
            'name', 'start_year', 'finish_year', 'date', 'num',
-           'flats_amount', 'developer', 'summa', 'summa_fed',
+           'flats_amount', 'area', 'developer', 'summa', 'summa_fed',
            'summa_reg', 'summ_mo_money', 'summ_without_mo_money',
            'period_of_payment', 'creation_form', 'mo',
             # for remove
@@ -88,7 +88,7 @@ class ContractForm(forms.ModelForm):
            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
            'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
            'entrance_door', 'window_constructions', 'floors', 'driveways',
-           'area_cmp', 'area', 'budget',
+           'area_cmp', 'budget',
         ]
 
 
