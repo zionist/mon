@@ -15,11 +15,13 @@ from apps.mo.models import Subvention
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
-        fields = ('num', 'date', 'amount', 'contract', 'subvention', 'pay_order', 'approve_status', 'payment_state')
+        fields = ('num', 'date', 'amount', 'contract', 'subvention', 'pay_order', 'approve_status',
+                  'payment_state', 'payment_budget_state')
 
     def __init__(self, *args, **kwargs):
         user_mo = kwargs.get('initial').get('user_mo') if 'initial' in kwargs else None
         super(PaymentForm, self).__init__(*args, **kwargs)
+        self.fields['payment_budget_state'].required = True
         if user_mo:
             self.fields['subvention'].queryset = Subvention.objects.filter(departamentagreement__mo=user_mo)
             self.fields['contract'].queryset = Contract.objects.filter(mo=user_mo)
