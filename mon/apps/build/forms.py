@@ -76,12 +76,12 @@ class BuildingForm(GroundForm):
             'start_year', 'finish_year', 'readiness', 'mo', 'address', 'floors', 'area_cmp',
             'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
             'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            'internal_doors', 'entrance_door', 'window_constructions',
+            'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
+            'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
             # for remove
-            'complete_date', 'comment', 'payment_perspective', 'offer', 'permission', 'cad_passport',
+            'complete_date', 'comment', 'offer', 'permission',
             'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways', 'cad_num',
-            'developer', 'contract', 'flat_num',
+            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
             ]
 
 
@@ -93,20 +93,20 @@ class BuildingUpdateForm(GroundForm):
     class Meta:
         model = Building
         # fields = ['heating', 'start_year', 'finish_year']
+
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state',
+        'approve_status', 'flats_amount')
         fields = [
             'start_year', 'finish_year', 'readiness', 'mo', 'address', 'floors', 'area_cmp',
             'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
             'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            'internal_doors', 'entrance_door', 'window_constructions',
-            # ask
-            'complete_date', 'comment', 'payment_perspective', 'offer', 'permission', 'cad_passport',
+            'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
+            'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
+            # for remove
+            'complete_date', 'comment', 'offer', 'permission',
             'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways', 'cad_num',
-            'developer', 'contract', 'flat_num',
+            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
             ]
-
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state',
-        'approve_status', 'flats_amount')
 
 
 class CopyBuildingForm(BuildingForm):
