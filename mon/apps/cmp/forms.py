@@ -153,6 +153,7 @@ class AuctionForm(forms.ModelForm):
     heating = CSIMultipleChoiceField(label=_(u"Отопление"), required=False,
                                      widget=CSICheckboxSelectMultiple, choices=HEATING_CHOICES)
 
+
     class Meta:
         model = Auction
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
@@ -207,6 +208,20 @@ class AuctionShowForm(forms.ModelForm):
         model = Auction
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'open_date', 'date', 'stage', 'proposal_count',
                    'contract', 'name', 'num',  'docs', 'has_trouble_docs', 'start_price')
+        fields = [
+            'start_year', 'finish_year', 'name', 'num', 'flats_amount',
+            'area_cmp', 'area', 'start_price', 'date', 'open_date',
+            'proposal_count', 'mo', 'stage', 'contract', 'electric_supply',
+            'water_settlement', 'water_removal', 'hot_water_supply', 'heating',
+            'internal_doors', 'is_water_boiler', 'is_loggia', 'is_balcony',
+            'gas_supply',
+            # to remove
+            'has_trouble_docs', 'public_transport', 'market',
+            'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
+            'driveways', 'is_heat_boiler', 'is_intercom', 'entrance_door',
+            'window_constructions',
+            ]
 
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
@@ -235,8 +250,22 @@ class ContractShowForm(ContractForm):
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date',
                    'docs', 'has_trouble_docs', 'developer', 'area', 'flats_amount')
 
-    def __init__(self, *args, **kwargs):
+        fields = [
+            'name', 'start_year', 'finish_year', 'date', 'num',
+            'flats_amount', 'area', 'developer', 'summa', 'summa_fed',
+            'summa_reg', 'summ_mo_money', 'summ_without_mo_money',
+            'period_of_payment', 'creation_form', 'mo', 'area_cmp',
+            # for remove
+            'has_trouble_docs', 'gas_supply', 'water_removal', 'water_settlement',
+            'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
+            'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
+            'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
+            'entrance_door', 'window_constructions', 'floors', 'driveways',
+             'budget',
+            ]
 
+    def __init__(self, *args, **kwargs):
         self.cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
         super(ContractShowForm, self).__init__(*args, **kwargs)
 
@@ -249,6 +278,7 @@ class ContractShowForm(ContractForm):
                 if hasattr(self.instance, field) and hasattr(self.cmp_initial, field):
                     if getattr(self.instance, field) != getattr(self.cmp_initial, field):
                         self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
 
 
 class CompareDataShowForm(forms.ModelForm):

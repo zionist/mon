@@ -254,7 +254,7 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
         filter_form = FilterAuctionForm(prefix=f_pref)
     objects = list(objects)
     for obj in objects:
-        setattr(obj, "index_number", objects.index(obj))
+        setattr(obj, "index_number", objects.index(obj) + 1)
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
@@ -550,7 +550,7 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
         return to_xls(request,  objects={ContractForm: objects})
     objects = list(objects)
     for obj in objects:
-        setattr(obj, "index_number", objects.index(obj))
+        setattr(obj, "index_number", objects.index(obj) + 1)
     page = request.GET.get('page', '1')
     paginator = Paginator(objects, 50)
     try:
