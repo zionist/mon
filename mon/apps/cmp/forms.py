@@ -163,8 +163,9 @@ class AuctionForm(forms.ModelForm):
             'proposal_count', 'mo', 'stage', 'contract', 'electric_supply',
             'water_settlement', 'water_removal', 'hot_water_supply', 'heating',
             'internal_doors', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            # to remove. Why gas_supply here?
-            'has_trouble_docs', 'gas_supply', 'public_transport', 'market',
+            'gas_supply',
+            # to remove
+            'has_trouble_docs', 'public_transport', 'market',
             'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
             'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
             'driveways', 'is_heat_boiler', 'is_intercom', 'entrance_door',

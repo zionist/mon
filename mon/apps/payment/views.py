@@ -86,13 +86,18 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
                     if dep.subvention.fed_budget.adm_coef:
                         adm_amount += dep.subvention.fed_budget.adm_coef
 
-            spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1) if payment.amount])
-            adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2) if payment.amount])
-            percent = round(((float(spent)/amount) * 100), 3) if amount else 0
+            reg_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1, payment_budget_state=2) if payment.amount])
+            fed_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1, payment_budget_state=1) if payment.amount])
+            reg_adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2, payment_budget_state=2) if payment.amount])
+            fed_adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2, payment_budget_state=1) if payment.amount])
+            spent = reg_spent + fed_spent
+            adm_spent = reg_adm_spent + fed_adm_spent
+            percent = round((float(spent/amount) * 100), 3) if amount else 0
             economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
             accounting.update({'mo': mo, 'spent': spent, 'saved': amount - spent, 'percent': percent,
                                'sub_amount': amount, 'economy': economy, 'home_amount': home_amount,
-                               'adm_amount': adm_amount, 'adm_spent': adm_spent})
+                               'adm_amount': adm_amount, 'adm_spent': adm_spent,
+                               'reg_spent': reg_spent, 'fed_spent': fed_spent})
             context.update({'accounting': accounting})
         if update and accounting:
             mo.update(**accounting)
