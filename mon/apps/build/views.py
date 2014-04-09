@@ -6,7 +6,7 @@ import mimetypes
 import xlwt
 from copy import deepcopy
 from webodt.converters import converter
-from datetime import datetime
+from datetime import datetime, date
 
 from django import forms
 from django.http import HttpResponse, HttpResponseNotFound, \
@@ -134,6 +134,11 @@ def add_building(request, dev_pk=None, state=None, contract=0):
             initial_kw.update({'mo': request.user.customuser.mo})
         if contract:
             initial_kw.update({'contract': contract})
+        from_dt = datetime.now()
+        if request.user.is_staff:
+            from_dt = request.user.customuser.get_user_date()
+        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+            'finish_year': date(from_dt.year, 12, 31)})
         if select and int(select) == 2:
             form = GroundForm(prefix=prefix, initial=initial_kw)
         elif select and int(select) in [0, 1]:

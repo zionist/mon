@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
+from datetime import datetime, date
 from copy import deepcopy
 from django.http import HttpResponse
 from django import forms
@@ -58,6 +58,11 @@ def add_auction(request):
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
+        from_dt = datetime.now()
+        if request.user.is_staff:
+            from_dt = request.user.customuser.get_user_date()
+        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+                           'finish_year': date(from_dt.year, 12, 31)})
         form = AuctionForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
         # move text_area fields to another form
@@ -401,6 +406,11 @@ def add_contract(request, auction_for_update=0):
             initial_kw.update({"auction_for_update": auction_for_update})
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
+        from_dt = datetime.now()
+        if request.user.is_staff:
+            from_dt = request.user.customuser.get_user_date()
+        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+                           'finish_year': date(from_dt.year, 12, 31)})
         form = ContractForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
