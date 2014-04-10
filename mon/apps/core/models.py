@@ -192,7 +192,7 @@ class BasePayment(models.Model):
     approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки платежа"), help_text=_(u"Статус проверки платежа"))
     num = models.CharField(max_length=2048, help_text=_(u"Номер документа, подтверждающего платеж"), verbose_name=_(u"Номер документа, подтверждающего платеж"),)
     date = models.DateField(db_index=True, help_text=_(u"Дата совершения платежа"), verbose_name=_(u"Дата совершения платежа"),)
-    amount = models.FloatField(null=True, blank=True, help_text=_(u"Сумма платежа (руб.)"), verbose_name=_(u"Сумма платежа (руб.)"),)
+    amount = models.FloatField(null=True, blank=False, help_text=_(u"Сумма платежа (руб.)"), verbose_name=_(u"Сумма платежа (руб.)"),)
     payment_budget_state = models.SmallIntegerField(blank=True, help_text=_(u"Бюджет"), verbose_name=_(u"Бюджет"), choices=PAYMENT_BUDGET_STATE_CHOICES)
     payment_state = models.SmallIntegerField(default=1, help_text=_(u"Тип платежа"), verbose_name=_(u"Тип платежа"), choices=PAYMENT_STATE_CHOICES)
 
