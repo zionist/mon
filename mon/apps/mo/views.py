@@ -75,9 +75,35 @@ def recount_mos(mos=[], kwargs=None):
     for mo in mos:
         sum_flats_amount = sum([int(contract.flats_amount) for contract in mo.contract_set.filter(**kwargs) if contract.flats_amount])
         mo.flats_amount = sum_flats_amount
-        amount_sum = sum([int(agr.subvention.amount) for agr in mo.departamentagreement_set.filter(**kwargs).filter(agreement_type=0) if agr.subvention.amount])
+        agreements = mo.departamentagreement_set.filter(**kwargs)
+
+        amount_sum = 0.0
+        reg_amount_sum = 0.0
+        fed_amount_sum = 0.0
+        home_reg_orphans = 0
+        home_fed_orphans = 0
+
+        for agr in agreements:
+            subvention = agr.subvention
+            if subvention.amount:
+                amount_sum += float(subvention.amount)
+            if hasattr(subvention, 'reg_budget'):
+                if subvention.reg_budget.sub_sum:
+                    reg_amount_sum += float(subvention.reg_budget.sub_sum)
+                if subvention.reg_budget.subvention_performance:
+                    home_reg_orphans += int(subvention.reg_budget.subvention_performance)
+            if hasattr(subvention, 'fed_budget'):
+                if subvention.fed_budget.sub_sum:
+                    fed_amount_sum += float(subvention.fed_budget.sub_sum)
+                if subvention.fed_budget.subvention_performance:
+                    home_fed_orphans += int(agr.subvention.fed_budget.subvention_performance)
         mo.common_amount = amount_sum
-        mo.save(update_fields=['flats_amount', 'common_amount'])
+        mo.common_reg_amount = reg_amount_sum
+        mo.common_fed_amount = fed_amount_sum
+        mo.home_reg_orphans = home_reg_orphans
+        mo.home_fed_orphans = home_fed_orphans
+        mo.home_orphans = home_reg_orphans + home_fed_orphans
+        mo.save()
     return True
 
 
@@ -91,24 +117,15 @@ def get_recount_mo(request, pk=None):
             agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
         if pk:
             recount_mos(MO.objects.filter(pk=pk), kwargs=agreement_kwargs)
-    return get_mos(request, pk=pk, recount=False)
+    return get_mos(request, pk=pk)
 
 
 @login_required
-def get_mos(request, pk=None, recount=True):
+def get_mos(request, pk=None):
     title = _(u'Муниципальные образования')
     template = 'mos.html'
     context = {'title': title, 'show_recount': True}
-    agreement_kwargs = {}
-    if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
-        from_dt = request.user.customuser.get_user_date()
-        to_dt = datetime(from_dt.year + 1, 1, 1)
-        agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
     if MO.objects.all().exists():
-        if recount:
-            recounts = MO.objects.filter(Q(flats_amount=0) | Q(common_amount=0))
-            if recounts:
-                recount_mos(recounts)
         if pk:
             objects = MO.objects.filter(pk=pk)
             if objects:

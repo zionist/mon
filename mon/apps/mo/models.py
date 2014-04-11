@@ -62,10 +62,14 @@ class MO(models.Model):
                                         blank=True, null=True, )
     has_trouble = models.NullBooleanField(blank=True, null=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
     home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
+    home_reg_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"))
+    home_fed_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"))
     common_economy = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая эканомия по субвенциям"), verbose_name=_(u"Общая эканомия по субвенциям"))
     common_percentage = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общий процент освоения субвенции"), verbose_name=_(u"Общий процент освоения субвенции"))
     common_spent = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая сумма потраченной субвенции"), verbose_name=_(u"Общая сумма потраченной субвенции"))
     common_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая сумма субвенции"), verbose_name=_(u"Общая сумма субвенции"))
+    common_reg_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Сумма субвенции от краевого бюджета"), verbose_name=_(u"Сумма субвенции от краевого бюджета"))
+    common_fed_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Сумма субвенции от федерального бюджета"), verbose_name=_(u"Сумма субвенции от федерального бюджета"))
     flats_amount = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Количество жилых помещений по заключенным контрактам"), verbose_name=_(u"Количество жилых помещений по заключенным контрактам"))
 
 
