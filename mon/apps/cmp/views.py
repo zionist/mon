@@ -61,7 +61,7 @@ def add_auction(request):
         from_dt = datetime.now()
         if request.user.is_staff:
             from_dt = request.user.customuser.get_user_date()
-        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+        initial_kw.update({'start_year': date(from_dt.year, 1, 1),
                            'finish_year': date(from_dt.year, 12, 31)})
         form = AuctionForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
@@ -404,7 +404,7 @@ def add_contract(request, auction_for_update=0):
         from_dt = datetime.now()
         if request.user.is_staff:
             from_dt = request.user.customuser.get_user_date()
-        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+        initial_kw.update({'start_year': date(from_dt.year, 1, 1),
                            'finish_year': date(from_dt.year, 12, 31)})
         form = ContractForm(prefix=prefix, initial=initial_kw)
         form, text_area_form = split_form(form)
@@ -673,11 +673,11 @@ def add_result(request):
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             result = form.save()
             result.cmp_data = cmp_form.save()
-            result.cmp_data.room = room_f.save()
-            result.cmp_data.hallway = hallway_f.save()
-            result.cmp_data.wc = wc_f.save()
-            result.cmp_data.kitchen = kitchen_f.save()
-            result.cmp_data.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
+            result.room = room_f.save()
+            result.hallway = hallway_f.save()
+            result.wc = wc_f.save()
+            result.kitchen = kitchen_f.save()
+            result.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             result.save(update_fields=['cmp_data'])
             return redirect('results')
         else:
@@ -745,7 +745,7 @@ def get_result(request, pk, extra=None):
     else:
         form = ResultShowForm(instance=result, prefix=prefix)
         cmp_form = CompareDataShowForm(instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result.cmp_data)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result)
         context.update({'form': form, 'cmp_form': cmp_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': result})
     return render(request, 'result.html', context, context_instance=RequestContext(request))
@@ -759,7 +759,7 @@ def update_result(request, pk, extra=None):
     if request.method == "POST":
         form = ResultForm(request.POST, request.FILES, instance=result, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data, request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, request=request)
         context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
@@ -778,7 +778,7 @@ def update_result(request, pk, extra=None):
         form = ResultForm(instance=result, prefix=prefix)
         form, text_area_form = split_form(form)
         cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result)
         context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form,
                         'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
@@ -800,10 +800,10 @@ def delete_result(request, pk):
     result = Result.objects.get(pk=pk)
     if result and 'delete' in request.POST:
         result.cmp_data.delete()
-        result.cmp_data.room.delete()
-        result.cmp_data.hallway.delete()
-        result.cmp_data.wc.delete()
-        result.cmp_data.kitchen.delete()
+        result.room.delete()
+        result.hallway.delete()
+        result.wc.delete()
+        result.kitchen.delete()
         result.delete()
         return redirect('results')
     elif 'cancel' in request.POST:

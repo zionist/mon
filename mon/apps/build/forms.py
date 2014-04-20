@@ -79,7 +79,7 @@ class BuildingForm(GroundForm):
             'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
             'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
             # for remove
-            'complete_date', 'comment', 'offer', 'permission',
+            'complete_date', 'comment',
             'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
             'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
             ]
@@ -104,7 +104,7 @@ class BuildingUpdateForm(GroundForm):
             'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
             'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
             # for remove
-            'complete_date', 'comment', 'offer', 'permission',
+            'complete_date', 'comment',
             'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
             'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
             ]
@@ -179,7 +179,7 @@ class BuildingShowForm(BuildingForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract', 'developer', 'offer', 'permission', 'approve_status',
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract', 'developer', 'approve_status',
                    'area', 'address', 'comment', 'complete_date', 'readiness', 'payment_perspective', 'flats_amount')
 
     def __init__(self, *args, **kwargs):

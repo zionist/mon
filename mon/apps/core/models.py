@@ -166,20 +166,6 @@ class BaseContract(BaseName):
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 
-class BaseResult(models.Model):
-
-    class Meta:
-        abstract = True
-
-    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
-    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
-
-    check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
-    doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
-    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
-    recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
-
-
 class BaseDeveloper(BaseName, ):
 
     class Meta:
@@ -505,6 +491,28 @@ class BaseCompareData(BaseCommonChars, ):
     area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
     area = models.FloatField(help_text=_(u"Общая площадь (кв. м)"), null=True, verbose_name=_(u"Общая площадь (кв. м)"), blank=False, )
 
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseCompareData, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class BaseResult(models.Model):
+
+    class Meta:
+        abstract = True
+
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
+
+    check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
+    doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
+    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
+    recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
+
     room = models.ForeignKey(Room, null=True, blank=True, )
     wc = models.ForeignKey(WC, null=True, blank=True, )
     hallway = models.ForeignKey(Hallway, null=True, blank=True, )
@@ -512,7 +520,7 @@ class BaseCompareData(BaseCommonChars, ):
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
-        d = super(BaseCompareData, self).to_dict() or {}
+        d = super(BaseResult, self).to_dict() or {}
         for k in attrs:
             if not '__' in k and getattr(self, k):
                 d.update({k: getattr(self, k)})
