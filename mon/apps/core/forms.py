@@ -139,6 +139,8 @@ class WCForm(forms.ModelForm):
         self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
         self.fields['wc_ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка в туалете", choices=choices, )
 
+        self.fields['wc_ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка в туалете", choices=choices, )
+
 
 class KitchenForm(forms.ModelForm):
 

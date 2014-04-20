@@ -24,12 +24,15 @@ PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения �
 PAYMENT_STATE_CHOICES = (((1, _(u'Платеж')), (2, _(u'Административный платеж')), ))
 PAYMENT_BUDGET_STATE_CHOICES = (((1, _(u'Федеральный')), (2, _(u'Краевой')), ))
 APPROVE_CHOICES = ((0, _(u'Не проверено')), (1, _(u'Требуется проверка')), (2, _(u'Проверено')), )
-STOVE_CHOICES = ((0, _(u'Не указано')), (1, _(u'Газовая кухонная плита')), (2, _(u'Электрическая кухонная плита')), (3, _(u'Кухонная плита')), )
+STOVE_CHOICES = ((0, _(u'Не указано')), (1, _(u'Газовая кухонная плита')), (2, _(u'Электрическая кухонная плита')), (3, _(u'Кухонная плита')), (4, _(u'Отсутствует')), )
 HEATING_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное поквартирное')),  (3, _(u'Автономное')))
-SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Раковина')), (2, _(u'Раковина со смесителем')), )
-BATH_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ванна')), (2, _(u'Ванна со смесителем')), )
+SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Мойка')), (2, _(u'Мойка со смесителем')), (3, _(u'Отсутствует')), )
+WC_SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Умывальник')), (2, _(u'Умывальник со смесителем')), (3, _(u'Отсутствует')), )
+BATH_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ванна')), (2, _(u'Ванна со смесителем')), (3, _(u'Отсутствует')), )
 AREA_CMP_CHOICES = ((0, _(u'Не менее')), (1, _(u'Равно')), )
 BUDGET_CHOICES = ((1, _(u'Федеральный')),  (2, _(u'Краевой')), )
+
+BUILD_STATE_CHOICES = ((1, _(u'Не оформлен в муниципальную собственность')),  (2, _(u'Оформлен в муниципальную собственность')), )
 
 YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
 
@@ -141,8 +144,13 @@ class BaseBuilding(models.Model):
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
-    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
+    build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=True, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
+    build_year = models.DateField(help_text=_(u"Год постройки"), verbose_name=_(u"Год постройки"), null=True, blank=True)
+    ownership_year = models.DateField(help_text=_(u"Дата перехода права собственности"), verbose_name=_(u"Дата перехода права собственности"), null=True, blank=True)
+    ownership_doc_num = models.TextField(help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
+    mo_fond_doc_date = models.DateField(help_text=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+    mo_fond_doc_num = models.TextField(help_text=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+
     cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
 
 
@@ -324,7 +332,7 @@ class BaseDevices(models.Model):
     lamp = models.NullBooleanField(help_text=_(u"Электропатрон"), verbose_name=_(u"Электропатрон"), blank=True, )
     ceiling_hook = models.NullBooleanField(help_text=_(u"Потолочный крюк"), verbose_name=_(u"Потолочный крюк"), blank=True, )
     heaters = models.NullBooleanField(help_text=_(u"Отопительные приборы"), verbose_name=_(u"Отопительные приборы"), blank=True, )
-    smoke_filter = models.NullBooleanField(help_text=_(u"Дымоулавливатель"), verbose_name=_(u"Дымоулавливатель"), blank=True, )
+    smoke_filter = models.NullBooleanField(help_text=_(u"Элементы пожарной безопасности"), verbose_name=_(u"Элементы пожарной безопасности"), blank=True, )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -355,7 +363,7 @@ class BaseRoom(BaseDevices):
 
 
 class BaseKitchen(BaseDevices):
-    sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
+    sink_with_mixer = models.IntegerField(help_text=_(u"Мойка"), default=0, blank=True, null=True, verbose_name=_(u"Мойка"), choices=SINK_CHOICES)
 
     class Meta:
         app_label = "core"
@@ -377,7 +385,7 @@ class BaseWC(BaseDevices, ):
     is_tower_dryer = models.NullBooleanField(help_text=_(u"Полотенцесушитель"), verbose_name=_(u"Полотенцесушитель"), blank=True, )
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.IntegerField(help_text=_(u"Ванна"), default=0, blank=True, null=True, verbose_name=_(u"Ванна"), choices=BATH_CHOICES)
-    sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
+    sink_with_mixer = models.IntegerField(help_text=_(u"Умывальник"), default=0, blank=True, null=True, verbose_name=_(u"Умывальник"), choices=WC_SINK_CHOICES)
     wc_switches = models.NullBooleanField(help_text=_(u"Выключатели в туалете"), verbose_name=_(u"Выключатели в туалете"), blank=True, )
 
     class Meta:
@@ -489,6 +497,8 @@ class BaseCompareData(BaseCommonChars, ):
     class Meta:
         abstract = True
 
+    planing_floor = models.IntegerField(help_text=_(u"Этаж (планируемый)"), null=True, verbose_name=_(u"Этаж (планируемый)"), blank=True, )
+    floor = models.IntegerField(help_text=_(u"Этаж сданного в эксплуатацию объекта"), null=True, verbose_name=_(u"Этаж сданного в эксплуатацию объекта"), blank=True, )
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
     flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений"), null=True, verbose_name=_(u"Количество жилых помещений"), blank=True, )

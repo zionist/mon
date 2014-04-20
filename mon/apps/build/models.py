@@ -105,6 +105,7 @@ class Ground(BaseBuilding, BaseCompareData, BaseFile):
         return "%s" % name
 
     cad_num = models.CharField(help_text=_(u"Кадастровый номер участка"), unique=True, db_index=True, max_length=2048, verbose_name=_(u"Кадастровый номер участка"))
+    cad_sum = models.FloatField(help_text=_(u"Кадастровая стоимость, руб."), null=True, verbose_name=_(u"Кадастровая стоимость, руб."), blank=True, )
     developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, help_text=_(u"Застройщик (владелец) объекта"), null=True, verbose_name=_(u"Застройщик (владелец) объекта"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"),)
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
@@ -115,6 +116,7 @@ class Ground(BaseBuilding, BaseCompareData, BaseFile):
 
 class Building(BaseBuilding, BaseCompareData, BaseFile):
     cad_num = models.CharField(help_text=_(u"Кадастровый номер"), unique=True, db_index=True, max_length=2048, verbose_name=_(u"Кадастровый номер"))
+    cad_sum = models.FloatField(help_text=_(u"Кадастровая стоимость, руб."), null=True, verbose_name=_(u"Кадастровая стоимость, руб."), blank=True, )
     developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=True, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
@@ -138,6 +140,7 @@ class Building(BaseBuilding, BaseCompareData, BaseFile):
 
 class CopyBuilding(BaseBuilding, BaseCompareData, BaseFile):
     cad_num = models.CharField(help_text=_(u"Кадастровый номер"), null=True, max_length=2048, verbose_name=_(u"Кадастровый номер"), blank=True, )
+    cad_sum = models.FloatField(help_text=_(u"Кадастровая стоимость, руб."), null=True, verbose_name=_(u"Кадастровая стоимость, руб."), blank=True, )
     developer = models.ForeignKey(Developer, on_delete=models.SET_NULL, blank=True, null=True, help_text=_(u"Застройщик (владелец) объекта"), verbose_name=_(u"Застройщик (владелец) объекта"))
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), blank=True, null=True, verbose_name=_(u"Муниципальное образование"), )
     contract = models.ForeignKey(Contract, blank=False, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
