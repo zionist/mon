@@ -307,10 +307,16 @@ def delete_mo(request, pk):
 @login_required
 def add_agreement(request, pk, state=None):
     template = 'mo_adding_agreement.html'
-    context = {'title': _(u'Добавление соглашения с министерством')}
+    context = {}
     mo = MO.objects.get(pk=pk)
     context.update({'object': mo})
-    agreement_type = int(state)
+    agreement_type = int(state) if state else 0
+    title = _(u'Добавление соглашения с министерством')
+    if agreement_type == 1:
+        title = _(u'Добавление дополнительного соглашения с министерством о прибавлении средств')
+    elif agreement_type == 2:
+        title = _(u'Добавление дополнительного соглашения с министерством о вычете средств')
+    context.update({'title': title})
     prefix, dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'mo', 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
     if request.method == "POST":
         form = MOShowForm(request.POST, prefix=prefix, instance=mo)
@@ -340,7 +346,7 @@ def add_agreement(request, pk, state=None):
         sub_form = SubventionForm(prefix=sub_prefix)
         fed_form = FederalBudgetForm(prefix=fed_prefix)
         reg_form = RegionalBudgetForm(prefix=reg_prefix)
-    context.update({'form': form, 'dep_form': dep_form, 'sub_form': sub_form, 'formsets': [fed_form, reg_form],
+    context.update({'form': form, 'dep_form': dep_form, 'state': agreement_type, 'sub_form': sub_form, 'formsets': [fed_form, reg_form],
                     'titles': [FederalBudget._meta.verbose_name, RegionalBudget._meta.verbose_name],
                     'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))

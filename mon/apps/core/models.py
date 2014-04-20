@@ -79,11 +79,11 @@ class BaseBudget(models.Model):
     class Meta:
         abstract = True
 
-    sub_sum = models.FloatField(help_text=_(u"Размер предоставляемой в текущем году субвенции"), null=True, verbose_name=_(u"Размер предоставляемой в текущем году субвенции"), blank=True, )
+    sub_sum = models.FloatField(help_text=_(u"Размер предоставляемой в текущем году субвенции"), default=0, null=True, verbose_name=_(u"Размер предоставляемой в текущем году субвенции"), blank=True, )
     sub_orph_home = models.FloatField(help_text=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
                                         verbose_name=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
-                                        blank=True, null=True, )
-    adm_coef = models.FloatField(help_text=_(u"Размер коэффициента на администрирование расходов"), null=True, verbose_name=_(u"Размер коэффициента на администрирование расходов"), blank=True, )
+                                        blank=True, null=True, default=0)
+    adm_coef = models.FloatField(help_text=_(u"Размер коэффициента на администрирование расходов"), default=0, null=True, verbose_name=_(u"Размер коэффициента на администрирование расходов"), blank=True, )
     subvention_performance = models.IntegerField(help_text=_(u"Показатель результативности предоставления субвенции "
                                                              u"(количество детей-сирот, подлежащих обеспечению жилыми "
                                                              u"помещениями в текущем году)"), default=0,
@@ -98,7 +98,7 @@ class BaseSubvention(models.Model):
         abstract = True
 
     date = models.DateField(auto_now=True)
-    amount = models.FloatField(help_text=_(u"Общая сумма предоставляемой в текущем году субвенции"), null=True,
+    amount = models.FloatField(help_text=_(u"Общая сумма предоставляемой в текущем году субвенции"), default=0, null=True,
                                  verbose_name=_(u"Общая сумма предоставляемой в текущем году субвенции"), blank=True, )
 
 

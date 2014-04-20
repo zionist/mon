@@ -9,6 +9,7 @@ AGREEMENT_TYPE_CHOICES = ((0, _(u'Соглашение с министерств
 
 
 class RegionalBudget(BaseBudget, ):
+    minis_sum = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Профинансировано Министерством краевых средств"), verbose_name=_(u"Профинансировано Министерством краевых средств"))
 
     class Meta:
         app_label = "mo"
@@ -19,6 +20,7 @@ class RegionalBudget(BaseBudget, ):
 
 
 class FederalBudget(BaseBudget, ):
+    minis_sum = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Профинансировано Министерством федеральных средств"), verbose_name=_(u"Профинансировано Министерством федеральных средств"))
 
     class Meta:
         app_label = "mo"
@@ -43,6 +45,7 @@ class Subvention(BaseSubvention, ):
         string = '%s' + _(u' по соглашению №') + '%s'
         return string % (self.amount, self.get_dep())
 
+    minis_sum = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Профинансировано Министерством, всего"), verbose_name=_(u"Профинансировано Министерством, всего"))
     fed_budget = models.ForeignKey(FederalBudget, help_text=_(u"Федеральный бюджет"), verbose_name=_(u"Федеральный бюджет"), blank=True, null=True, )
     reg_budget = models.ForeignKey(RegionalBudget, help_text=_(u"Краевой бюджет"), verbose_name=_(u"Краевой бюджет"), blank=True, null=True, )
 
@@ -61,6 +64,7 @@ class MO(models.Model):
                                         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         blank=True, null=True, )
     has_trouble = models.NullBooleanField(blank=True, null=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
+    planing_home_orphans = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"), verbose_name=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"))
     home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
     home_reg_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"))
     home_fed_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"))
