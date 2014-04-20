@@ -305,11 +305,12 @@ def delete_mo(request, pk):
 
 
 @login_required
-def add_agreement(request, pk):
+def add_agreement(request, pk, state=None):
     template = 'mo_adding_agreement.html'
     context = {'title': _(u'Добавление соглашения с министерством')}
     mo = MO.objects.get(pk=pk)
     context.update({'object': mo})
+    agreement_type = int(state)
     prefix, dep_prefix, sub_prefix, reg_prefix, fed_prefix = 'mo', 'dep_mo', 'sub_mo', 'reg_mo', 'fed_mo'
     if request.method == "POST":
         form = MOShowForm(request.POST, prefix=prefix, instance=mo)
@@ -330,7 +331,8 @@ def add_agreement(request, pk):
                 mo.home_orphans = int(mo.home_orphans) + int(sub.reg_budget.subvention_performance)
             mo.save(update_fields=['home_orphans'])
             dep.mo = mo
-            dep.save(update_fields=['subvention', 'mo'])
+            dep.agreement_type = agreement_type
+            dep.save(update_fields=['subvention', 'mo', 'agreement_type'])
             return redirect('mos')
     else:
         form = MOShowForm(prefix=prefix, instance=mo)
