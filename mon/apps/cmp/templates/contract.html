@@ -62,15 +62,9 @@
             {% trans 'Остаток неоплаченных средств по контракту ' %} <strong>{{contract_remainder}}</strong> {% trans ' руб.' %}
             </p>
         </div>
-        {% if form or formsets %}
+        {% if form %}
             {% if form %}
                 {% include "view_table.html" %}
-            {% endif %}
-            {% if formsets %}
-                {% for form in formsets %}
-                    <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
-                    {% include "view_table.html" %}
-                {% endfor %}
             {% endif %}
         {% endif %}
 

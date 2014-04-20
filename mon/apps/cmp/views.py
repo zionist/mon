@@ -368,8 +368,7 @@ def add_contract(request, auction_for_update=0):
     if request.method == "POST":
         form = ContractForm(request.POST, request.FILES, prefix=prefix)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and image_form.is_valid():
             cd = form.cleaned_data
             auction = None
             if cd.get('auction_for_update'):
@@ -378,12 +377,8 @@ def add_contract(request, auction_for_update=0):
                 except ObjectDoesNotExist:
                     return HttpResponseNotFound("Aucton not found")
             contract = form.save()
-            contract.room = room_f.save()
-            contract.hallway = hallway_f.save()
-            contract.wc = wc_f.save()
-            contract.kitchen = kitchen_f.save()
             contract.docs = image_form.save()
-            contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
+            contract.save(update_fields=['docs'])
             if auction:
                 if auction.contract:
                     return HttpResponse(u"Вы не можете привязать созданный контракт к аукциону %s. "
@@ -397,7 +392,7 @@ def add_contract(request, auction_for_update=0):
             # update Auction after contract save. Set contract field to this Contract object
             return redirect('contracts')
         else:
-            context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            context.update({'form': form, 'prefix': prefix, 'images': image_form, })
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix)
@@ -412,14 +407,10 @@ def add_contract(request, auction_for_update=0):
         initial_kw.update({'start_year': date(from_dt.year, 01, 01),
                            'finish_year': date(from_dt.year, 12, 31)})
         form = ContractForm(prefix=prefix, initial=initial_kw)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-        context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+        form, text_area_form = split_form(form)
+        context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix,
+                        'images': image_form,
+                        })
         return render_to_response(template, context, context_instance=RequestContext(request))
 
 
@@ -439,29 +430,13 @@ def copy_contract(request, pk):
 
     contract_dict = forms.model_to_dict(contract)
 
-    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id', 'developer',
-              'docs']:
+    for n in ['mo', 'id', 'developer', 'docs']:
         contract_dict.pop(n)
 
     for copy in xrange(amount):
-        # fks
         copy = CopyContract(**contract_dict)
         copy.mo = contract.mo
         copy.developer = contract.developer
-
-        # create new fk related objects
-        copy.room = copy_object(contract.room)
-        copy.room.save()
-        copy.room_id = copy.room.id
-        copy.hallway = copy_object(contract.hallway)
-        copy.hallway.save()
-        copy.hallway_id = copy.hallway.id
-        copy.wc = copy_object(contract.wc)
-        copy.wc.save()
-        copy.wc_id = copy.wc.id
-        copy.kitchen = copy_object(contract.kitchen)
-        copy.kitchen.save()
-        copy.kitchen_id = copy.kitchen.id
         copy.save()
     return get_contract_copies(request)
 
@@ -588,14 +563,6 @@ def delete_contract_copy(request, pk):
         copy = CopyContract.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    if copy.room:
-        copy.room.delete()
-    if copy.hallway:
-        copy.hallway.delete()
-    if copy.wc:
-        copy.wc.delete()
-    if copy.kitchen:
-        copy.kitchen.delete()
     copy.delete()
     return redirect("contract_copies")
 
@@ -613,15 +580,9 @@ def update_contract_copy(request, pk):
     prefix, images_prefix = 'contract', 'contract_images'
     form = ContractForm(prefix=prefix, instance=copy)
     image_form = ContractDocumentsForm(prefix=images_prefix)
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
     context.update({'object': copy, 'form': form, 'prefix': prefix,
-                    'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': [
-                        BaseRoom._meta.verbose_name,
-                        BaseHallway._meta.verbose_name,
-                        BaseWC._meta.verbose_name,
-                        BaseKitchen._meta.verbose_name,
-                        ]})
+                    'images': image_form,
+                    })
     delete_contract_copy(request, copy.pk)
     return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -638,16 +599,10 @@ def get_contract(request, pk, extra=None):
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix, instance=contract.docs)
         form = ContractShowForm(instance=contract)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
         objects = list(contract.building_set.all()) + list(contract.ground_set.all())
-        context.update({'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f], 'images': image_form,
+        context.update({'form': form, 'copyform': CopyForm(), 'images': image_form,
                         'building_list': objects,
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+                        })
     payment_amount = sum(payment.amount for payment in contract.payment_set.all())
     remainder = contract.summa - payment_amount if contract.summa else 0
     context.update({
@@ -665,35 +620,22 @@ def update_contract(request, pk, extra=None):
     if request.method == "POST":
         form = ContractForm(request.POST, request.FILES, prefix=prefix, instance=contract)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=contract.docs)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract, request=request)
-        context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        context.update({'object': contract, 'form': form, 'prefix': prefix, })
+        if form.is_valid() and image_form.is_valid():
             image_form.save()
             form.save()
-            for obj in [room_f, hallway_f, wc_f, kitchen_f]:
-                obj.save()
             return redirect('contracts')
         else:
             context.update({'object': contract, 'form': form, 'prefix': prefix, 'images': image_form,
-                            'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                            'titles': [
-                                BaseRoom._meta.verbose_name,
-                                BaseHallway._meta.verbose_name,
-                                BaseWC._meta.verbose_name,
-                                BaseKitchen._meta.verbose_name,
-                                ]})
+                            })
             return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
     else:
         image_form = ContractDocumentsForm(instance=contract.docs, prefix=images_prefix)
         form = ContractForm(instance=contract, prefix=prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
-        context.update({'object': contract, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+        form, text_area_form = split_form(form)
+        context.update({'object': contract, 'form': form, 'text_area_fields': text_area_form, 'images': image_form,
+                        'prefix': prefix,
+                        })
     return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
 
 
@@ -710,14 +652,6 @@ def delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
     contract = Contract.objects.get(pk=pk)
     if contract and 'delete' in request.POST:
-        if contract.room:
-            contract.room.delete()
-        if contract.hallway:
-            contract.hallway.delete()
-        if contract.wc:
-            contract.wc.delete()
-        if contract.kitchen:
-            contract.kitchen.delete()
         contract.delete()
         return redirect('contracts')
     elif 'cancel' in request.POST:

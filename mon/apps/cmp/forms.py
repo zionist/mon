@@ -37,13 +37,6 @@ class CompareDataForm(forms.ModelForm):
 class ContractForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ContractForm, self).__init__(*args, **kwargs)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['internal_doors'] = forms.ChoiceField(label=u"Материал межкомнатных дверей", choices=choices, required=False)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="ENTRANCE_DOOR_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['entrance_door'] = forms.ChoiceField(label=u"Материал входной двери", choices=choices, required=False)
-        choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="WINDOW_CONSTRUCTIONS_CHOICES").choice_set.order_by("num").values('num', 'value')]
-        self.fields['window_constructions'] = forms.ChoiceField(label=u"Материал оконных констукций", choices=choices, required=False)
-
         if self.fields.get('name'):
             self.fields['name'].label = u"Предмет контракта"
 
@@ -61,34 +54,22 @@ class ContractForm(forms.ModelForm):
                                                      label=u"Контракт для обновления аукциона",
                                                      required=False, widget=forms.HiddenInput())
 
-
-    electric_supply = forms.ChoiceField(label=_(u"Электроснабжение"), required=False,
-        widget=forms.Select, choices=ELECTRIC_SUPPLY_CHOICES)
-    water_removal = forms.ChoiceField(label=_(u"Водоотведение"), required=False,
-        widget=forms.Select, choices=WATER_REMOVAL_CHOICES)
-    water_settlement = forms.ChoiceField(label=_(u"Водоподведение"), required=False,
-        widget=forms.Select, choices=WATER_SETTLEMENT_CHOICES)
-    hot_water_supply = forms.ChoiceField(label=_(u"Горячее водоснабжение"), required=False,
-        widget=forms.Select, choices=HOT_WATER_SUPPLY_CHOICES)
-    heating = forms.ChoiceField(label=_(u"Отопление"), required=False,
-        widget=forms.Select, choices=HEATING_CHOICES)
-
     class Meta:
         model = Contract
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
         fields = [
-           'name', 'start_year', 'finish_year', 'date', 'num',
+           'start_year', 'finish_year', 'name', 'date', 'num', 'address',
            'flats_amount', 'area', 'developer', 'summa', 'summa_fed',
-           'summa_reg', 'summ_mo_money', 'summ_without_mo_money',
-           'period_of_payment', 'creation_form', 'mo',
+           'summa_reg', 'summ_without_mo_money', 'summ_mo_money',
+           'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs',
             # for remove
-           'has_trouble_docs', 'gas_supply', 'water_removal', 'water_settlement',
-           'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
-           'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-           'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
-           'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
-           'entrance_door', 'window_constructions', 'floors', 'driveways',
-           'area_cmp', 'budget',
+           # 'gas_supply', 'water_removal', 'water_settlement',
+           # 'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
+           # 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+           # 'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
+           # 'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
+           # 'entrance_door', 'window_constructions', 'floors', 'driveways',
+           # 'area_cmp', 'budget',
         ]
 
 
@@ -119,6 +100,7 @@ class ContractDocumentsForm(forms.ModelForm):
 
     class Meta:
         model = ContractDocuments
+        fields = ['mun_contracts']
 
 
 class AuctionForm(forms.ModelForm):
@@ -251,18 +233,18 @@ class ContractShowForm(ContractForm):
                    'docs', 'has_trouble_docs', 'developer', 'area', 'flats_amount')
 
         fields = [
-            'name', 'start_year', 'finish_year', 'date', 'num',
+            'start_year', 'finish_year', 'name', 'date', 'num', 'address',
             'flats_amount', 'area', 'developer', 'summa', 'summa_fed',
-            'summa_reg', 'summ_mo_money', 'summ_without_mo_money',
-            'period_of_payment', 'creation_form', 'mo', 'area_cmp',
+            'summa_reg', 'summ_without_mo_money', 'summ_mo_money',
+            'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs',
             # for remove
-            'has_trouble_docs', 'gas_supply', 'water_removal', 'water_settlement',
-            'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
-            'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
-            'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
-            'entrance_door', 'window_constructions', 'floors', 'driveways',
-             'budget',
+            #'has_trouble_docs', 'gas_supply', 'water_removal', 'water_settlement',
+            #'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
+            #'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            #'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
+            #'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
+            #'entrance_door', 'window_constructions', 'floors', 'driveways',
+            # 'budget',
             ]
 
     def __init__(self, *args, **kwargs):
