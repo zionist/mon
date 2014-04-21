@@ -1,0 +1,20 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h4>{{ title }}</h4>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+    <a class="btn btn-small" href="{% url 'create-max_flat_price' %}"> {% trans 'Добавить' %}</a>
+    <table class="table table-condensed table-hover">
+    <tr><th>Год</th><th>Сумма руб.</th> </tr> <th> </th>
+        {% for obj in objects %}
+        <tr> <td> {{ obj.year }} </td>  <td> {{ obj.max_price }} </td>
+            <td> <a class="btn btn-small btn-danger" href="{% url 'delete-max_flat_price' obj.id %}"> {% trans 'Удалить' %}</a></td> </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}

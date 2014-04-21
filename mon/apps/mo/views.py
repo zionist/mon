@@ -19,10 +19,10 @@ from django.forms.models import inlineformset_factory, formset_factory, modelfor
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
 
-from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget
+from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget, MaxFlatPrice
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
     RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, \
-    RegionalBudgetShowForm, MOPerformanceForm, SubventionMinusForm
+    RegionalBudgetShowForm, MOPerformanceForm, SubventionMinusForm, MaxFlatPriceForm
 from apps.build.models import Building, Ground, ContractDocuments
 from apps.cmp.models import Auction
 from apps.user.models import CustomUser
@@ -132,15 +132,23 @@ def get_mos(request, pk=None):
                 context.update({'object': objects[0]})
         else:
             objects = MO.objects.all().order_by('name')
+        # sort city first
+        sorted_objects = []
+        for obj in objects:
+            if obj.name.startswith(u"г."):
+                sorted_objects.append(obj)
+        for obj in objects:
+            if not obj.name.startswith(u"г."):
+                sorted_objects.append(obj)
         page = request.GET.get('page', '1')
-        paginator = Paginator(objects, 50)
+        paginator = Paginator(sorted_objects, 50)
         try:
-            objects = paginator.page(page)
+            sorted_objects = paginator.page(page)
         except PageNotAnInteger:
-            objects = paginator.page(1)
+            sorted_objects = paginator.page(1)
         except EmptyPage:
-            objects = paginator.page(paginator.num_pages)
-        context.update({'mo_list': objects})
+            sorted_objects = paginator.page(paginator.num_pages)
+        context.update({'mo_list': sorted_objects})
     return render(request, template, context, context_instance=RequestContext(request))
 
 
@@ -653,9 +661,6 @@ def get_filter(request, num, extra=None):
 @login_required
 def xls_work_table(request):
 
-    # import time
-    # start = time.time()
-
     # create
     book = xlwt.Workbook(encoding='utf8')
     sheet = book.add_sheet('untitled')
@@ -701,172 +706,236 @@ def xls_work_table(request):
     now = datetime.now()
 
     # МО
-    sheet.write_merge(0, 0, 1, 2, u'МО', style_bold)
-    sheet.write_merge(0, header_height, 0, 0, u'№', style_bold)
-
-    sheet.write_merge(1, header_height, 1, 1, u'Наименование муниципального образования', green_style)
-    sheet.write_merge(1, header_height, 2, 2, u"Форма создания специализированного жилищного фонда"
+    col = 0
+    sheet.write_merge(0, 0, 1, 3, u'МО', style_bold)
+    sheet.write_merge(0, header_height, col, col, u'№', style_bold)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Наименование муниципального образования', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u"Форма создания специализированного жилищного фонда"
                                   u" (С - строительство, ДС - долевое строительство "
                                   u"П - приобретение)", green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u"Численность граждан от 18 лет и старше, включенных в список", green_style)
+    col += 1
     # Краевой бюджет
-    sheet.write_merge(0, 0, 3, 9, u'Краевой бюджет (по состоянию на %d.%d.%d %d:%d)' % \
+    sheet.write_merge(0, 0, col, col + 6, u'Краевой бюджет (по состоянию на %d.%d.%d %d:%d)' % \
         (now.day, now.month, now.year, now.hour, now.minute), style_bold)
-    sheet.write_merge(1, header_height, 3, 3, u'Количество жилых помещений', green_style)
-    sheet.write_merge(1, header_height, 4, 4, u'Сумма с учетом коэффициента на администрирование', green_style)
-    sheet.write_merge(1, header_height, 5, 5, u'Сумма без учета коэффицента на администрирование', green_style)
-    sheet.write_merge(1, header_height, 6, 6, u'Профинансировано министерством', green_style)
-    sheet.write_merge(1, header_height, 7, 7, u'Кассовый расход', green_style)
-    sheet.write_merge(1, header_height, 8, 8, u'% исполнения по кассовому расходу', green_style)
-    sheet.write_merge(1, header_height, 9, 9, u'Остаток неосвоенных средств', green_style)
+    sheet.write_merge(1, header_height, col, col, u'Количество жилых помещений', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма с учетом коэффициента на администрирование', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма без учета коэффицента на администрирование', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Профинансировано министерством', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Кассовый расход', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, 9, 9, u'% исполнения по кассовому расходу', green_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Остаток неосвоенных средств', green_style)
+    col += 1
 
     # Федеральный бюджет
-    sheet.write_merge(0, 0, 10, 16, u'Федеральный бюджет (по состоянию на %d.%d.%d %d:%d)' % \
+    sheet.write_merge(0, 0, col, col + 6, u'Федеральный бюджет (по состоянию на %d.%d.%d %d:%d)' % \
                                   (now.day, now.month, now.year, now.hour, now.minute), style_bold)
-    sheet.write_merge(1, header_height, 10, 10, u'Количество жилых помещений', blue_style)
-    sheet.write_merge(1, header_height, 11, 11, u'Сумма с учетом коэффициента на администрирование', blue_style)
-    sheet.write_merge(1, header_height, 12, 12, u'Сумма без учета коэффицента на администрирование', blue_style)
-    sheet.write_merge(1, header_height, 13, 13, u'Профинансировано министерством', blue_style)
-    sheet.write_merge(1, header_height, 14, 14, u'Кассовый расход', blue_style)
-    sheet.write_merge(1, header_height, 15, 15, u'% исполнения по кассовому расходу', blue_style)
-    sheet.write_merge(1, header_height, 16, 16, u'Остаток неосвоенных средств', blue_style)
+    sheet.write_merge(1, header_height, col, col, u'Количество жилых помещений', blue_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма с учетом коэффициента на администрирование', blue_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма без учета коэффицента на администрирование', blue_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Профинансировано министерством', blue_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Кассовый расход', blue_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'% исполнения по кассовому расходу', blue_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Остаток неосвоенных средств', blue_style)
+    col += 1
 
     # Итого
-    sheet.write_merge(0, 0, 17, 19, u'Итого федеральный и краевой бюджет', style_bold)
-    sheet.write_merge(1, header_height, 17, 17, u'Количество жилых помещений', style_plain)
-    sheet.write_merge(1, header_height, 18, 18, u'Сумма с учетом коэффициента на администрирование', style_plain)
-    sheet.write_merge(1, header_height, 19, 19, u'Кассовый расход', style_plain)
+    sheet.write_merge(0, 0, col, col + 2, u'Итого федеральный и краевой бюджет', style_bold)
+    sheet.write_merge(1, header_height, col, col, u'Количество жилых помещений', style_plain)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма с учетом коэффициента на администрирование', style_plain)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Кассовый расход', style_plain)
+    col += 1
 
     # Заключенные контракты
-    sheet.write_merge(0, 0, 20, 25, u'Заключенные контракты', style_bold)
-    sheet.write_merge(1, header_height, 20, 20, u'Количество жилых помещений', grey_style)
-    sheet.write_merge(1, header_height, 21, 21, u'Сумма по заключенным контрактам (без учета средств МО)', grey_style)
-    sheet.write_merge(1, header_height, 22, 22, u'Сумма муниципальных средств, включенных в сумму контракта', grey_style)
-    sheet.write_merge(1, header_height, 23, 23, u'Сумма по заключенным контрактам (ИТОГО)', grey_style)
-    sheet.write_merge(1, header_height, 24, 24, u'% исполнения от суммы предусмотренной субвенции', grey_style)
-    sheet.write_merge(1, header_height, 25, 25, u'Экономия по результатам заключенных контрактов', grey_style)
+    sheet.write_merge(0, 0, col, col + 5, u'Заключенные контракты', style_bold)
+    sheet.write_merge(1, header_height, col, col, u'Количество жилых помещений', grey_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма по заключенным контрактам (без учета средств МО)', grey_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма муниципальных средств, включенных в сумму контракта', grey_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Сумма по заключенным контрактам (ИТОГО)', grey_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'% исполнения от суммы предусмотренной субвенции', grey_style)
+    col += 1
+    sheet.write_merge(1, header_height, col, col, u'Экономия по результатам заключенных контрактов', grey_style)
+    col += 1
 
     # fill table
     row = header_height + 1
-    col = 0
     num = 1
     object_kwargs = {}
     payment_kwargs = {}
     agreement_kwargs = {}
     if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
-        from_dt = request.user.customuser.get_user_date()
-        to_dt = datetime(from_dt.year + 1, 01, 01)
+        user_year = request.user.customuser.get_user_date().year
+        from_dt = datetime(user_year, 01, 01)
+        to_dt = datetime(user_year, 12, 31)
         agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
         payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
-        object_kwargs = {'start_year__lt': from_dt, 'finish_year__gt': from_dt}
+        object_kwargs = {'start_year__lt': request.user.customuser.get_user_date(),
+                         'finish_year__gt': request.user.customuser.get_user_date()}
     payment_kwargs.update({} )
-    for mo in MO.objects.all():
+    # sort city first
+    sorted_objects = []
+    objects = MO.objects.all().order_by('name')
+    for obj in objects:
+        if obj.name.startswith(u"г."):
+            sorted_objects.append(obj)
+    for obj in objects:
+        if not obj.name.startswith(u"г."):
+            sorted_objects.append(obj)
+    for mo in sorted_objects:
+        col = 0
         sheet.write(row, col, u"%s" % num)
-        sheet.write(row, col + 1, mo.name)
+        col += 1
+
+        sheet.write(row, col, mo.name)
+        col += 1
+
         mo_createion_form_map = {
             u"Приобретение": u"П",
             u"Долевое строительство": u"ДС",
             U"Строительство": u"C",
             }
-        sheet.write(row, col + 2, u", ".join([mo_createion_form_map[c[1]] for c in CREATION_FORM_CHOICES if mo.creation_form and unicode(c[0]) in mo.creation_form.split(',')]))
+        sheet.write(row, col, u", ".join([mo_createion_form_map[c[1]] for c in CREATION_FORM_CHOICES if mo.creation_form and unicode(c[0]) in mo.creation_form.split(',')]))
+        col += 1
+
+        # Численность граждан от 18 лет и старше, включенных в список
+        sheet.write(row, col, mo.planing_home_orphans)
+        col += 1
 
         ## Краевой бюджет
         # Количество жилых помещений
         query = mo.departamentagreement_set.filter(**agreement_kwargs)
-        # should be only one subvention with budget for one year
-        agreement = query.filter(agreement_type=0)[0] if query.filter(agreement_type=0).exists() else None
-        reg_subvention_performance = agreement.subvention.reg_budget.subvention_performance if agreement and agreement.subvention.reg_budget else 0
-        sheet.write(row, col + 3, reg_subvention_performance)
+        reg_subvention_performance = sum([agr.subvention.reg_budget.subvention_performance or 0 for agr in query.all() if agr.subvention and agr.subvention.reg_budget])
+        sheet.write(row, col, reg_subvention_performance)
+        col += 1
 
         # Краевой бюджет сумма с учетом коэф администрирования
         reg_sum_with_k = 0
-        for arg in query.filter(agreement_type=0):
+        reg_sum_without_k = 0
+        for arg in query.all():
             if arg.subvention.reg_budget:
                 if arg.subvention.reg_budget.sub_sum:
+                    reg_sum_without_k += arg.subvention.reg_budget.sub_sum
                     reg_sum_with_k += arg.subvention.reg_budget.sub_sum
                 if arg.subvention.reg_budget.adm_coef:
                     reg_sum_with_k += arg.subvention.reg_budget.adm_coef
         # count additional agreements as part of reg budget
-        for arg in query.exclude(agreement_type=0):
-            if arg.subvention.amount:
-                reg_sum_with_k += arg.subvention.amount
-        sheet.write(row, col + 4, u"%s руб." % reg_sum_with_k)
+        #for arg in query.exclude(agreement_type=0):
+        #    if arg.subvention.amount:
+        #        reg_sum_with_k += arg.subvention.amount
+        sheet.write(row, col, u"%s " % reg_sum_with_k)
+        col += 1
 
         # Краевой бюджет сумма без учета коэф администрирования
-        reg_sum_without_k = 0
-        for arg in query.filter(agreement_type=0):
-            if arg.subvention.reg_budget:
-                if arg.subvention.reg_budget.adm_coef:
-                    reg_sum_without_k = reg_sum_with_k - arg.subvention.reg_budget.adm_coef
-        sheet.write(row, col + 5, u"%s руб." % reg_sum_without_k)
+        sheet.write(row, col, u"%s " % reg_sum_without_k)
+        col += 1
 
-        # Профинансировано министерством ?
+        # Профинансировано министерством
+        reg_minis_sum = sum([agr.subvention.reg_budget.minis_sum or 0 for agr in query.all() if agr.subvention and agr.subvention.reg_budget])
+        sheet.write(row, col, reg_minis_sum)
+        col += 1
 
         # Краевой бюджет кассовый расход
-        reg_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=2, **payment_kwargs) \
-            .filter(contract__mo=mo).values("amount")])
-        sheet.write(row, col + 7, u"%s руб." % reg_spend_amount)
+        reg_spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(payment_budget_state=2,
+            **payment_kwargs).filter(contract__mo=mo).values("amount")])
+        sheet.write(row, col, u"%s " % reg_spend_amount)
+        col += 1
 
         # % исполнения по кассовому расходу
         percent_reg_rest_of_unspended = 0
         if reg_sum_with_k and reg_spend_amount:
             percent_reg_rest_of_unspended = (float(reg_spend_amount) / float(reg_sum_with_k)) * 100
-        sheet.write(row, col + 8, u"%s " % percent_reg_rest_of_unspended + u"%")
+        sheet.write(row, col, u"%s " % percent_reg_rest_of_unspended + u"%")
+        col += 1
 
         # Остаток неосвоенных средств
         reg_rest_of_unspended = reg_sum_with_k - reg_spend_amount
-        sheet.write(row, col + 9, u"%s руб." % reg_rest_of_unspended)
+        sheet.write(row, col, u"%s " % reg_rest_of_unspended)
+        col += 1
 
         ## Федеральный бюджет
         # Количество жилых помещений
-        # should be only one subvention with budget for one year
-        agreement = query.filter(agreement_type=0)[0] if query.filter(agreement_type=0).exists() else None
-        fed_subvention_performance = agreement.subvention.fed_budget.subvention_performance if agreement and agreement.subvention.fed_budget else 0
-        sheet.write(row, col + 10, fed_subvention_performance)
+        query = mo.departamentagreement_set.filter(**agreement_kwargs)
+        fed_subvention_performance = sum([agr.subvention.fed_budget.subvention_performance or 0 for agr in query.all() if agr.subvention and agr.subvention.fed_budget])
+        sheet.write(row, col, fed_subvention_performance)
+        col += 1
 
         # Федеральный бюджет сумма с учетом коэф администрирования
         fed_sum_with_k = 0
-        for arg in query.filter(agreement_type=0):
-            if arg.subvention.fed_budget and arg.subvention.fed_budget.sub_sum:
-                fed_sum_with_k += arg.subvention.fed_budget.sub_sum
+        fed_sum_without_k = 0
+        for arg in query.all():
+            if arg.subvention.fed_budget:
+                if arg.subvention.fed_budget.sub_sum:
+                    fed_sum_without_k += arg.subvention.fed_budget.sub_sum
+                    fed_sum_with_k += arg.subvention.fed_budget.sub_sum
                 if arg.subvention.fed_budget.adm_coef:
                     fed_sum_with_k += arg.subvention.fed_budget.adm_coef
-        sheet.write(row, col + 11, u"%s руб." % fed_sum_with_k)
+        sheet.write(row, col, u"%s " % fed_sum_with_k)
+        col += 1
 
         # Федеральный бюджет сумма без учета коэф администрирования
-        fed_sum_without_k = 0
-        for arg in query.filter(agreement_type=0):
-            if arg.subvention.fed_budget:
-                if arg.subvention.fed_budget.adm_coef:
-                    fed_sum_without_k = fed_sum_with_k - arg.subvention.fed_budget.adm_coef
-        sheet.write(row, col + 12, u"%s руб." % fed_sum_without_k)
+        sheet.write(row, col, u"%s " % fed_sum_without_k)
+        col += 1
 
         # Профинансировано министерством ?
+        fed_minis_sum = sum([agr.subvention.fed_budget.minis_sum or 0 for agr in query.all() if agr.subvention and agr.subvention.fed_budget])
+        sheet.write(row, col, fed_minis_sum)
+        col += 1
 
         # Федеральный бюджет кассовый расход
-        fed_spend_amount = sum([p.get("amount") for p in Payment.objects.filter(contract__budget=1, **payment_kwargs)\
-            .filter(contract__mo=mo).values("amount")])
-        sheet.write(row, col + 14, u"%s руб." % fed_spend_amount)
+        fed_spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(payment_budget_state=1,
+            **payment_kwargs).filter(contract__mo=mo).values("amount")])
+        sheet.write(row, col, u"%s " % fed_spend_amount)
+        col += 1
 
         # % исполнения по кассовому расходу
         percent_fed_rest_of_unspended = 0
         if fed_sum_with_k and fed_spend_amount:
             percent_fed_rest_of_unspended = (float(fed_spend_amount) / float(fed_sum_with_k)) * 100
-        sheet.write(row, col + 15, u"%s " % percent_fed_rest_of_unspended + u"%")
+        sheet.write(row, col, u"%s " % percent_fed_rest_of_unspended + u"%")
+        col += 1
 
         # Остаток неосвоенных средств
         fed_rest_of_unspended = fed_sum_with_k - fed_spend_amount
-        sheet.write(row, col + 16, u"%s руб." % fed_rest_of_unspended)
+        sheet.write(row, col, u"%s " % fed_rest_of_unspended)
+        col += 1
 
         ## sums
-        # Количество жилых пормещений
+        # Количество жилых помещений
         sum_flats_amount = reg_subvention_performance + fed_subvention_performance
-        sheet.write(row, col + 17, sum_flats_amount)
+        sheet.write(row, col, sum_flats_amount)
+        col += 1
+
         # Сумма с учетом коэффицента администрирования
         sum_sum_with_k = reg_sum_with_k + fed_sum_with_k
-        sheet.write(row, col + 18, u"%s руб." % sum_sum_with_k)
+        sheet.write(row, col, u"%s " % sum_sum_with_k)
+        col += 1
+
+
         # Кассовый расход
         sum_spend_amount = reg_spend_amount + fed_spend_amount
-        sheet.write(row, col + 19, u"%s руб." % sum_spend_amount)
+        sheet.write(row, col, u"%s " % sum_spend_amount)
+        col += 1
 
         ## contracts
         # Количество жилых помещений
@@ -891,37 +960,95 @@ def xls_work_table(request):
 
 
         # Количество жилых помещений
-        sheet.write(row, col + 20, contracts_flats_amount)
+        sheet.write(row, col, contracts_flats_amount)
+        col += 1
 
         # Сумма по заключенным контрактам (без учета средств МО)
-        sheet.write(row, col + 21, contracts_summ_without_mo_money)
+        sheet.write(row, col, contracts_summ_without_mo_money)
+        col += 1
 
         # Сумма муниципальных средств, включенных в сумму контракта
-        sheet.write(row, col + 22, contracts_summ_mo_money)
+        sheet.write(row, col, contracts_summ_mo_money)
+        col += 1
 
         # Сумма по заключенным контрактам ИТОГО
-        sheet.write(row, col + 23, contracts_summ)
+        sheet.write(row, col, contracts_summ)
+        col += 1
 
         # % исполнения от суммы предусмотренной субвенции (сумма субвенций)
         percent_rest_of_unspended_contract = 0
         if reg_sum_with_k and fed_sum_with_k and reg_spend_amount:
             percent_rest_of_unspended_contract = (float(contracts_summ) / float(reg_sum_with_k + fed_spend_amount)) * 100
-        sheet.write(row, col + 24, u"%s " % percent_rest_of_unspended_contract + u"%")
+        sheet.write(row, col, u"%s " % percent_rest_of_unspended_contract + u"%")
+        col += 1
 
         # Экономия по результатам заключенных контрактов
         contracts_economy = 0
-        spent = sum([int(contract.summa) for contract in mo.contract_set.filter(**object_kwargs) if contract.summa])
-        contracts_economy = sum([int(auction.start_price) for auction in mo.auction_set.filter(**object_kwargs) if auction.start_price]) - spent
-        sheet.write(row, col + 25, u"%s руб." % contracts_economy)
+        max_flat_price = MaxFlatPrice.objects.get(year=user_year)
+        contracts_economy = contracts_flats_amount * max_flat_price.max_price - contracts_summ
+        sheet.write(row, col, contracts_economy)
+        col += 1
 
 
         row += 1
         num += 1
 
-    # end = time.time()
-    # print end - start
-
     response = HttpResponse(mimetype='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=list.xls'
     book.save(response)
     return response
+
+@login_required
+def add_max_flat_price(request):
+    template = 'max_flat_price_creation.html'
+    title = _(u'Максимальная стоимость квартиры')
+    context = {'title': title}
+    if not request.user.is_staff:
+        return HttpResponseForbidden(u"Forbidden")
+    if request.method == "POST":
+        form = MaxFlatPriceForm(request.POST)
+        if form.is_valid():
+            object = form.save()
+            return redirect('max_flat_prices')
+    else:
+        form = MaxFlatPriceForm()
+    context.update({'form': form})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def update_max_flat_price(request, pk):
+    template = 'max_flat_price_creation.html'
+    title = _(u'Максимальная стоимость квартиры')
+    context = {'title': title}
+    if not request.user.is_staff:
+        return HttpResponseForbidden(u"Forbidden")
+    if request.method == "POST":
+        form = MaxFlatPriceForm(request.POST)
+        if form.is_valid():
+            object = form.save()
+    else:
+        object = MaxFlatPrice.objects.get(pk=pk)
+        form = MaxFlatPriceForm(instance=object)
+    context.update({'form': form})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+@login_required
+def delete_max_flat_price(request, pk):
+    title = _(u'Максимальная стоимость квартиры')
+    context = {'title': title}
+    if not request.user.is_staff:
+        return HttpResponseForbidden(u"Forbidden")
+    object = MaxFlatPrice.objects.get(pk=pk)
+    object.delete()
+    return redirect('max_flat_prices')
+
+
+@login_required
+def get_max_flat_prices(request):
+    template = 'max_flat_prices.html'
+    title = _(u'Максимальная стоимость квартиры')
+    context = {'title': title}
+    objects = MaxFlatPrice.objects.all()
+    context.update({'objects': objects})
+    return render_to_response(template, context, context_instance=RequestContext(request))

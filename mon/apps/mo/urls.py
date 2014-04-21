@@ -32,5 +32,10 @@ urlpatterns = patterns(
     url(r'^mo/filter/(?P<num>[0-9]+)/$', views.get_filter, name='filter'),
     url(r'^mo/xls/work_table/$', views.xls_work_table, name='xls_work_table'),
 
+    url(r'^mo/max_flat_price/add/$', views.add_max_flat_price, name='create-max_flat_price'),
+    url(r'^mo/max_flat_price/update/(?P<pk>[0-9]+)/$', views.update_max_flat_price, name='create-max_flat_price'),
+    url(r'^mo/max_flat_price/delete/(?P<pk>[0-9]+)/$', views.delete_max_flat_price, name='delete-max_flat_price'),
+    url(r'^mo/max_flat_prices/$', views.get_max_flat_prices, name='max_flat_prices'),
+
 
 )

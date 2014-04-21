@@ -1,0 +1,27 @@
+{% extends "base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h4>{{ title }}</h4>
+    {% if errorlist %}
+        <div class="error">
+            {{ errorlist }}
+        </div>
+    {% else %}
+        {% if form %}
+        <form method="POST" enctype="multipart/form-data" action="{% url 'create-max_flat_price' %}"> {% csrf_token %}
+            <div class="row">
+                <div class="span3">
+                    <span class="text-error">{{ form.year.errors }} </span>
+                    {{ form.year.label }} {{ form.year }}
+                </div>
+                <div class="span9">
+                    <span class="text-error">{{ form.max_price.errors }} </span>
+                    {{ form.max_price.label }} {{ form.max_price }}
+                </div>
+            </div>
+        <button class="btn btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
+        </form>
+        {% endif %}
+    {% endif %}
+{% endblock %}

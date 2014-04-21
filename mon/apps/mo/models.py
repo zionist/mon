@@ -64,7 +64,7 @@ class MO(models.Model):
                                         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         blank=True, null=True, )
     has_trouble = models.NullBooleanField(blank=True, null=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
-    planing_home_orphans = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"), verbose_name=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"))
+    planing_home_orphans = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"), verbose_name=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"))
     home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
     home_reg_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"))
     home_fed_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"))
@@ -135,3 +135,7 @@ class PeopleAmount(models.Model):
         help_text=_(u"Взыскателей по исполнительным производствам (количество человек)"))
 
     mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование муниципального образования"), verbose_name=_(u"Наименование муниципального образования"), )
+
+class MaxFlatPrice(models.Model):
+    year = models.IntegerField(unique=True, help_text=_(u'Год'), verbose_name=_(u'Год'))
+    max_price = models.FloatField(help_text=_(u'Максимальная стоимость квартиры руб.'), verbose_name=_(u'Максимальная стоимость квартиры руб.'))

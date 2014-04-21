@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
     modelformset_factory, modelform_factory, BaseModelFormSet
-from .models import MO, RegionalBudget, FederalBudget, Subvention, DepartamentAgreement, PeopleAmount
+from .models import MO, RegionalBudget, FederalBudget, Subvention, DepartamentAgreement, PeopleAmount, MaxFlatPrice
 from apps.core.models import CREATION_FORM_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple
 
@@ -18,7 +18,7 @@ class MOForm(forms.ModelForm):
 
     class Meta:
         model = MO
-        fields = ('name', 'creation_form', 'has_trouble')
+        fields = ('name', 'creation_form', 'has_trouble', 'planing_home_orphans')
 
 
 class RegionalBudgetForm(forms.ModelForm):
@@ -36,6 +36,10 @@ class SubventionForm(forms.ModelForm):
         model = Subvention
         exclude = ('date', 'reg_budget', 'fed_budget')
 
+
+class MaxFlatPriceForm(forms.ModelForm):
+    class Meta:
+        model = MaxFlatPrice
 
 class SubventionMinusForm(forms.ModelForm):
 
