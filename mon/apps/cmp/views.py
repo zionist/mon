@@ -20,9 +20,9 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
-from .models import Result, AuctionDocuments, Auction, Person, CompareData, CopyAuction
+from .models import Result, Auction, Person, CompareData, CopyAuction
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
-    ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm, FilterAuctionForm
+    ResultShowForm, CompareDataShowForm, ContractDocumentsForm, FilterAuctionForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form, set_fields_equal, copy_object, to_xls
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
@@ -38,23 +38,26 @@ def add_auction(request):
     context = {'title': _(u'Добавление аукциона')}
     prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
-        image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         form = AuctionForm(request.POST, request.FILES, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=True)
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             auction = form.save()
-            auction.docs = image_form.save()
             auction.room = room_f.save()
             auction.hallway = hallway_f.save()
             auction.wc = wc_f.save()
             auction.kitchen = kitchen_f.save()
-            auction.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
+            auction.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('auctions')
         else:
-            context.update({'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                            'titles': [
+                                BaseRoom._meta.verbose_name,
+                                BaseHallway._meta.verbose_name,
+                                BaseWC._meta.verbose_name,
+                                BaseKitchen._meta.verbose_name,
+                            ]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
-        image_form = AuctionDocumentsForm(prefix=images_prefix)
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
@@ -66,7 +69,7 @@ def add_auction(request):
         form = AuctionForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
         # move text_area fields to another form
-        context.update({'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,
@@ -105,14 +108,13 @@ def update_auction_copy(request, pk):
     template = 'auction_creation.html'
     context = {'title': _(u'Добавление аукциона')}
     prefix, images_prefix = 'auction', 'auction_images'
-    image_form = AuctionDocumentsForm(prefix=images_prefix, instance=copy)
     initial_kw = {}
     if hasattr(request.user, 'customuser'):
         initial_kw.update({'mo': request.user.customuser.mo})
     form = AuctionForm(prefix=prefix, initial=initial_kw, instance=copy)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True, parent=copy)
     # move text_area fields to another form
-    context.update({'form': form, 'images': image_form, 'prefix': prefix,
+    context.update({'form': form, 'prefix': prefix,
                     'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [
                         BaseRoom._meta.verbose_name,
@@ -141,7 +143,7 @@ def copy_auction(request, pk):
     auction_dict = forms.model_to_dict(auction)
 
     for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id',
-              'docs', 'contract']:
+              'contract']:
         auction_dict.pop(n)
 
     for copy in xrange(amount):
@@ -282,9 +284,8 @@ def get_auction(request, pk, extra=None):
         context.update({'form': form})
     else:
         form = AuctionShowForm(prefix=prefix, instance=auction)
-        image_form = AuctionDocumentsForm(prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction, multi=True)
-        context.update({'form': form, 'images': image_form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
                                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name,]})
     context.update({'object': auction})
@@ -298,17 +299,15 @@ def update_auction(request, pk, extra=None):
     prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
         form = AuctionForm(request.POST, request.FILES, prefix=prefix, instance=auction)
-        image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, request=request, multi=True)
         context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
-            image_form.save()
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('auctions')
         else:
-            context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix,
+            context.update({'object': auction, 'form': form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                             'titles': [
                                 BaseRoom._meta.verbose_name,
@@ -318,13 +317,12 @@ def update_auction(request, pk, extra=None):
                                 ]})
             return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
     else:
-        image_form = AuctionDocumentsForm(instance=auction.docs, prefix=images_prefix)
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
         form = AuctionForm(instance=auction, prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, multi=True)
-        context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
                                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
@@ -599,6 +597,7 @@ def get_contract(request, pk, extra=None):
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix, instance=contract.docs)
         form = ContractShowForm(instance=contract)
+        form.fields.pop("auction_for_update")
         objects = list(contract.building_set.all()) + list(contract.ground_set.all())
         context.update({'form': form, 'copyform': CopyForm(), 'images': image_form,
                         'building_list': objects,

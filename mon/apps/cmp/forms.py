@@ -9,7 +9,7 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 import autocomplete_light
 
 
-from .models import CompareData, Result, Auction, Person, AuctionDocuments
+from .models import CompareData, Result, Auction, Person
 from apps.build.models import Contract, ContractDocuments
 from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, WATER_REMOVAL_CHOICES, \
     HEATING_CHOICES, ELECTRIC_SUPPLY_CHOICES
@@ -63,13 +63,13 @@ class ContractForm(forms.ModelForm):
            'summa_reg', 'summ_without_mo_money', 'summ_mo_money',
            'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs',
             # for remove
-           # 'gas_supply', 'water_removal', 'water_settlement',
-           # 'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
-           # 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-           # 'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
-           # 'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
-           # 'entrance_door', 'window_constructions', 'floors', 'driveways',
-           # 'area_cmp', 'budget',
+            # 'gas_supply', 'water_removal', 'water_settlement',
+            # 'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
+            # 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            # 'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_water_boiler',
+            # 'is_heat_boiler', 'is_intercom', 'is_loggia', 'is_balcony', 'internal_doors',
+            # 'entrance_door', 'window_constructions', 'floors', 'driveways',
+            # 'area_cmp', 'budget',
         ]
 
 
@@ -88,12 +88,6 @@ class ResultForm(forms.ModelForm):
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
                 required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'
-
-
-class AuctionDocumentsForm(forms.ModelForm):
-
-    class Meta:
-        model = AuctionDocuments
 
 
 class ContractDocumentsForm(forms.ModelForm):
@@ -138,21 +132,21 @@ class AuctionForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'docs')
+        exclude = ('room', 'hallway', 'wc', 'kitchen')
 
         fields = [
             'start_year', 'finish_year', 'name', 'num', 'flats_amount',
             'area_cmp', 'area', 'start_price', 'date', 'open_date',
             'proposal_count', 'mo', 'stage', 'contract', 'electric_supply',
             'water_settlement', 'water_removal', 'hot_water_supply', 'heating',
-            'internal_doors', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            'gas_supply',
+            'is_heat_boiler', 'gas_supply',
+            'internal_doors', 'entrance_door', 'window_constructions',
+            'is_water_boiler', 'is_loggia', 'is_balcony',
             # to remove
-            'has_trouble_docs', 'public_transport', 'market',
-            'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
-            'driveways', 'is_heat_boiler', 'is_intercom', 'entrance_door',
-            'window_constructions',
+            # 'has_trouble_docs', 'public_transport', 'market',
+            # 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            # 'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
+            # 'driveways', 'is_intercom',
         ]
 
     def clean(self):
@@ -188,21 +182,20 @@ class AuctionShowForm(forms.ModelForm):
 
     class Meta:
         model = Auction
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'open_date', 'date', 'stage', 'proposal_count',
-                   'contract', 'name', 'num',  'docs', 'has_trouble_docs', 'start_price')
+        exclude = ('room', 'hallway', 'wc', 'kitchen',)
         fields = [
             'start_year', 'finish_year', 'name', 'num', 'flats_amount',
             'area_cmp', 'area', 'start_price', 'date', 'open_date',
             'proposal_count', 'mo', 'stage', 'contract', 'electric_supply',
             'water_settlement', 'water_removal', 'hot_water_supply', 'heating',
-            'internal_doors', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            'gas_supply',
+            'is_heat_boiler', 'gas_supply',
+            'internal_doors', 'entrance_door', 'window_constructions',
+            'is_water_boiler', 'is_loggia', 'is_balcony',
             # to remove
-            'has_trouble_docs', 'public_transport', 'market',
-            'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
-            'driveways', 'is_heat_boiler', 'is_intercom', 'entrance_door',
-            'window_constructions',
+            # 'has_trouble_docs', 'public_transport', 'market',
+            # 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+            # 'is_clother_drying', 'is_parking', 'is_dustbin_area', 'floors',
+            # 'driveways', 'is_intercom',
             ]
 
     def __init__(self, *args, **kwargs):
@@ -229,8 +222,7 @@ class ContractShowForm(ContractForm):
 
     class Meta:
         model = Contract
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'num', 'name', 'summa', 'sign_date',
-                   'docs', 'has_trouble_docs', 'developer', 'area', 'flats_amount')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'auction_for_update')
 
         fields = [
             'start_year', 'finish_year', 'name', 'date', 'num', 'address',

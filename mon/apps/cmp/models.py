@@ -5,8 +5,7 @@ from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
 from apps.core.models import BaseDocumentModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
-    Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES
-from apps.imgfile.models import File, Image, BaseFile
+    Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES, BaseAuction
 
 from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground, Contract
@@ -58,34 +57,9 @@ class Result(BaseResult, ):
     doc_files = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Предоставленные документы"), verbose_name=_(u"Предоставленные документы"))
 
 
-class AuctionDocuments(BaseDocumentModel, BaseFile):
-
-    class Meta:
-        app_label = "cmp"
-        verbose_name = "Auction Documents"
-    def __unicode__(self):
-        return '%s' % self.id
-
-    notice = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение"), verbose_name=_(u"Извещение"), )
-    mun_contract_project = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта"), verbose_name=_(u"Проект муниципального контракта"), )
-    technical_specification = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание"), verbose_name=_(u"Техническое задание"), )
-    max_price_substantiation = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта"), verbose_name=_(u"Обоснование начальной максимальной цены контракта"), )
-    notice_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Извещение с комментариями и рекомендациями"), verbose_name=_(u"Извещение с комментариями и рекомендациями"), )
-    mun_contract_project_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Проект муниципального контракта с комментариями и рекомендациями"), verbose_name=_(u"Проект муниципального контракта с комментариями и рекомендациями"), )
-    technical_specification_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Техническое задание с комментариями и рекомендациями"), verbose_name=_(u"Техническое задание с комментариями и рекомендациями"), )
-    max_price_substantiation_rec = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"),
-        verbose_name=_(u"Обоснование начальной максимальной цены контракта с комментариями и рекомендациями"), )
-
-    def to_list(self):
-        attrs = deepcopy(self.__dict__)
-        l = [getattr(self, k[:-3]) for k in attrs if k and '_id' in k and getattr(self, k[:-3])]
-        return l
-
-
-class Auction(BaseContract, BaseAuctionData,):
+class Auction(BaseAuction, BaseAuctionData,):
     contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"), null=True, verbose_name=_(u"Данные по заключенному контракту"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    docs = models.ForeignKey(AuctionDocuments, help_text=_(u"Аукционная документация"), verbose_name=_(u"Аукционная документация"), null=True, blank=True, )
 
     class Meta:
         app_label = "cmp"
@@ -102,10 +76,9 @@ class Auction(BaseContract, BaseAuctionData,):
                 d.update({k: getattr(self, k)})
         return d
 
-class CopyAuction(BaseContract, BaseAuctionData,):
+class CopyAuction(BaseAuction, BaseAuctionData,):
     contract = models.ForeignKey(Contract, help_text=_(u"Данные по заключенному контракту"), null=True, verbose_name=_(u"Данные по заключенному контракту"), blank=True, )
     mo = models.ForeignKey(MO, help_text=_(u"Муниципальное образование"), verbose_name=_(u"Муниципальное образование"), )
-    # docs = models.ForeignKey(AuctionDocuments, help_text=_(u"Аукционная документация"), verbose_name=_(u"Аукционная документация"), null=True, blank=True, )
 
     class Meta:
         app_label = "cmp"

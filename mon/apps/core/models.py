@@ -166,6 +166,17 @@ class BaseContract(BaseName):
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 
+class BaseAuction(BaseName):
+
+    class Meta:
+        abstract = True
+
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
+
+    num = models.CharField(help_text=_(u"Номер"), max_length=2048, verbose_name=_(u"Номер"), )
+
+
 class BaseDeveloper(BaseName, ):
 
     class Meta:
@@ -612,20 +623,19 @@ class AuctionHallway(BaseMultiMaterials, BaseHallway):
         return d
 
 
-class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImprovement, ):
+class BaseAuctionData(BaseMultiWaterSupply):
 
     class Meta:
         abstract = True
 
-    flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений по номеру заказа"), null=True, verbose_name=_(u"Количество жилых помещений по номеру заказа"), blank=False, )
-    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
-    area = models.FloatField(help_text=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), null=True, verbose_name=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), blank=False, )
-    floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
-    driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
-
+    flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений по номеру заказа"), null=True,
+                                       verbose_name=_(u"Количество жилых помещений по номеру заказа"), blank=False, )
+    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"),
+                                   default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
+    area = models.FloatField(help_text=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), null=True,
+                             verbose_name=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), blank=False, )
     is_water_boiler = models.NullBooleanField(help_text=_(u"Водонагревательный прибор (бойлер)"), verbose_name=_(u"Водонагревательный прибор (бойлер)"), blank=True, )
     is_heat_boiler = models.NullBooleanField(help_text=_(u"Отопительный котел"), verbose_name=_(u"Отопительный котел"), blank=True, )
-    is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
     internal_doors = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал межкомнатных дверей"),
@@ -637,7 +647,8 @@ class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImpr
 
     stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), null=True, blank=False, verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
     start_price = models.FloatField(help_text=_(u"Начальная (максимальная) цена руб."), null=True, verbose_name=_(u"Начальная (максимальная) цена руб."), blank=False, )
-    date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"),  null=True, verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"),  blank=False, )
+    date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа)"),  null=True,
+                            verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа)"),  blank=False, )
     open_date = models.DateTimeField(help_text=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"),  null=True, verbose_name=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"),  blank=False, )
     proposal_count = models.IntegerField(help_text=_(u"Количество поданных заявок"), verbose_name=_(u"Количество поданных заявок"), blank=True, default=0)
 
