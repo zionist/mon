@@ -136,6 +136,8 @@ class PeopleAmount(models.Model):
 
     mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование муниципального образования"), verbose_name=_(u"Наименование муниципального образования"), )
 
+
 class MaxFlatPrice(models.Model):
+    mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование МО"), verbose_name=_(u"Наименование МО"), )
     year = models.IntegerField(unique=True, help_text=_(u'Год'), verbose_name=_(u'Год'))
     max_price = models.FloatField(help_text=_(u'Максимальная стоимость квартиры руб.'), verbose_name=_(u'Максимальная стоимость квартиры руб.'))

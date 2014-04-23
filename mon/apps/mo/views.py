@@ -781,6 +781,7 @@ def xls_work_table(request):
     # fill table
     row = header_height + 1
     num = 1
+    user_year = datetime.today().year
     object_kwargs = {}
     payment_kwargs = {}
     agreement_kwargs = {}
@@ -983,12 +984,11 @@ def xls_work_table(request):
         col += 1
 
         # Экономия по результатам заключенных контрактов
-        contracts_economy = 0
         max_flat_price = MaxFlatPrice.objects.get(year=user_year)
         contracts_economy = contracts_flats_amount * max_flat_price.max_price - contracts_summ
+        contracts_economy = contracts_economy if contracts_economy > 0 else 0
         sheet.write(row, col, contracts_economy)
         col += 1
-
 
         row += 1
         num += 1
@@ -1032,6 +1032,7 @@ def update_max_flat_price(request, pk):
         form = MaxFlatPriceForm(instance=object)
     context.update({'form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
 
 @login_required
 def delete_max_flat_price(request, pk):
