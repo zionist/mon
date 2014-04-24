@@ -216,8 +216,7 @@ def to_xls(request, objects={}, fk_forms=True, multi=False):
         for fk_name, fk_form in fk_forms.iteritems():
             for field in fk_form:
                 sheet.write(row, col, u"%s %s" % (fk_name, field.label)
-                if field.label else u"%s %s" % (fk_name, field.name),
-                            style_bold)
+                if field.label else u"%s %s" % (fk_name, field.name), style_bold)
                 col += 1
             # write values
         row += 1

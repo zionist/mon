@@ -41,6 +41,7 @@ class MaxFlatPriceForm(forms.ModelForm):
     class Meta:
         model = MaxFlatPrice
 
+
 class SubventionMinusForm(forms.ModelForm):
 
     class Meta:
