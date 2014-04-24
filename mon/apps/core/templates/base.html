@@ -55,6 +55,7 @@
                                 <li><a href="{% url 'buildings-xls' %}">{% trans 'Выгрузка объектов' %}</a></li>
                                 <li><a href="{% url 'contracts-xls' %}">{% trans 'Выгрузка контрактов' %}</a></li>
                                 <li><a href="{% url 'auctions-xls' %}">{% trans 'Выгрузка аукционов' %}</a></li>
+                                <li><a href="{% url 'payments-xls' %}">{% trans 'Выгрузка платежей' %}</a></li>
                                 <li><a href="{% url 'building_copies' %}">{% trans 'Копии объектов' %}</a></li>
                             {% endif %}
                             {% if user.is_staff %}
@@ -63,6 +64,7 @@
                                 <li><a href="{% url 'buildings-all-xls' %}">{% trans 'Выгрузка всех объектов' %}</a></li>
                                 <li><a href="{% url 'contracts-all-xls' %}">{% trans 'Выгрузка всех контрактов' %}</a></li>
                                 <li><a href="{% url 'auctions-all-xls' %}">{% trans 'Выгрузка всех аукционов' %}</a></li>
+                                <li><a href="{% url 'payments-all-xls' %}">{% trans 'Выгрузка всех платежей' %}</a></li>
                                 <li><a href="{% url 'building_copies-all' %}">{% trans 'Все копии объектов' %}</a></li>
                             {% endif %}
                         </ul>

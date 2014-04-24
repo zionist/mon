@@ -21,6 +21,7 @@ from .models import Payment
 from .forms import PaymentForm, PaymentShowForm, DateForm
 from apps.mo.models import MO
 from apps.user.models import CustomUser
+from apps.core.views import to_xls
 
 
 @login_required
@@ -129,7 +130,7 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
 
 
 @login_required
-def get_payments(request, mo=None, all=False):
+def get_payments(request, mo=None, all=False, xls=False):
     context = {'title': _(u'Платежи')}
     template = 'payments.html'
     prefix = 'acc_date'
@@ -150,7 +151,8 @@ def get_payments(request, mo=None, all=False):
             mo = request.user.customuser.mo if request.user.customuser.mo else MO.objects.get(pk=mo)
             context = {'title': _(u'Платежи %s') % mo.name}
             objects = recount_accounting(mo, user=request.user, context=context)
-
+        if xls:
+            return to_xls(request,  objects={PaymentForm: objects}, fk_forms = False)
         form = DateForm(prefix=prefix)
         context.update({'date_form': form})
         page = request.GET.get('page', '1')
