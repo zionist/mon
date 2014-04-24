@@ -174,7 +174,7 @@ def copy_object(obj):
     return new_obj
 
 # object instance: form for display
-def to_xls(request, objects={}):
+def to_xls(request, objects={}, fk_forms=True, multi=False):
     # create
     book = xlwt.Workbook(encoding='utf8')
     sheet = book.add_sheet('untitled')
@@ -196,9 +196,12 @@ def to_xls(request, objects={}):
     # object fields should be same as form fields
     # get all types of objects
 
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
-    fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
-                u'Кухня': kitchen_f, u'Комната': room_f}
+    if fk_forms:
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=multi)
+        fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
+                    u'Кухня': kitchen_f, u'Комната': room_f}
+    else:
+        fk_forms = {}
     row = 0
     for form, objs in objects.iteritems():
         if not objs:
@@ -235,9 +238,10 @@ def to_xls(request, objects={}):
                 col += 1
 
             # write fk forms values
-            room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=obj)
-            fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
-                        u'Кухня': kitchen_f, u'Комната': room_f}
+            if fk_forms:
+                room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=obj, multi=multi)
+                fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
+                            u'Кухня': kitchen_f, u'Комната': room_f}
             for fk_name, fk_form in fk_forms.iteritems():
                 for field in fk_form:
                     value = fk_form.initial.get(field.name)

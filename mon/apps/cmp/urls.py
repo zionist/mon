@@ -5,8 +5,10 @@ from apps.cmp import views
 urlpatterns = patterns(
     'apps.cmp.views',
 
-    url(r'^auctions/all/$', views.get_auctions, name='auctions-all'),
+    url(r'^auctions/all/$', views.get_mo_auctions, {'all': True}, name='auctions-all'),
+    url(r'^auctions/all/xls/$', views.get_mo_auctions, {'all': True, 'xls': True}, name='auctions-all-xls'),
     url(r'^auctions/$', views.get_mo_auctions, name='auctions'),
+    url(r'^auctions/xls/$', views.get_mo_auctions, {'xls': True}, name='auctions-xls'),
     url(r'^auctions/mo/(?P<pk>[0-9]+)/$', views.get_mo_auctions, name='mo-auctions'),
     url(r'^auction/add/$', views.add_auction, name='create-auction'),
     url(r'^auction/(?P<pk>[0-9]+)/$', views.get_auction, name='change-auction'),

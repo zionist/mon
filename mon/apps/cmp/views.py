@@ -219,32 +219,31 @@ def get_auctions(request, pk=None):
 
 
 @login_required
-def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auctions.html'):
+def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auctions.html', xls=False):
     context = {'title': _(u'Аукционы')}
     kwargs = {}
     mo_obj = None
     from_dt = None
-    if pk:
-        mo_obj = MO.objects.get(pk=pk)
-        context = {'title': _(u'Аукционы %s' % mo_obj.name)}
-    elif hasattr(request.user, 'customuser'):
-        mo_obj = request.user.customuser.mo
-        context = {'title': _(u'Аукционы %s' % mo_obj.name)}
+    if hasattr(request.user, 'customuser'):
         from_dt = request.user.customuser.get_user_date()
-    if from_dt:
         kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
-    if all:
+    if pk or not all:
+        if pk:
+            mo_obj = MO.objects.get(pk=pk)
+        elif not all and hasattr(request.user, 'customuser'):
+            mo_obj = request.user.customuser.mo
+        if mo_obj:
+            if copies:
+                context = {'title': _(u'Копии аукционов %s' % (mo_obj))}
+            else:
+                context = {'title': _(u'Аукционы %s' % (mo_obj))}
+            context.update({'object': mo_obj})
+            kwargs.update({'mo': mo_obj})
+    if all or not mo_obj:
         if copies:
             context = {'title': _(u'Все копии аукционов')}
         else:
             context = {'title': _(u'Все аукционы')}
-    elif mo_obj:
-        if copies:
-            context = {'title': _(u'Копии аукционов %s' % (mo_obj))}
-        else:
-            context = {'title': _(u'Аукционы %s' % (mo_obj))}
-        context.update({'object': mo_obj})
-        kwargs.update({'mo': mo_obj})
     objects = []
     if copies:
         objects = CopyAuction.objects.filter(**kwargs).order_by('num')
@@ -260,6 +259,8 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
     else:
         filter_form = FilterAuctionForm(prefix=f_pref)
     objects = list(objects)
+    if xls:
+        return to_xls(request,  objects={AuctionForm: objects}, multi=True)
     for obj in objects:
         setattr(obj, "index_number", objects.index(obj) + 1)
     page = request.GET.get('page', '1')
@@ -530,7 +531,7 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
         if Contract.objects.filter(**kwargs).exists():
             objects = Contract.objects.filter(**kwargs).order_by('num')
     if xls:
-        return to_xls(request,  objects={ContractForm: objects})
+        return to_xls(request,  objects={ContractForm: objects}, fk_forms=False)
     objects = list(objects)
     for obj in objects:
         setattr(obj, "index_number", objects.index(obj) + 1)
