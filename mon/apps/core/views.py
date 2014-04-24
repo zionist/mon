@@ -26,7 +26,9 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.core.servers.basehttp import FileWrapper
 from apps.core.templatetags.extras import get_choice_or_value
 
-from .forms import RoomForm, HallwayForm, WCForm, KitchenForm, \
+from .forms import RoomForm, HallwayForm, WCForm, KitchenForm,\
+    ResultRoomForm, ResultHallwayForm, ResultWCForm, ResultKitchenForm, \
+    ResultRoomShowForm, ResultHallwayShowForm, ResultWCShowForm, ResultKitchenShowForm, \
     RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm, \
     AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm, \
     AuctionRoomShowForm, AuctionHallwayShowForm, AuctionWCShowForm, AuctionKitchenShowForm
@@ -46,9 +48,11 @@ def generate_fonts_css(request):
                               context_instance=RequestContext(request))
 
 
-def get_fk_forms(parent=None, request=None, multi=None):
+def get_fk_forms(parent=None, request=None, multi=None, result=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     forms = [RoomForm, HallwayForm, WCForm, KitchenForm] if not multi else [AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm]
+    if result:
+        forms = [ResultRoomForm, ResultHallwayForm, ResultWCForm, ResultKitchenForm]
     if not parent:
         if request and request.method == "POST":
             room_f = forms[0](request.POST, request.FILES, prefix=room_p)
@@ -74,10 +78,12 @@ def get_fk_forms(parent=None, request=None, multi=None):
     return [room_f, hallway_f, wc_f, kitchen_f]
 
 
-def get_fk_show_forms(parent=None, multi=None):
+def get_fk_show_forms(parent=None, multi=None, result=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     forms = [RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm] if not multi \
         else [AuctionRoomShowForm, AuctionHallwayShowForm, AuctionWCShowForm, AuctionKitchenShowForm]
+    if result:
+        forms = [ResultRoomShowForm, ResultHallwayShowForm, ResultWCShowForm, ResultKitchenShowForm]
     room_f = forms[0](prefix=room_p, instance=parent.room)
     hallway_f = forms[1](prefix=hallway_p, instance=parent.hallway)
     wc_f = forms[2](prefix=wc_p, instance=parent.wc)

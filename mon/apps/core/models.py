@@ -128,32 +128,6 @@ class BaseOrphan(models.Model):
     is_privilege = models.NullBooleanField(blank=True, )
 
 
-class BaseBuilding(models.Model):
-
-    class Meta:
-        abstract = True
-
-    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
-    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
-
-    approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
-    state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
-    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
-    complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
-    comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
-    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
-    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
-
-    build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=True, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
-    build_year = models.DateField(help_text=_(u"Год постройки"), verbose_name=_(u"Год постройки"), null=True, blank=True)
-    ownership_year = models.DateField(help_text=_(u"Дата перехода права собственности"), verbose_name=_(u"Дата перехода права собственности"), null=True, blank=True)
-    ownership_doc_num = models.TextField(help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
-    mo_fond_doc_date = models.DateField(help_text=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
-    mo_fond_doc_num = models.TextField(help_text=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
-
-    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
-
-
 class BaseContract(BaseName):
 
     class Meta:
@@ -341,7 +315,7 @@ class BaseDevices(models.Model):
 
 
 # common classes
-class BaseRoom(BaseDevices):
+class BaseRoom(models.Model):
 
     class Meta:
         app_label = "core"
@@ -359,7 +333,7 @@ class BaseRoom(BaseDevices):
         return d
 
 
-class BaseKitchen(BaseDevices):
+class BaseKitchen(models.Model):
     sink_with_mixer = models.IntegerField(help_text=_(u"Мойка"), default=0, blank=True, null=True, verbose_name=_(u"Мойка"), choices=SINK_CHOICES)
 
     class Meta:
@@ -378,7 +352,7 @@ class BaseKitchen(BaseDevices):
         return d
 
 
-class BaseWC(BaseDevices, ):
+class BaseWC(models.Model):
     is_tower_dryer = models.NullBooleanField(help_text=_(u"Полотенцесушитель"), verbose_name=_(u"Полотенцесушитель"), blank=True, )
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.IntegerField(help_text=_(u"Ванна"), default=0, blank=True, null=True, verbose_name=_(u"Ванна"), choices=BATH_CHOICES)
@@ -401,7 +375,7 @@ class BaseWC(BaseDevices, ):
         return d
 
 
-class BaseHallway(BaseDevices, ):
+class BaseHallway(models.Model):
 
     class Meta:
         app_label = "core"
@@ -478,6 +452,90 @@ class Hallway(BaseMaterials, BaseHallway, ):
         return d
 
 
+class ResultRoom(BaseDevices, Room):
+    class Meta:
+        verbose_name = u"Комната"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultRoom, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class ResultKitchen(BaseDevices, Kitchen):
+
+    class Meta:
+        verbose_name = u"Кухня"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultKitchen, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class ResultWC(BaseDevices, WC, ):
+    class Meta:
+        verbose_name = u"Ванная комната"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultWC, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class ResultHallway(BaseDevices, Hallway, ):
+    class Meta:
+        verbose_name = u"Прихожая"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultHallway, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class BaseBuilding(models.Model):
+
+    class Meta:
+        abstract = True
+
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
+
+    approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
+    state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
+    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
+    complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
+    comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
+    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
+    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
+
+    build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=True, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
+    build_year = models.DateField(help_text=_(u"Год постройки"), verbose_name=_(u"Год постройки"), null=True, blank=True)
+    ownership_year = models.DateField(help_text=_(u"Дата перехода права собственности"), verbose_name=_(u"Дата перехода права собственности"), null=True, blank=True)
+    ownership_doc_num = models.TextField(help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
+    mo_fond_doc_date = models.DateField(help_text=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+    mo_fond_doc_num = models.TextField(help_text=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+
+    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
+
+    room = models.ForeignKey(Room, null=True, blank=True, )
+    wc = models.ForeignKey(WC, null=True, blank=True, )
+    hallway = models.ForeignKey(Hallway, null=True, blank=True, )
+    kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )
+
+
 class Developer(BaseDeveloper, ):
 
     class Meta:
@@ -524,10 +582,10 @@ class BaseResult(models.Model):
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
 
-    room = models.ForeignKey(Room, null=True, blank=True, )
-    wc = models.ForeignKey(WC, null=True, blank=True, )
-    hallway = models.ForeignKey(Hallway, null=True, blank=True, )
-    kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )
+    room = models.ForeignKey(ResultRoom, null=True, blank=True, )
+    wc = models.ForeignKey(ResultWC, null=True, blank=True, )
+    hallway = models.ForeignKey(ResultHallway, null=True, blank=True, )
+    kitchen = models.ForeignKey(ResultKitchen, null=True, blank=True, )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)

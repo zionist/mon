@@ -439,11 +439,15 @@ def get_building(request, pk, state=None, extra=None):
     if not request.user.is_staff:
         form.fields.pop('approve_status')
         form.fields.pop('mo')
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
+    context.update({'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     if build.result_set.all().exists():
         parent = build.result_set.latest('id')
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=parent)
-        context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+        res_room_f, res_hallway_f, res_wc_f, res_kitchen_f = get_fk_show_forms(parent=parent, result=True)
+        context.update({'formsets': [(room_f, res_room_f), (hallway_f, res_hallway_f),
+                                     (wc_f, res_wc_f), (kitchen_f, res_kitchen_f)]})
+    else:
+        context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': build, 'form': form, 'copyform': CopyForm(), })
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
@@ -506,16 +510,23 @@ def update_building(request, pk, state=None, extra=None):
         if not request.user.is_staff:
             form.fields.pop('approve_status')
             form.fields.pop('mo')
-        if form.is_valid():
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             new_build = form.save()
             if not request.user.is_staff:
                 new_build.approve_status = build.approve_status
                 new_build.mo = build.mo
+                new_build.room = room_f.save()
+                new_build.hallway = hallway_f.save()
+                new_build.wc = wc_f.save()
+                new_build.kitchen = kitchen_f.save()
                 new_build.save()
             return redirect('buildings')
         else:
             form, text_area_form = split_form(form)
-            context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix,})
+            context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix,
+                            'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                            'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
             return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
     else:
         initial_kw = {'mo': build.mo}
@@ -527,8 +538,11 @@ def update_building(request, pk, state=None, extra=None):
         if not request.user.is_staff:
             form.fields.pop('approve_status')
             form.fields.pop('mo')
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build)
         form, text_area_form = split_form(form)
-        context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix, })
+        context.update({'object': build, 'form': form,  'text_area_fields': text_area_form,
+                        'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
         return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
 
 

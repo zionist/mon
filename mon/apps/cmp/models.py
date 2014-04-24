@@ -4,10 +4,9 @@ from datetime import datetime
 from copy import deepcopy
 from django.db import models
 from django.utils.translation import ugettext as _
-from apps.core.models import BaseDocumentModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer, \
-    Room, Hallway, WC, Kitchen, Developer, STAGE_CHOICES, BaseAuction
+from apps.core.models import BaseDocumentModel, BaseBuilding, BaseAuctionData, BaseCompareData, BaseContract, BaseResult, Developer,\
+    ResultRoom, ResultHallway, ResultWC, ResultKitchen, Developer, STAGE_CHOICES, BaseAuction
 
-from apps.core.models import Room, Hallway, WC, Kitchen
 from apps.build.models import Building, Ground, Contract
 from apps.mo.models import MO
 from apps.user.models import CustomUser
