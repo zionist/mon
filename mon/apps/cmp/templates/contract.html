@@ -20,11 +20,14 @@
                 {% trans 'Удалить' %}</a></div>
             </form>
         </div><br />
-        {% if building_list %}
-            <div class="row">
-                <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
-                <div class="right"> <a class="btn" href="{% url 'create-building' object.id %}"> Добавить связанный объект </a> </div>
+        <div class="row">
+            <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
+            <div class="right">
+                <a class="btn" href="{% url 'create-building' object.id %}"> Добавить связанный объект </a>
+                <a class="btn" href="{% url 'create-payment' object.id %}"> Добавить связанный платеж </a>
             </div>
+        </div>
+        {% if building_list %}
             <table class="table table-condensed table-hover">
                 {% regroup building_list by state as objects_list %}
                 <tr><th> {% trans 'Адрес' %}</th><th> </th>

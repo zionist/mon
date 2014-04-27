@@ -22,10 +22,11 @@ from .forms import PaymentForm, PaymentShowForm, DateForm
 from apps.mo.models import MO
 from apps.user.models import CustomUser
 from apps.core.views import to_xls
+from apps.build.models import Contract
 
 
 @login_required
-def add_payment(request):
+def add_payment(request, contract=None):
     template = 'payment_creation.html'
     context = {'title': _(u'Добавление платежа')}
     prefix = 'pay'
@@ -35,7 +36,11 @@ def add_payment(request):
             form.save()
             return redirect('payments')
     else:
-        form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo})
+        if contract:
+            contract = Contract.objects.get(pk=contract)
+            form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo, 'contract': contract})
+        else:
+            form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo})
     context.update({'form': form, 'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
