@@ -20,7 +20,7 @@ def divide(value, arg):
 
 @register.filter
 def get_choice_or_value(form, field_name):
-    if form.initial:
+    if hasattr(form, 'initial') and form.initial:
         if hasattr(form.fields[field_name], "choices"):
             if form.initial.get(field_name) is not None:
                 # get multichoice from form

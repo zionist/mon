@@ -444,7 +444,7 @@ def get_building(request, pk, state=None, extra=None):
     if build.result_set.all().exists():
         parent = build.result_set.latest('id')
         res_room_f, res_hallway_f, res_wc_f, res_kitchen_f = get_fk_show_forms(parent=parent, result=True)
-        context.update({'formsets': [(room_f, res_room_f), (hallway_f, res_hallway_f),
+        context.update({'result': True, 'formsets': [(room_f, res_room_f), (hallway_f, res_hallway_f),
                                      (wc_f, res_wc_f), (kitchen_f, res_kitchen_f)]})
     else:
         context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
