@@ -24,7 +24,7 @@ from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, Subventio
     RegionalBudgetForm, MOShowForm, DepartamentAgreementShowForm, SubventionShowForm, FederalBudgetShowForm, \
     RegionalBudgetShowForm, MOPerformanceForm, SubventionMinusForm, MaxFlatPriceForm
 from apps.build.models import Building, Ground, ContractDocuments
-from apps.cmp.models import Auction
+from apps.cmp.models import Auction, Contract
 from apps.user.models import CustomUser
 from apps.core.models import CREATION_FORM_CHOICES
 from apps.payment.models import Payment
@@ -1014,6 +1014,140 @@ def add_max_flat_price(request):
         form = MaxFlatPriceForm()
     context.update({'form': form})
     return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def xls_contract_grapth(request):
+
+    # create
+    book = xlwt.Workbook(encoding='utf8')
+    sheet = book.add_sheet('untitled')
+
+    # custom colors
+    xlwt.add_palette_colour("c_light_grey", 0x21)
+    xlwt.add_palette_colour("c_light_green", 0x22)
+    xlwt.add_palette_colour("c_light_blue", 0x23)
+    book.set_colour_RGB(0x21, 230, 230, 230)
+    book.set_colour_RGB(0x22, 200, 255, 200)
+    book.set_colour_RGB(0x23, 174, 255, 227)
+
+    # styles
+    style_plain = xlwt.easyxf(
+        "font: height 180;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    style_bold = xlwt.easyxf(
+        "font: bold 1, height 180;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    date_style = xlwt.easyxf(num_format_str='dd/mm/yyyy')
+    grey_style = xlwt.easyxf(
+        "pattern: pattern solid, fore_colour c_light_grey;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    green_style = xlwt.easyxf(
+        "pattern: pattern solid, fore_colour c_light_green;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+    blue_style = xlwt.easyxf(
+        "pattern: pattern solid, fore_colour c_light_blue;"
+        "border: left thin, right thin, top thin, bottom thin;"
+        "align: vertical center, horizontal center, wrap True;"
+    )
+
+    ## make header
+    header_height = 7
+    now = datetime.now()
+
+    # МО
+    col = 0
+    sheet.write_merge(0, header_height, 0, 0, u'Наименование месяца', style_bold)
+    sheet.write_merge(0, header_height, 1, 1, u'Количество контрактов, шт', style_bold)
+    sheet.write_merge(0, header_height, 2, 2, u'%', style_bold)
+    sheet.write_merge(0, header_height, 3, 3, u'Кассовый расход по освоению субвенций, руб.', style_bold)
+    sheet.write_merge(0, header_height, 4, 4, u'%', style_bold)
+
+    months = [
+        {1: u'Январь'},
+        {2: u'Февраль'},
+        {3: u'Март'},
+        {4: u'Апрель'},
+        {5: u'Май'},
+        {6: u'Июнь'},
+        {7: u'Июль'},
+        {8: u'Август'},
+        {9: u'Сентябрь'},
+        {10: u'Октябрь'},
+        {11: u'Ноябрь'},
+        {12: u'Декабрь'},
+    ]
+
+    agreement_kwargs = {}
+    payment_kwargs = {}
+    object_kwargs = {}
+    if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
+        user_year = request.user.customuser.get_user_date().year
+        from_dt = datetime(user_year, 01, 01)
+        to_dt = datetime(user_year, 12, 31)
+        payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        object_kwargs = {'start_year__lt': request.user.customuser.get_user_date(),
+                         'finish_year__gt': request.user.customuser.get_user_date()}
+
+    col = 0
+    row = header_height + 1
+
+    # count common data
+    subvention_performance = 0
+    sum_with_k = 0
+    for mo in MO.objects.all():
+        query = mo.departamentagreement_set.filter(**agreement_kwargs)
+        reg_subvention_performance = sum([agr.subvention.reg_budget.subvention_performance or 0 for agr in query.all() if agr.subvention and agr.subvention.reg_budget])
+        fed_subvention_performance = sum([agr.subvention.fed_budget.subvention_performance or 0 for agr in query.all() if agr.subvention and agr.subvention.fed_budget])
+        subvention_performance += reg_subvention_performance
+        subvention_performance += fed_subvention_performance
+        for arg in query.all():
+            if arg.subvention.reg_budget:
+                if arg.subvention.reg_budget.sub_sum:
+                    sum_with_k += arg.subvention.reg_budget.sub_sum
+                if arg.subvention.reg_budget.adm_coef:
+                    sum_with_k += arg.subvention.reg_budget.adm_coef
+            if arg.subvention.fed_budget:
+                if arg.subvention.fed_budget.sub_sum:
+                    sum_with_k += arg.subvention.fed_budget.sub_sum
+                if arg.subvention.fed_budget.adm_coef:
+                    sum_with_k += arg.subvention.fed_budget.adm_coef
+
+    # fill table
+    for month in months:
+        # Наименование месяца
+        sheet.write(row, col, month.values()[0])
+        # Количество контрактов
+        contracts_num = Contract.objects.filter(**object_kwargs).filter(date__month=month.keys()[0]).count()
+        sheet.write(row, col + 1, contracts_num)
+        # Отношение количества жилых помещений в контрактах к показателю результативности субвенции (%)
+        flats_amount = sum([amount.values()[0] or 0 for amount in Contract.objects.filter(**object_kwargs).filter(date__month=month.keys()[0]).values('flats_amount')])
+        percent_of_contracts_flats_amount_and_subvention_perfomance = float(flats_amount) / float(subvention_performance) * 100
+        sheet.write(row, col + 2, percent_of_contracts_flats_amount_and_subvention_perfomance)
+        # Кассовый расход по освоению субвенций
+        spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(**payment_kwargs).filter(date__month=month.keys()[0]).values("amount")])
+        sheet.write(row, col + 3, spend_amount)
+        # Отношение сумм субвенций к кассовому расходу (%)
+        if not spend_amount:
+            percent_of_sum_with_k_and_spend_amount = 0
+        else:
+            percent_of_sum_with_k_and_spend_amount = spend_amount / sum_with_k * 100
+        sheet.write(row, col + 4, percent_of_sum_with_k_and_spend_amount)
+        row += 1
+
+    response = HttpResponse(mimetype='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=list.xls'
+    book.save(response)
+    return response
 
 
 @login_required
