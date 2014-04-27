@@ -9,7 +9,7 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 import autocomplete_light
 
 from .models import Building, Ground
-from apps.core.models import STATE_CHOICES, \
+from apps.core.models import STATE_CHOICES, BUILD_STATE_CHOICES, \
     WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
 from apps.core.forms import cmp_single
 from apps.build.models import Contract
@@ -66,7 +66,12 @@ class GroundUpdateForm(GroundForm):
 class BuildingForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
+        print 'kw', kwargs
+        build_state = kwargs.get('initial').get('ownership_build_state') if 'initial' in kwargs else None
         super(BuildingForm, self).__init__(*args, **kwargs)
+        if build_state and int(build_state) == 2:
+            print 'fields', self.fields
+            self.fields = ['build_year', 'ownership_year', 'ownership_doc_num', 'mo_fond_doc_date', 'mo_fond_doc_num']
 
     class Meta:
         model = Building
@@ -83,7 +88,6 @@ class BuildingForm(GroundForm):
             'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
             'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
             ]
-
 
 
 class BuildingUpdateForm(GroundForm):
@@ -158,6 +162,7 @@ class GroundMonitoringForm(forms.ModelForm):
 
 class BuildingSelectForm(forms.Form):
     state = forms.ChoiceField(label=_(u'Тип объекта'), required=True, choices=STATE_CHOICES, help_text=_(u"Тип объекта"), )
+    build_state = forms.ChoiceField(label=_(u'Статус объекта'), required=True, choices=BUILD_STATE_CHOICES, help_text=_(u"Статус объекта"), )
     developer = forms.ModelChoiceField(label=_(u'Выберите застройщика'),
         required=False, queryset=Developer.objects.all(),
         help_text=_(u"Выберите застройщика (будет предложено добавить нового при пустом значении)"), )

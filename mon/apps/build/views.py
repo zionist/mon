@@ -76,9 +76,12 @@ def select_building_state(request, contract=None):
         if select_form.is_valid():
             cd = select_form.cleaned_data
             if not cd.get('developer'):
-                return redirect('add-building-developer', state=int(cd.get('state')), contract=cd.get('contract') or 0)
+                return redirect('add-building-developer', state=int(cd.get('state')),
+                                 contract=cd.get('contract') or 0)
             dev_pk = cd.get('developer').pk
-            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk, contract=cd.get('contract') or 0)
+            print 'cd', cd
+            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk, build_state=cd.get('build_state'),
+                             contract=cd.get('contract') or 0)
     else:
         initial = {}
         if contract:
@@ -89,7 +92,7 @@ def select_building_state(request, contract=None):
 
 
 @login_required
-def add_building(request, dev_pk=None, state=None, contract=0):
+def add_building(request, dev_pk=None, state=None, contract=0, build_state=1):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
@@ -105,7 +108,7 @@ def add_building(request, dev_pk=None, state=None, contract=0):
             form = GroundForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(request.POST, request.FILES, prefix=prefix)
+            form = BuildingForm(request.POST, request.FILES, prefix=prefix, initial={'ownership_build_state': build_state})
             state_int = int(select)
         if not request.user.is_staff:
             form.fields.pop('approve_status')
@@ -141,6 +144,7 @@ def add_building(request, dev_pk=None, state=None, contract=0):
         if select and int(select) == 2:
             form = GroundForm(prefix=prefix, initial=initial_kw)
         elif select and int(select) in [0, 1]:
+            initial_kw.update({'ownership_build_state': build_state})
             form = BuildingForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)

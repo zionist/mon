@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^building/add/(?P<contract>[0-9]*)/$', views.select_building_state, name='create-building'),
     url(r'^building/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/$', views.add_building, name='add-building'),
     url(r'^building/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/(?P<contract>[0-9]*)/$', views.add_building, name='add-building'),
+    url(r'^building/add/(?P<state>[0-9]+)/(?P<dev_pk>[0-9]*)/(?P<contract>[0-9]*)/(?P<build_state>[0-2]*)/$', views.add_building, name='add-building'),
     url(r'^monitorings/$', views.get_monitorings, name='monitorings'),
     url(r'^monitorings/(?P<mo>[0-9]+)/$', views.get_monitorings, name='monitorings'),
     url(r'^monitorings/all/$', views.get_monitorings, {'all': True}, name='monitorings-all'),
