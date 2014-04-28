@@ -692,6 +692,8 @@ def add_result(request, object=None):
             object = Building.objects.get(pk=object)
             initial_kw.update({'building': object})
         form = ResultForm(prefix=prefix, initial=initial_kw)
+        for field in form:
+            print field.name
         cmp_form = CompareDataForm(prefix=cmp_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(result=True)
         form, text_area_form = split_form(form)
@@ -762,7 +764,7 @@ def update_result(request, pk, extra=None):
     if request.method == "POST":
         form = ResultForm(request.POST, request.FILES, instance=result, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, request=request, result=True)
         context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
@@ -781,7 +783,7 @@ def update_result(request, pk, extra=None):
         form = ResultForm(instance=result, prefix=prefix)
         form, text_area_form = split_form(form)
         cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, result=True)
         context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form,
                         'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
