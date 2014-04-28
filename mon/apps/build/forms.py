@@ -66,28 +66,27 @@ class GroundUpdateForm(GroundForm):
 class BuildingForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
-        print 'kw', kwargs
         build_state = kwargs.get('initial').get('ownership_build_state') if 'initial' in kwargs else None
         super(BuildingForm, self).__init__(*args, **kwargs)
+        self.ownership = None
         if build_state and int(build_state) == 2:
-            print 'fields', self.fields
-            self.fields = ['build_year', 'ownership_year', 'ownership_doc_num', 'mo_fond_doc_date', 'mo_fond_doc_num']
+            self.ownership = True
+        if not self.ownership:
+            for name in ['build_year', 'ownership_year', 'ownership_doc_num', 'mo_fond_doc_date', 'mo_fond_doc_num']:
+                del self.fields[name]
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state',
-        'approve_status', 'flats_amount')
-        fields = [
-            'start_year', 'finish_year', 'readiness', 'mo', 'address', 'floors', 'area_cmp',
-            'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
-            'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
-            'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
-            # for remove
-            'complete_date', 'comment',
-            'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
-            ]
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state', 'approve_status', 'flats_amount')
+        fields = ['build_year', 'ownership_year', 'ownership_doc_num', 'mo_fond_doc_date', 'mo_fond_doc_num',
+                  'start_year', 'finish_year', 'readiness', 'mo', 'address', 'floors', 'area_cmp',
+                   'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
+                   'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
+                   'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
+                   'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
+                   'complete_date', 'comment',
+                   'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
+                   'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways']
 
 
 class BuildingUpdateForm(GroundForm):

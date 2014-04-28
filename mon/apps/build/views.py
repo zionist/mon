@@ -79,7 +79,6 @@ def select_building_state(request, contract=None):
                 return redirect('add-building-developer', state=int(cd.get('state')),
                                  contract=cd.get('contract') or 0)
             dev_pk = cd.get('developer').pk
-            print 'cd', cd
             return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk, build_state=cd.get('build_state'),
                              contract=cd.get('contract') or 0)
     else:
