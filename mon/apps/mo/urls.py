@@ -10,7 +10,7 @@ from apps.mo import views
 urlpatterns = patterns(
     'apps.mo.views',
 
-    url(r'^mos/$', views.get_mos, name='mos'),
+    url(r'^mos/$', views.get_recount_mo, name='mos'),
     url(r'^mos/select/$', views.mos_select, name='select-mos'),
     url(r'^mo/select/(?P<pk>[0-9]+)/$', views.select_mo,  name='select-mo'),
     url(r'^mo/add/$', views.add_mo, name='create-mo'),

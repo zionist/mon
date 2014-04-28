@@ -109,6 +109,7 @@ def recount_mos(mos=[], kwargs=None):
 
 @login_required
 def get_recount_mo(request, pk=None):
+    print 'recount'
     agreement_kwargs = {}
     if MO.objects.all().exists():
         if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
@@ -117,6 +118,8 @@ def get_recount_mo(request, pk=None):
             agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
         if pk:
             recount_mos(MO.objects.filter(pk=pk), kwargs=agreement_kwargs)
+        else:
+            recount_mos(MO.objects.all(), kwargs=agreement_kwargs)
     return get_mos(request, pk=pk)
 
 
