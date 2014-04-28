@@ -24,6 +24,44 @@ class CompareDataForm(forms.ModelForm):
         model = CompareData
         exclude = ('room', 'hallway', 'wc', 'kitchen')
 
+        fields = [
+            # ! no area and cmp_date in tech document
+            'cmp_date',
+            'area',
+            'floors',
+            'driveways',
+            'electric_supply',
+            'water_settlement',
+            'water_removal',
+            'hot_water_supply',
+            'heating',
+            'gas_supply',
+            'internal_doors',
+            'entrance_door',
+            'window_constructions',
+            'is_water_boiler',
+            'is_loggia',
+            'is_balcony',
+            'kindergarden',
+            'school',
+            'clinic',
+            'market',
+            'public_transport',
+            'is_routes',
+            'is_playground',
+            'is_clother_drying',
+            'is_dustbin_area',
+            'is_parking',
+
+            # for remove or hide
+            # 'is_heat_boiler',
+            # 'is_intercom',
+            # 'planing_floor',
+            # 'floor',
+            # 'flats_amount',
+            # 'area_cmp',
+        ]
+
     def __init__(self, *args, **kwargs):
         super(CompareDataForm, self).__init__(*args, **kwargs)
         choices = [(c.get("num"), c.get("value")) for c in Choices.objects.get(name="INTERNAL_DOORS_CHOICES").choice_set.order_by("num").values('num', 'value')]
@@ -80,6 +118,28 @@ class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
         exclude = ('cmp_data', )
+        fields = [
+            'start_year',
+            'finish_year',
+            'mo',
+            'mo_pers',
+            'establish_pers',
+            # no auction, but in present in tech doc
+            'contract',
+            'building',
+            'readiness',
+            'doc_files',
+            'doc_list',
+            'recommend',
+            # 'room',
+            # 'wc',
+            # 'hallway',
+            # 'kitchen',
+            # 'ground',
+
+            # for remove
+            # 'check_date',
+        ]
 
     def __init__(self, *args, **kwargs):
         super(ResultForm, self).__init__(*args, **kwargs)

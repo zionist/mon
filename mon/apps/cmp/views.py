@@ -26,7 +26,7 @@ from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, Perso
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form, set_fields_equal, copy_object, to_xls
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
-from apps.build.models import Contract, ContractDocuments, CopyContract
+from apps.build.models import Contract, ContractDocuments, CopyContract, Building
 from apps.build.forms import BuildingShowForm, GroundShowForm, CopyForm
 from apps.imgfile.models import Image
 from apps.mo.models import MO
@@ -662,14 +662,14 @@ def delete_contract(request, pk):
 
 
 @login_required
-def add_result(request):
+def add_result(request, object=None):
     template = 'result_creation.html'
     context = {'title': _(u'Добавление результатов выезда в МО')}
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
         form = ResultForm(request.POST, request.FILES, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, result=True)
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             result = form.save()
             result.cmp_data = cmp_form.save()
@@ -688,9 +688,14 @@ def add_result(request):
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
+        if object:
+            object = Building.objects.get(pk=object)
+            initial_kw.update({'building': object})
         form = ResultForm(prefix=prefix, initial=initial_kw)
+        for field in form:
+            print field.name
         cmp_form = CompareDataForm(prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(result=True)
         form, text_area_form = split_form(form)
         context.update({'form': form, 'cmp_form': cmp_form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
@@ -702,7 +707,7 @@ def add_result(request):
 def get_results(request, mo=None, all=False):
     template = 'results.html'
     kwargs = {}
-
+    context = {}
     mo_obj = None
     if mo:
         mo_obj = MO.objects.get(pk=mo)
@@ -714,9 +719,9 @@ def get_results(request, mo=None, all=False):
         kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
 
     if all:
-        context = {'title': _(u'Все выезды')}
+        context.update({'title': _(u'Все выезды')})
     elif mo_obj:
-        context = {'title': _(u'Выезды в %s' % (mo_obj))}
+        context.update({'title': _(u'Выезды в %s' % (mo_obj))})
         kwargs.update({'mo': mo_obj})
 
     if Result.objects.filter(**kwargs).exists():
@@ -759,7 +764,7 @@ def update_result(request, pk, extra=None):
     if request.method == "POST":
         form = ResultForm(request.POST, request.FILES, instance=result, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, request=request, result=True)
         context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
@@ -778,7 +783,7 @@ def update_result(request, pk, extra=None):
         form = ResultForm(instance=result, prefix=prefix)
         form, text_area_form = split_form(form)
         cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, result=True)
         context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form,
                         'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,

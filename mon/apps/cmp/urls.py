@@ -48,6 +48,7 @@ urlpatterns = patterns(
     url(r'^results/(?P<mo>[0-9]+)/$', views.get_results, name='results'),
     url(r'^results/all/$', views.get_results,  {'all': True}, name='results-all'),
     url(r'^result/add/$', views.add_result, name='create-result'),
+    url(r'^result/add/(?P<object>[0-9]+)/$', views.add_result, name='create-result'),
     url(r'^result/(?P<pk>[0-9]+)/$', views.get_result, name='change-result'),
     url(r'^result/update/(?P<pk>[0-9]+)/$', views.update_result, name='update-result'),
     url(r'^result/pre_delete/(?P<pk>[0-9]+)/$', views.pre_delete_result, name='pre-delete-result'),

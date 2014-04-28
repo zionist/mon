@@ -33,6 +33,12 @@
                     {% trans 'Удалить' %}</a></div>
                  </form>
             </div><br />
+            <div class="row">
+                <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
+                <div class="right">
+                    <a class="btn" href="{% url 'create-result' object.id %}"> Добавить связанный выезд </a>
+                </div>
+            </div>
         {% endif %}
     {% endif %}
     {% if form or formsets %}
