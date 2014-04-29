@@ -21,7 +21,7 @@
             <div class="auction-table">
             <table class="table table-condensed">
                 <tr><th> {% trans 'Дата выезда' %}</th><th> {% trans 'Наименование МО' %}</th>
-                    <th> {% trans 'Замечания по результатам' %}</th><th> {% trans 'Дата следующего выезда' %}</th></tr>
+                    <th> {% trans 'Замечания по результатам' %}</th></tr>
                 {% for obj in result_list %}
                     {% if obj.id %}
                         <tr>
@@ -36,7 +36,6 @@
                                     {% endif %}
                                 {% endwith %}
                             </td>
-                            <td>{{obj.check_date}}</td>
                         </tr>
                     {% endif %}
                 {% endfor %}

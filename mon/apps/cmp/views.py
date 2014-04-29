@@ -688,6 +688,9 @@ def add_result(request, object=None):
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
+            from_dt = request.user.customuser.get_user_date()
+            initial_kw.update({'start_year': date(from_dt.year, 1, 1),
+                               'finish_year': date(from_dt.year, 12, 31)})
         if object:
             object = Building.objects.get(pk=object)
             initial_kw.update({'building': object})

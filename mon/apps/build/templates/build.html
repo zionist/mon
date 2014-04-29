@@ -28,11 +28,36 @@
                     <div class="span1"> {{ copyform.amount }} </div>
                     <div class="span1"><button class="btn" type="submit" >
                          {% trans 'Скопировать' %} </button></div>
-
                 <div class="span2 text-right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id object.state %}">
                     {% trans 'Удалить' %}</a></div>
                  </form>
             </div><br />
+{% if result_list %}
+    <div class="auction-table">
+        <table class="table table-condensed">
+            <tr><th> {% trans 'Дата выезда' %}</th><th> {% trans 'Наименование МО' %}</th>
+                <th> {% trans 'Замечания по результатам' %}</th></tr>
+            {% for obj in result_list %}
+            {% if obj.id %}
+            <tr>
+                <td><a href="{% url 'change-result' obj.id %}">{{obj.cmp_data.cmp_date}}</a></td>
+                <td>{{obj.mo.name}}</td>
+                <td>
+                    {% with obj.recommend as recommend %}
+                    {% if recommend and recommend != ' ' and recommend != 'Нет' and recommend != 'нет' %}
+                    {% trans 'Да' %}
+                    {% else %}
+                    {% trans 'Нет' %}
+                    {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+
             <div class="row">
                 <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
                 <div class="right">

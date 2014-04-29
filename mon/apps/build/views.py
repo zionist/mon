@@ -445,6 +445,7 @@ def get_building(request, pk, state=None, extra=None):
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
     context.update({'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     if build.result_set.all().exists():
+        context.update({'result_list': build.result_set.all()})
         parent = build.result_set.latest('id')
         res_room_f, res_hallway_f, res_wc_f, res_kitchen_f = get_fk_show_forms(parent=parent, result=True)
         context.update({'result': True, 'formsets': [(room_f, res_room_f), (hallway_f, res_hallway_f),

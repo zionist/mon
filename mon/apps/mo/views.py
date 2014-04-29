@@ -87,12 +87,12 @@ def recount_mos(mos=[], kwargs=None):
             subvention = agr.subvention
             if subvention.amount:
                 amount_sum += float(subvention.amount)
-            if hasattr(subvention, 'reg_budget'):
+            if hasattr(subvention, 'reg_budget') and subvention.reg_budget:
                 if subvention.reg_budget.sub_sum:
                     reg_amount_sum += float(subvention.reg_budget.sub_sum)
                 if subvention.reg_budget.subvention_performance:
                     home_reg_orphans += int(subvention.reg_budget.subvention_performance)
-            if hasattr(subvention, 'fed_budget'):
+            if hasattr(subvention, 'fed_budget') and subvention.fed_budget:
                 if subvention.fed_budget.sub_sum:
                     fed_amount_sum += float(subvention.fed_budget.sub_sum)
                 if subvention.fed_budget.subvention_performance:
