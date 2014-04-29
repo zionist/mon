@@ -124,7 +124,7 @@ class ResultForm(forms.ModelForm):
             'mo',
             'mo_pers',
             'establish_pers',
-            # no auction, but in present in tech doc
+            # no auction, but it present in tech doc
             'contract',
             'building',
             'readiness',

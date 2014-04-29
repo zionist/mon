@@ -943,7 +943,7 @@ def cmp_result_building(request, pk):
     result = res.cmp_data
 
     form = CompareDataShowForm(instance=result)
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=res)
     context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
 
     if res.building:
@@ -968,7 +968,7 @@ def cmp_result_building(request, pk):
                     'object_pre_delete_url': object_pre_delete_url})
 
 
-    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=result)
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=res)
     cmp_form, form = set_fields_equal(cmp_form, form)
     room_cf, room_f = set_fields_equal(room_cf, room_f)
     hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
