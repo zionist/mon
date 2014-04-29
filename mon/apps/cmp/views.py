@@ -940,6 +940,51 @@ def cmp_contract_auction(request, pk):
 
 
 @login_required
+def cmp_building_auction(request, pk):
+    building = Building.objects.get(pk=pk)
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Объект %s' % building.address)}
+
+    contract_form = BuildingShowForm(instance=building)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=building)
+
+    if building.contract and building.contract.auction_set.all().exists():
+        cmp_obj = building.contract.auction_set.all()[0]
+        auction_form = AuctionShowForm(instance=cmp_obj, cmp_initial=building)
+    else:
+        context.update({'errorlist': _('No one matched object')})
+        return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    context.update({'cmp_object_title': _(u'Аукцион %s' % cmp_obj.num)})
+
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=building, multi=True)
+    auction_form, contract_form = set_fields_equal(auction_form, contract_form)
+    room_cf, room_f = set_fields_equal(room_cf, room_f)
+    hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
+    wc_cf, wc_f = set_fields_equal(wc_cf, wc_f)
+    kitchen_cf, kitchen_f = set_fields_equal(kitchen_cf, kitchen_f)
+
+    object_update_url = reverse('update-building', args=[building.id, 1])
+    object_pre_delete_url = reverse('pre-delete-building', args=[building.id, 1])
+    cmp_obj_update_url = reverse('update-auction', args=[cmp_obj.id, ])
+    cmp_obj_pre_delete_url = reverse('pre-delete-auction', args=[cmp_obj.id, ])
+    context.update({'cmp_obj_update_url': cmp_obj_update_url,
+                    'cmp_obj_pre_delete_url': cmp_obj_pre_delete_url})
+    context.update({'object_update_url': object_update_url,
+                    'object_pre_delete_url': object_pre_delete_url})
+
+    context.update({'cmp_form': auction_form, 'room_cf': room_cf, 'hallway_cf': hallway_cf,
+                    'wc_cf': wc_cf, 'kitchen_cf': kitchen_cf, })
+    context.update({'form': contract_form, 'room_f': room_f, 'hallway_f': hallway_f,
+                    'wc_f': wc_f, 'kitchen_f': kitchen_f, })
+
+    context.update({'object': building, 'cmp_object': cmp_obj,
+                    'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                               BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+    return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+
+@login_required
 def cmp_result_building(request, pk):
     res = Result.objects.get(pk=pk)
     context = {'title': _(u'Сравнение параметров'), 'object_title': _(u'Результат')}

@@ -520,11 +520,12 @@ def update_building(request, pk, state=None, extra=None):
             if not request.user.is_staff:
                 new_build.approve_status = build.approve_status
                 new_build.mo = build.mo
-                new_build.room = room_f.save()
-                new_build.hallway = hallway_f.save()
-                new_build.wc = wc_f.save()
-                new_build.kitchen = kitchen_f.save()
-                new_build.save()
+            room = room_f.save()
+            new_build.room = room
+            new_build.hallway = hallway_f.save()
+            new_build.wc = wc_f.save()
+            new_build.kitchen = kitchen_f.save()
+            new_build.save()
             return redirect('buildings')
         else:
             form, text_area_form = split_form(form)
