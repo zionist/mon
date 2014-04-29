@@ -524,9 +524,9 @@ class BaseBuilding(models.Model):
     build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=True, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
     build_year = models.DateField(help_text=_(u"Год постройки"), verbose_name=_(u"Год постройки"), null=True, blank=True)
     ownership_year = models.DateField(help_text=_(u"Дата перехода права собственности"), verbose_name=_(u"Дата перехода права собственности"), null=True, blank=True)
-    ownership_doc_num = models.TextField(help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
+    ownership_doc_num = models.CharField(max_length=512, help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
     mo_fond_doc_date = models.DateField(help_text=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
-    mo_fond_doc_num = models.TextField(help_text=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+    mo_fond_doc_num = models.CharField(max_length=512, help_text=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
 
     cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
 

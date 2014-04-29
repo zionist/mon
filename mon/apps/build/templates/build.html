@@ -64,7 +64,8 @@
             <div class="row">
                 <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
                 <div class="right">
-                    <a class="btn" href="{% url 'create-result' object.id %}"> Добавить связанный выезд </a>
+                    <a class="btn" href="{% url 'update-building-state' object.id %}"> {% trans 'Редактировать статус'%} </a>
+                    <a class="btn" href="{% url 'create-result' object.id %}"> {% trans 'Добавить связанный выезд' %} </a>
                 </div>
             </div>
         {% endif %}

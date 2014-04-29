@@ -37,7 +37,7 @@ from apps.build.models import Building, Ground, CopyBuilding
 from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
     GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, CopyBuildingForm, \
     GroundMonitoringForm, BuildingSelectMonitoringForm, BuildingUpdateForm, GroundUpdateForm, \
-    CopyForm
+    CopyForm, BuildingUpdateStateForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form, copy_object, to_xls
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
@@ -85,8 +85,26 @@ def select_building_state(request, contract=None):
         initial = {}
         if contract:
             initial.update({"contract": contract})
-        form = BuildingSelectForm(prefix=prefix, initial=initial)
-    context.update({'select_form': form})
+        select_form = BuildingSelectForm(prefix=prefix, initial=initial)
+    context.update({'select_form': select_form})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def update_building_state(request, pk, build_state=None):
+    template = 'build_updating.html'
+    build = Building.objects.get(pk=pk)
+    build_state = int(build_state) if build_state else 1
+    context = {'title': _(u'Изменение статуса объекта рынка жилья'), 'object': build}
+    prefix = 'update_build'
+    if request.method == "POST":
+        state_form = BuildingUpdateStateForm(request.POST, prefix=prefix, instance=build)
+        if state_form.is_valid():
+            state_form.save()
+            return redirect('get-building', pk=pk)
+    else:
+        state_form = BuildingUpdateStateForm(prefix=prefix, instance=build)
+    context.update({'state_form': state_form})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
@@ -435,7 +453,7 @@ def get_building(request, pk, state=None, extra=None):
         form = GroundForm(instance=build)
     else:
         build = Building.objects.get(pk=pk)
-        form = BuildingForm(instance=build)
+        form = BuildingForm(instance=build, initial={'ownership_build_state': build.build_state})
     if not request.user.is_staff:
         if build.mo != request.user.customuser.mo:
             return HttpResponseForbidden("Forbidden")

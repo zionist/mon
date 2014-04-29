@@ -77,16 +77,14 @@ class BuildingForm(GroundForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'developer', 'state', 'approve_status', 'flats_amount')
-        fields = ['build_year', 'ownership_year', 'ownership_doc_num', 'mo_fond_doc_date', 'mo_fond_doc_num',
-                  'start_year', 'finish_year', 'readiness', 'mo', 'address', 'floors', 'area_cmp',
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state', 'approve_status', 'flats_amount')
+        fields = ['start_year', 'finish_year', 'readiness', 'payment_perspective', 'mo', 'address', 'developer',
+                  'contract', 'floors', 'area_cmp',
                    'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
-                   'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
-                   'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
-                   'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
-                   'complete_date', 'comment',
-                   'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-                   'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways']
+                   'heating', 'is_heat_boiler', 'gas_supply', 'internal_doors', 'entrance_door', 'window_constructions',
+                   'is_water_boiler', 'is_loggia', 'is_balcony', 'flat_num', 'complete_date', 'comment',
+                   'build_state', 'build_year', 'ownership_year', 'ownership_doc_num',
+                   'cad_num', 'cad_sum', 'cad_passport', 'floor', 'mo_fond_doc_date', 'mo_fond_doc_num',]
 
 
 class BuildingUpdateForm(GroundForm):
@@ -107,10 +105,22 @@ class BuildingUpdateForm(GroundForm):
             'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
             'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
             # for remove
-            'complete_date', 'comment',
-            'public_transport', 'market', 'kindergarden', 'school', 'clinic', 'is_routes', 'is_playground',
-            'is_clother_drying', 'is_parking', 'is_dustbin_area', 'is_intercom', 'driveways',
+            'complete_date', 'comment'
             ]
+
+
+class BuildingUpdateStateForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(BuildingUpdateStateForm, self).__init__(*args, **kwargs)
+        self.fields['build_state'].choices = (BUILD_STATE_CHOICES[1],)
+        for name in ['cad_num', 'cad_sum', 'floor', 'mo_fond_doc_date', 'mo_fond_doc_num']:
+            self.fields[name].required = True
+
+    class Meta:
+        model = Building
+        fields = ['build_state', 'build_year', 'ownership_year', 'ownership_doc_num',
+                  'cad_num', 'cad_sum', 'floor', 'mo_fond_doc_date', 'mo_fond_doc_num', 'cad_passport', ]
 
 
 class CopyBuildingForm(BuildingForm):
@@ -183,8 +193,8 @@ class BuildingShowForm(BuildingForm):
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract', 'developer', 'approve_status',
-                   'area', 'address', 'comment', 'complete_date', 'readiness', 'payment_perspective', 'flats_amount')
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'contract', 'developer', 'approve_status', 'cad_passport',
+                   'area', 'address', 'comment', 'complete_date', 'payment_perspective', 'flats_amount')
 
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
