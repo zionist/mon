@@ -121,6 +121,7 @@ def get_questions_list(request):
             room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=building)
             object_formsets = [room_f, hallway_f, wc_f, kitchen_f]
             context['building_forms'].append({object_form: object_formsets})
+            print context['building_forms']
             # get only last cmp form for displaying
             if building.result_set:
                 if building.result_set.order_by('cmp_data__cmp_date'):
@@ -129,15 +130,15 @@ def get_questions_list(request):
                     context['contract_cmp_data'].append({building.pk: last_cmp_form})
         context["contract"] = contract
         context["contract_form"] = contract_form
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
+        # room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
 
-    context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': [
-                        Room._meta.verbose_name,
-                        Hallway._meta.verbose_name,
-                        WC._meta.verbose_name,
-                        Kitchen._meta.verbose_name,
-                        ]})
+    #context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+    #                'titles': [
+    #                    Room._meta.verbose_name,
+    #                    Hallway._meta.verbose_name,
+    #                    WC._meta.verbose_name,
+    #                    Kitchen._meta.verbose_name,
+    #                    ]})
     template = webodt.ODFTemplate('quest.odt')
     document = template.render(Context(context))
     conv = converter()

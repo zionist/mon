@@ -19,7 +19,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 
 from .models import Payment
 from .forms import PaymentForm, PaymentShowForm, DateForm
-from apps.mo.models import MO
+from apps.mo.models import MO, MaxFlatPrice
 from apps.user.models import CustomUser
 from apps.core.views import to_xls
 from apps.build.models import Contract
@@ -99,7 +99,29 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
             spent = reg_spent + fed_spent
             adm_spent = reg_adm_spent + fed_adm_spent
             percent = round((float(spent/amount) * 100), 3) if amount else 0
-            economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+
+
+            object_kwargs = {'start_year__lt': user.customuser.get_user_date(),
+                             'finish_year__gt': user.customuser.get_user_date()}
+            max_flat_price = MaxFlatPrice.objects.get(year=from_dt.year)
+            query = mo.contract_set.filter(**object_kwargs).values("flats_amount", "summa",
+                                                               "summ_without_mo_money", "summ_mo_money")
+            # Количество жилых помещений
+            contracts_flats_amount = 0
+            contracts_summ = 0
+            query = mo.contract_set.filter(**object_kwargs).values("flats_amount", "summa",
+                                                                   "summ_without_mo_money", "summ_mo_money")
+            for contract in query:
+                if contract["flats_amount"]:
+                    contracts_flats_amount += contract["flats_amount"]
+                    # Сумма по заключенным контрактам ИТОГО
+                if contract["summa"]:
+                    contracts_summ += contract["summa"]
+            contracts_economy = contracts_flats_amount * max_flat_price.max_price - contracts_summ
+            contracts_economy = contracts_economy if contracts_economy > 0 else 0
+
+            # economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+            economy = contracts_economy
             accounting.update({'mo': mo, 'spent': spent, 'saved': amount - spent, 'percent': percent,
                                'sub_amount': amount, 'economy': economy, 'home_amount': home_amount,
                                'adm_amount': adm_amount, 'adm_spent': adm_spent,

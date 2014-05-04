@@ -170,7 +170,6 @@ class BuildingUpdateForm(GroundForm):
                 for name in ['ownership_year', 'cad_num', 'cad_sum',  'floor',
                              'mo_fond_doc_date',  'mo_fond_doc_num', ]:
                     self.fields[name].required = True
-                self.fields['build_state'] = forms.ChoiceField(choices=BUILD_STATE_CHOICES, )
             else:
                 for name in ['ownership_year', 'build_year', 'cad_num', 'cad_sum',  'floor',
                              'mo_fond_doc_date',  'mo_fond_doc_num', ]:
