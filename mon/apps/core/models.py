@@ -357,7 +357,7 @@ class BaseWC(models.Model):
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.IntegerField(help_text=_(u"Ванна"), default=0, blank=True, null=True, verbose_name=_(u"Ванна"), choices=BATH_CHOICES)
     sink_with_mixer = models.IntegerField(help_text=_(u"Умывальник"), default=0, blank=True, null=True, verbose_name=_(u"Умывальник"), choices=WC_SINK_CHOICES)
-    wc_switches = models.NullBooleanField(help_text=_(u"Выключатели в туалете"), verbose_name=_(u"Выключатели в туалете"), blank=True, )
+    # wc_switches = models.NullBooleanField(help_text=_(u"Выключатели в туалете"), verbose_name=_(u"Выключатели в туалете"), blank=True, )
 
     class Meta:
         app_label = "core"
@@ -521,7 +521,7 @@ class BaseBuilding(models.Model):
     readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
     payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
 
-    build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=True, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
+    build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=False, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
     build_year = models.DateField(help_text=_(u"Год постройки"), verbose_name=_(u"Год постройки"), null=True, blank=True)
     ownership_year = models.DateField(help_text=_(u"Дата перехода права собственности"), verbose_name=_(u"Дата перехода права собственности"), null=True, blank=True)
     ownership_doc_num = models.CharField(max_length=512, help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)

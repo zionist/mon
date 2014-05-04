@@ -120,12 +120,13 @@ def add_building(request, dev_pk=None, state=None, contract=0, build_state=1):
     dev = Developer.objects.get(pk=dev_pk)
     context.update({'state': select, 'dev': dev_pk})
     if request.method == "POST" and 'build' in request.POST:
+        build_state = request.POST.get('%s-build_state' % prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if select and int(select) == 2:
             form = GroundForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(request.POST, request.FILES, prefix=prefix, initial={'ownership_build_state': build_state})
+            form = BuildingForm(request.POST, request.FILES, prefix=prefix, initial={'build_state': build_state})
             state_int = int(select)
         if not request.user.is_staff:
             form.fields.pop('approve_status')
@@ -161,7 +162,7 @@ def add_building(request, dev_pk=None, state=None, contract=0, build_state=1):
         if select and int(select) == 2:
             form = GroundForm(prefix=prefix, initial=initial_kw)
         elif select and int(select) in [0, 1]:
-            initial_kw.update({'ownership_build_state': build_state})
+            initial_kw.update({'build_state': build_state})
             form = BuildingForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
@@ -447,13 +448,18 @@ def get_building_copies(request, mo=None, all=False):
 @login_required
 def get_building(request, pk, state=None, extra=None):
 
+    def _remove_common_fields(form, res_form):
+        for field in form.fields:
+            if field in res_form.fields:
+                res_form.fields.pop(field)
+
     context = {'title': _(u'Параметры объекта')}
     if state and int(state) == 2:
         build = Ground.objects.get(pk=pk)
         form = GroundForm(instance=build)
     else:
         build = Building.objects.get(pk=pk)
-        form = BuildingForm(instance=build, initial={'ownership_build_state': build.build_state})
+        form = BuildingForm(instance=build, initial={'build_state': build.build_state})
     if not request.user.is_staff:
         if build.mo != request.user.customuser.mo:
             return HttpResponseForbidden("Forbidden")
@@ -466,6 +472,11 @@ def get_building(request, pk, state=None, extra=None):
         context.update({'result_list': build.result_set.all()})
         parent = build.result_set.latest('id')
         res_room_f, res_hallway_f, res_wc_f, res_kitchen_f = get_fk_show_forms(parent=parent, result=True)
+        # remove common fields from result fk objects
+        _remove_common_fields(room_f, res_room_f)
+        _remove_common_fields(hallway_f, res_hallway_f)
+        _remove_common_fields(wc_f, res_wc_f)
+        _remove_common_fields(kitchen_f, res_kitchen_f)
         context.update({'result': True, 'formsets': [(room_f, res_room_f), (hallway_f, res_hallway_f),
                                      (wc_f, res_wc_f), (kitchen_f, res_kitchen_f)]})
     else:
@@ -557,6 +568,7 @@ def update_building(request, pk, state=None, extra=None):
             form = GroundUpdateForm(prefix=prefix, instance=build, initial=initial_kw)
         else:
             form = BuildingUpdateForm(prefix=prefix, instance=build, initial=initial_kw)
+
         # remove approve_status field from view if not admin
         if not request.user.is_staff:
             form.fields.pop('approve_status')

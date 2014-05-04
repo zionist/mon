@@ -2,6 +2,7 @@
 
 from django import forms
 from django.forms.formsets import formset_factory
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.forms.models import inlineformset_factory, formset_factory, \
@@ -10,7 +11,7 @@ import autocomplete_light
 
 from .models import Building, Ground
 from apps.core.models import STATE_CHOICES, BUILD_STATE_CHOICES, \
-    WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer
+    WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, Developer, READINESS_CHOICES
 from apps.core.forms import cmp_single
 from apps.build.models import Contract
 from apps.core.models import Choices
@@ -66,61 +67,201 @@ class GroundUpdateForm(GroundForm):
 class BuildingForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
-        build_state = kwargs.get('initial').get('ownership_build_state') if 'initial' in kwargs else None
+
+
+        build_state = kwargs.get('initial').get('build_state') if 'initial' in kwargs else None
+
+        def _validate_readiness(value):
+            if not build_state:
+                raise ValidationError(u'Степень готовности должа быть "Сдан в эксплуатацию"')
+            else:
+                if int(value) != 5:
+                    raise ValidationError(u'Степень готовности должна быть "Сдан в эксплуатацию"')
+
         super(BuildingForm, self).__init__(*args, **kwargs)
+        self.fields['readiness'] = forms.ChoiceField(choices=READINESS_CHOICES,
+                                                     validators=[_validate_readiness, ],
+                                                     label=u'Степень готовности')
+        self.fields['contract'].required = True
         self.ownership = None
         if build_state and int(build_state) == 2:
             self.ownership = True
+            for name in ['ownership_year', 'cad_num', 'cad_sum',  'floor',
+                         'mo_fond_doc_date',  'mo_fond_doc_num', ]:
+                self.fields[name].required = True
         if not self.ownership:
-            for name in ['build_year', 'ownership_year', 'ownership_doc_num', 'mo_fond_doc_date', 'mo_fond_doc_num']:
-                del self.fields[name]
+            for name in ['ownership_year', 'build_year', 'cad_num', 'cad_sum',  'floor',
+                'mo_fond_doc_date',  'mo_fond_doc_num', ]:
+                self.fields.pop(name)
+        self.fields['build_state'].widget = forms.HiddenInput()
 
     class Meta:
         model = Building
-        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state', 'approve_status', 'flats_amount')
-        fields = ['start_year', 'finish_year', 'readiness', 'payment_perspective', 'mo', 'address', 'developer',
-                  'contract', 'floors', 'area_cmp',
-                   'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
-                   'heating', 'is_heat_boiler', 'gas_supply', 'internal_doors', 'entrance_door', 'window_constructions',
-                   'is_water_boiler', 'is_loggia', 'is_balcony', 'flat_num', 'complete_date', 'comment',
-                   'build_state', 'build_year', 'ownership_year', 'ownership_doc_num',
-                   'cad_num', 'cad_sum', 'cad_passport', 'floor', 'mo_fond_doc_date', 'mo_fond_doc_num',]
+        exclude = ('room', 'hallway', 'wc', 'kitchen', 'state', 'approve_status', 'flats_amount', )
+        fields = [
+            'start_year', # Срок начала учета в системе
+            'finish_year', # Срок окончания учета в системе
+            'readiness', # Степень готовности
+            'payment_perspective', # Перспектива освоения
+            'mo', # Муниципальное образование
+            'address', # Адрес
+            'developer', # Застройщик (владелец) объекта
+            'contract', # Контракт
+            'planing_floor', # Этаж (планируемый)
+            'driveway_num', # Подъезд
+            'area', # Общая площадь (кв. м)
+            # 'area_cmp', # Общая площадь не менее/равна
+            'electric_supply', # Электроснабжение
+            'water_settlement', # Водоподведение
+            'water_removal', # Водоотведение
+            'hot_water_supply', # Горячее водоснабжение
+            'heating', # Отопление
+            'is_heat_boiler', # Отопительный котел
+            'gas_supply', # Газоснабжение
+            'internal_doors', # Материал межкомнатных дверей
+            'entrance_door', # Материал входной двери
+            'window_constructions', # Материал оконных констукций
+            'is_water_boiler', # Водонагревательный прибор (бойлер)
+            'is_loggia', # Наличие лоджии
+            'is_balcony', # Наличие балкона
+            'comment', # Комментарий
+
+            'build_state', # Статус объекта
+            'ownership_year', # Дата перехода права собственности
+            'build_year', # Год постройки
+            'cad_num', # Кадастровый номер
+            'cad_sum', # Кадастровая стоимость, руб.
+            'floor', # Этаж сданного в эксплуатацию объекта
+            'mo_fond_doc_date', # Дата документа МО о передаче жилого помещения в спец. фонд
+            'mo_fond_doc_num', # Номер документа МО о передаче жилого помещения в спец. фонд
+
+            # for remove
+            # 'mo_fond_doc_date', # Дата документа МО о передаче жилого помещения в спец. фонд
+            # 'mo_fond_doc_num', # Номер документа МО о передаче жилого помещения в спец. фонд
+            # 'public_transport', # Ближайшая остановка общественного транспорта отдаленность, м
+            # 'market', # Магазин отдаленность, м
+            # 'kindergarden', # Детский сад отдаленность, м
+            # 'school', # Школа отдаленность, м
+            # 'clinic', # Поликлиника отдаленность, м
+            # 'is_routes', # Подъездные пути
+            # 'is_playground', # Детская площадка
+            # 'is_clother_drying', # Площадка для сушки белья
+            # 'is_parking', # Парковка
+            # 'is_dustbin_area', # Площадка для мусорных контейнеров
+            # 'is_intercom', # Домофон
+            # 'complete_date', # Срок сдачи в эксплуатацию
+            # 'ownership_doc_num', # Номер документа перехода права собственности
+            # 'cad_passport', # Выписка из кадастрового паспорта
+            # 'floors', # Этажность
+            # 'driveways', # Подъездность
+            # 'flats_amount', # Количество жилых помещений
+            # 'flat_num', # Номер жилого помещения
+        ]
 
 
 class BuildingUpdateForm(GroundForm):
 
     def __init__(self, *args, **kwargs):
         super(BuildingUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['contract'].required = True
+        self.ownership = None
+        if self.instance:
+            if self.instance.build_state and int(self.instance.build_state) == 2:
+                for name in ['ownership_year', 'cad_num', 'cad_sum',  'floor',
+                             'mo_fond_doc_date',  'mo_fond_doc_num', ]:
+                    self.fields[name].required = True
+                self.fields['build_state'] = forms.ChoiceField(choices=BUILD_STATE_CHOICES, )
+            else:
+                for name in ['ownership_year', 'build_year', 'cad_num', 'cad_sum',  'floor',
+                             'mo_fond_doc_date',  'mo_fond_doc_num', ]:
+                    self.fields.pop(name)
+
 
     class Meta:
         model = Building
-        # fields = ['heating', 'start_year', 'finish_year']
-
         exclude = ('room', 'hallway', 'wc', 'kitchen', 'state',
-        'approve_status', 'flats_amount')
+        'approve_status', 'build_state')
         fields = [
-            'start_year', 'finish_year', 'readiness', 'mo', 'address', 'floors', 'area_cmp',
-            'area', 'electric_supply', 'water_settlement', 'water_removal', 'hot_water_supply',
-            'heating', 'gas_supply', 'is_heat_boiler', 'is_water_boiler', 'is_loggia', 'is_balcony',
-            'internal_doors', 'entrance_door', 'window_constructions', 'payment_perspective',
-            'cad_passport', 'cad_num', 'developer', 'contract', 'flat_num',
+            'start_year', # Срок начала учета в системе
+            'finish_year', # Срок окончания учета в системе
+            'readiness', # Степень готовности
+            'payment_perspective', # Перспектива освоения
+            'mo', # Муниципальное образование
+            'address', # Адрес
+            'developer', # Застройщик (владелец) объекта
+            'contract', # Контракт
+            'planing_floor', # Этаж (планируемый)
+            'driveway_num', # Подъезд
+            'area', # Общая площадь (кв. м)
+             # 'area_cmp', # Общая площадь не менее/равна
+            'electric_supply', # Электроснабжение
+            'water_settlement', # Водоподведение
+            'water_removal', # Водоотведение
+            'hot_water_supply', # Горячее водоснабжение
+            'heating', # Отопление
+            'is_heat_boiler', # Отопительный котел
+            'gas_supply', # Газоснабжение
+            'internal_doors', # Материал межкомнатных дверей
+            'entrance_door', # Материал входной двери
+            'window_constructions', # Материал оконных констукций
+            'is_water_boiler', # Водонагревательный прибор (бойлер)
+            'is_loggia', # Наличие лоджии
+            'is_balcony', # Наличие балкона
+            'comment', # Комментарий
+
+            'build_state', # Статус объекта
+            'ownership_year', # Дата перехода права собственности
+            'build_year', # Год постройки
+            'cad_num', # Кадастровый номер
+            'cad_sum', # Кадастровая стоимость, руб.
+            'floor', # Этаж сданного в эксплуатацию объекта
+            'mo_fond_doc_date', # Дата документа МО о передаче жилого помещения в спец. фонд
+            'mo_fond_doc_num', # Номер документа МО о передаче жилого помещения в спец. фонд
+
             # for remove
-            'complete_date', 'comment'
-            ]
+            # 'mo_fond_doc_date', # Дата документа МО о передаче жилого помещения в спец. фонд
+            # 'mo_fond_doc_num', # Номер документа МО о передаче жилого помещения в спец. фонд
+            # 'public_transport', # Ближайшая остановка общественного транспорта отдаленность, м
+            # 'market', # Магазин отдаленность, м
+            # 'kindergarden', # Детский сад отдаленность, м
+            # 'school', # Школа отдаленность, м
+            # 'clinic', # Поликлиника отдаленность, м
+            # 'is_routes', # Подъездные пути
+            # 'is_playground', # Детская площадка
+            # 'is_clother_drying', # Площадка для сушки белья
+            # 'is_parking', # Парковка
+            # 'is_dustbin_area', # Площадка для мусорных контейнеров
+            # 'is_intercom', # Домофон
+            # 'complete_date', # Срок сдачи в эксплуатацию
+            # 'ownership_doc_num', # Номер документа перехода права собственности
+            # 'cad_passport', # Выписка из кадастрового паспорта
+            # 'floors', # Этажность
+            # 'driveways', # Подъездность
+            # 'flats_amount', # Количество жилых помещений
+            # 'flat_num', # Номер жилого помещения
+        ]
 
 
 class BuildingUpdateStateForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
+
+        def _validate_status(value):
+            print self.instance.readiness
+            print value
+            if self.instance.readiness is None:
+                raise ValidationError(u'Степень готовновсти должна быть "Сдан в эксплуатацию"')
+            else:
+                print int(self.instance.readiness) != 5
+                if int(self.instance.readiness) != 5 and int(value) == 2:
+                    raise ValidationError(u'Степень готовности должна быть "Сдан в эксплуатацию"')
         super(BuildingUpdateStateForm, self).__init__(*args, **kwargs)
-        self.fields['build_state'].choices = (BUILD_STATE_CHOICES[1],)
-        for name in ['cad_num', 'cad_sum', 'floor', 'mo_fond_doc_date', 'mo_fond_doc_num']:
-            self.fields[name].required = True
+        self.fields['build_state'] = forms.ChoiceField(choices=BUILD_STATE_CHOICES, validators=[_validate_status, ],
+                                                       label=u'Статус объекта')
+        self.fields['build_state'].choices = BUILD_STATE_CHOICES
 
     class Meta:
         model = Building
-        fields = ['build_state', 'build_year', 'ownership_year', 'ownership_doc_num',
-                  'cad_num', 'cad_sum', 'floor', 'mo_fond_doc_date', 'mo_fond_doc_num', 'cad_passport', ]
+        fields = ['build_state', ]
 
 
 class CopyBuildingForm(BuildingForm):
