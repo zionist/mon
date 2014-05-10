@@ -53,6 +53,14 @@ def get_choice_or_value(form, field_name):
 
 
 @register.filter
+def hide_not_set(value):
+    if value == u"Не указано":
+        return u""
+    else:
+        return value
+
+
+@register.filter
 def yes_no_rus(value):
     if isinstance(value, SafeText) or isinstance(value, str):
         m = re.search('<span\s*class="text-error">(.*?)</span>', value)

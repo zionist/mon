@@ -13,14 +13,14 @@ from apps.build.models import Building
 from apps.cmp.models import Contract, Result, CompareData, Auction, MO, \
     Person
 from apps.cmp.forms import ContractForm, ResultForm, CompareDataForm, \
-    AuctionForm
+    AuctionForm, ContractShowForm, CompareDataShowForm
 from apps.core.forms import RoomShowForm, HallwayShowForm, WCShowForm, \
     KitchenShowForm
 from apps.build.forms import BuildingForm, BuildingShowForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form
 from apps.core.models import WC, Room, Hallway, Kitchen, Developer
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
-from apps.imgfile.forms import QuestionsListForm, SelectMoForm
+from apps.imgfile.forms import QuestionsListForm, SelectMoForm, QuestionsListFormSimple
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -61,6 +61,47 @@ def get_questions_list_form(request):
     print context
     return render_to_response(template, context,
                               context_instance=RequestContext(request))
+
+
+def get_questions_list_form_simple(request):
+    context = {'title': u'Создать форму опроса'}
+    template = 'qet_questions_list_form.html'
+    # form from get_questions_list was wrong
+    if request.method == 'GET':
+        mo = MO.objects.get(pk=request.GET.get('mo'))
+        if not mo:
+            return HttpResponseBadRequest(u"Не указано МО")
+        form = QuestionsListFormSimple(mo)
+    # generate new print form for MO
+    elif request.method == 'POST':
+        mo = MO.objects.get(name=request.POST.get("mo"))
+        if not mo:
+            return HttpResponseBadRequest(u"Не указано МО")
+        form = QuestionsListFormSimple(mo=mo, data=request.POST)
+        if form.is_valid():
+            context = {'title': u'Бланк опроса'}
+            auction = Auction.objects.get(pk=form.cleaned_data.get('auction'))
+            context.update({'auction': auction})
+            template = 'questions_list.html'
+            data = form.cleaned_data.copy()
+            data['auction'] = auction.num
+            form.data = data
+            context.update({'common_form': form})
+            contract_form = ContractShowForm(instance=auction.contract)
+            context.update({'contract_form': contract_form})
+            build_forms = {}
+            for obj in auction.contract.building_set.all():
+                formset = get_fk_show_forms(parent=obj)
+                build_forms[BuildingForm(instance=obj)] = formset
+            context.update({'building_forms': build_forms})
+            return render_to_response(template, context,
+                                      context_instance=RequestContext(request))
+    else:
+        return HttpResponseNotFound("Not found")
+    context.update({'form': form})
+    return render_to_response(template, context,
+                              context_instance=RequestContext(request))
+
 
 
 def get_questions_list(request):

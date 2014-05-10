@@ -10,8 +10,7 @@
         </div>
     {% else %}
         {% if form %}
-            <form method="POST" action="{% url 'questions-list-form' %}"> {% csrf_token %}
-
+            <form method="GET" action="{% url 'questions-list-simple' %}"> {% csrf_token %}
                 <table border="0">
                     {% for field in form %}
                     <tr><td width="30%">{{ field.label_tag }}</td><td>{{ field.errors }}{{ field }}</td></tr>

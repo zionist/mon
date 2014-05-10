@@ -1,0 +1,252 @@
+{% load i18n %}
+{% load extras %}
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title> {{ title }}</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+{% block content %}
+<h2 align="center"> {{ title }}  </h2>
+<p align = "center">
+   для выезда в муниципальное образование Краснодарского края
+    с целью мониторинга исполнения соглашения, заключенного с министерством
+    социального развития и семейной политики Краснодарского края
+</p>
+<h4 align="center"> Общая информация </h4>
+<table width="100%" align="center">
+  <tbody>
+    <th> Название </th> <th> Значение</th>
+    {% for field in common_form %}
+    <tr>
+        <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+        <td class="td-right" width="50%" align="center"> {{ field.value }} </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td class="td-left" width="50%" align="center"> Информация по проведению торгов </td>
+        {% if auction.open_date %}
+        <td class="td-right" width="50%" align="center"> Объявлены торги на приобретение, строительство, долевое строительство на момент проведения проверки. Дата: {{ auction.open_date }} </td>
+        {% else %}
+        <td class="td-right" width="50%" align="center"> Не объявлены торги на приобретение, строительство, долевое строительство на момент проведения проверки. </td>
+        {% endif %}
+    </tr>
+  </tbody>
+</table>
+
+<h4 align="center"> Информация по контракту</h4>
+<table width="100%" align="center">
+    <tbody>
+    <th> Название </th> <th> Значение</th>
+{% for field in contract_form %}
+<tr>
+        <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+        <td class="td-right" width="50%" align="center"> {{ contract_form|get_choice_or_value:field.name|default_if_none:"" }} </td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+<h4 align="center"> Информация по объектам</h4>
+{% for build_form, formset in building_forms.items %}
+    <table width="100%" align="center">
+        <tbody>
+        <th> Название </th> <th> Значение</th>
+        {% for field in build_form %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+            <td class="td-right grey" width="50%" align="center"> {{ build_form|get_choice_or_value:field.name|yes_no_rus|default_if_none:""|hide_not_set }} </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> Детский сад, отдаленность, м</td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Школа, отдаленность, м</td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Поликлиника, отдаленность, м</td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Магазин, отдаленность, м</td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Ближайшая остановка общественного транспорта, м</td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Подъездные пути</td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Детская площадка </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Площадка для сушки белья </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Площадка для мусорных контейнеров </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Парковка </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Перечень предоставленных документов </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+
+        <tr> <td class="td-left" align="center"> <strong>Комната</strong> </td> <td class="td-right">  </td></tr>
+        {% for field in formset.0 %}
+            <tr>
+                <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+                <td class="td-right grey" width="50%" align="center"> {{ formset.0|get_choice_or_value:field.name|yes_no_rus|default_if_none:""|hide_not_set }} </td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> Дымоуловитель </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Выключатели </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Розетки </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Отопительный прибор </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Электропатрон </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Потолочный крюк </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+
+        <tr> <td class="td-left" align="center"> <strong>Прихожая</strong> </td> <td class="td-right">  </td></tr>
+        {% for field in formset.1 %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+            <td class="td-right grey" width="50%" align="center"> {{ formset.1|get_choice_or_value:field.name|yes_no_rus|default_if_none:""|hide_not_set }} </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> Дымоуловитель </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Выключатели </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Розетки </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Отопительный прибор </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Электропатрон </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Потолочный крюк </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+
+        <tr> <td class="td-left" align="center"> <strong>Санузел</strong> </td> <td class="td-right">  </td></tr>
+        {% for field in formset.2 %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+            <td class="td-right grey" width="50%" align="center"> {{ formset.2|get_choice_or_value:field.name|yes_no_rus|default_if_none:""|hide_not_set }} </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> Дымоуловитель </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Выключатели </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Розетки </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Отопительный прибор </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Электропатрон </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Потолочный крюк </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+
+        <tr> <td class="td-left" align="center"> <strong>Кухня</strong> </td> <td class="td-right">  </td></tr>
+        {% for field in formset.3 %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> {{ field.label }}</td>
+            <td class="td-right grey" width="50%" align="center"> {{ formset.3|get_choice_or_value:field.name|yes_no_rus|default_if_none:""|hide_not_set }} </td>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td class="td-left" width="50%" align="center"> Дымоуловитель </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Выключатели </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Розетки </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Отопительный прибор </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Электропатрон </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+        <tr>
+            <td class="td-left" width="50%" align="center"> Потолочный крюк </td>
+            <td class="td-right grey" width="50%" align="center">  </td>
+        </tr>
+
+
+    </tbody>
+    <br />
+{% endfor %}
+{% endblock %}
+<link media="screen" href="{{ STATIC_URL }}css/print.css" type="text/css" rel="stylesheet" />
+</body>
+</html>
+

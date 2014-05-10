@@ -56,3 +56,25 @@ class QuestionsListForm(forms.Form):
                                                     label=u"Все объекты типовые")
         self.fields['list_sent_to_mo'] = forms.ChoiceField(choices=YES_NO_CHOICES,
             label=u"Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")
+
+
+class QuestionsListFormSimple(forms.Form):
+
+    def __init__(self, mo=None, *args, **kwargs):
+        super(QuestionsListFormSimple, self).__init__(*args, **kwargs)
+        self.fields['mo'] = forms.CharField(initial=mo.name,
+                                            label=u"Муниципальное образование",
+                                            widget=forms.TextInput(attrs={'readonly': True}))
+        choices = [(a.get('id'), a.get('num'))
+                   for a in Auction.objects.filter(mo=mo.pk).values('id', 'num')]
+        # choices.insert(0, ("", u"----"))
+        self.fields['auction'] = forms.ChoiceField(label=u"Аукцион", required=True,
+                                                   choices=choices)
+        self.fields['responsible_person'] = forms.CharField(
+            label=u"Исполнитель работ от муниципального образования", widget=forms.Textarea)
+        self.fields['persons_list'] = forms.CharField(
+            label=u"Учаcники комиссии от учреждения", widget=forms.Textarea)
+        # self.fields['objects_equal'] = forms.ChoiceField(choices=YES_NO_CHOICES,
+        #                                                 label=u"Все объекты типовые")
+        # self.fields['list_sent_to_mo'] = forms.ChoiceField(choices=YES_NO_CHOICES,
+        #    label=u"Направлен ли список граждан, подлежащих обеспечению жилыми помещениями в муниципальное образование (информация уточняется предварительно в отделе управления государственной информационной системой)")
