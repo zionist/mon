@@ -10,11 +10,14 @@
         </div>
     {% else %}
         {% if form and object %}
-    <div class="span4"><a class="btn btn-info" href="{% url 'update-result' object.id %}">
+    <div class="span3"><a class="btn btn-info" href="{% url 'update-result' object.id %}">
         {% trans 'редактировать' %}</a></div>
-    <div class="span5">
+    <div class="span3">
         <a class="btn btn-small" href="{% url 'cmp-result-building' object.id %}">
             {% trans 'Сравнить с объектом' %}</a></div>
+    <div class="span4">
+        <a class="btn btn-small" href="{% url 'get-monitoring-info' object.id %}">
+        {% trans 'Информация о проведенном мониторинге' %}</a></div>
     <div class="right"><a class="btn btn-danger" href="{% url 'pre-delete-result' object.id %}">
     {% trans 'Удалить' %}</a></div>
     <br />

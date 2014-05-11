@@ -22,3 +22,7 @@ table {
 .grey {
     color: #888888;
 }
+
+p {
+    text-align: left;
+}

@@ -13,4 +13,6 @@ urlpatterns = patterns(
         name='questions-list-form'),
     url(r'^imgfile/get_select_mo_form/$', views.get_select_mo_form,
         name='select-mo-form'),
+    url(r'^imgfile/get_monitoring_info/(?P<pk>[0-9]+)/$', views.get_monitoring_info,
+        name='get-monitoring-info'),
 )

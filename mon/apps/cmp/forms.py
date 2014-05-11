@@ -343,7 +343,7 @@ class ResultShowForm(forms.ModelForm):
 
     class Meta:
         model = Result
-        exclude = ('cmp_data', )
+        exclude = ('cmp_data', 'room', 'wc', 'hallway', 'kitchen')
 
     def __init__(self, *args, **kwargs):
         cmp_initial = kwargs.pop('cmp_initial') if kwargs.get('cmp_initial') else None
