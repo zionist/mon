@@ -20,7 +20,7 @@
                     <th> {% trans 'Муниципальное образование' %}</th>
                     <th>{% trans 'Контракт' %}</th>
                     <th>{% trans 'Застройщик' %}</th>
-                    <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr>
+                    <!-- <th>{% trans 'Срок сдачи в эксплуатацию' %}</th></tr> -->
                     {% for state in objects_list %}
                         {% if state.grouper == 0 %}
                             <tr><th colspan="6"> <strong>{% trans 'Сданные объекты' %}</strong></th></tr>
@@ -37,7 +37,7 @@
                               <td> {{ item.mo.name }} </td>
                               <td> <a href="{% url 'change-contract' item.contract.pk %}"> {{ item.contract.num }} </a> </td>
                               <td> {{ item.developer|truncatechars:50 }} </td>
-                              <td> {{ item.complete_date }} </td>
+                              <!-- <td> {{ item.complete_date }} </td> -->
                           </tr>
                         {% endfor %}
                     {% endfor %}

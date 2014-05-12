@@ -99,7 +99,7 @@ class ContractForm(forms.ModelForm):
            'start_year', 'finish_year', 'name', 'date', 'num', 'address',
            'flats_amount', 'area', 'developer', 'summa', 'summa_fed',
            'summa_reg', 'summ_without_mo_money', 'summ_mo_money',
-           'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs',
+           'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs', 'check_result_info'
             # for remove
             # 'gas_supply', 'water_removal', 'water_settlement',
             # 'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
@@ -288,7 +288,7 @@ class ContractShowForm(ContractForm):
             'start_year', 'finish_year', 'name', 'date', 'num', 'address',
             'flats_amount', 'area', 'developer', 'summa', 'summa_fed',
             'summa_reg', 'summ_without_mo_money', 'summ_mo_money',
-            'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs',
+            'period_of_payment', 'creation_form', 'mo', 'has_trouble_docs', 'check_result_info'
             # for remove
             #'has_trouble_docs', 'gas_supply', 'water_removal', 'water_settlement',
             #'hot_water_supply', 'heating', 'electric_supply', 'public_transport',
