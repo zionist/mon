@@ -397,8 +397,8 @@ def add_dop_agreement(request, pk, state=None):
 
 @login_required
 def update_agreement(request, pk, extra=None, state=None):
-    if state and int(state) in [1, 2]:
-        return update_dop_agreement(request, pk, state)
+    # if state and int(state) in [1, 2]:
+    #    return update_dop_agreement(request, pk, state)
     context = {'title': _(u'Соглашение с министерством'), 'state': state}
     dep_agreement = DepartamentAgreement.objects.get(pk=pk)
     prefix = 'dep'
@@ -492,6 +492,7 @@ def get_agreement(request, pk):
     sub = dep_agreement.subvention
     fed = sub.fed_budget
     reg = sub.reg_budget
+    context.update({'show_edit_agreement': True})
 
     sub_form = SubventionShowForm(instance=sub)
     fed_form = FederalBudgetShowForm(instance=fed)
