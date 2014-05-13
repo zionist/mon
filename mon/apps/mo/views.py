@@ -994,8 +994,8 @@ def xls_work_table(request):
 
         # % исполнения от суммы предусмотренной субвенции (сумма субвенций)
         percent_rest_of_unspended_contract = 0
-        if reg_sum_with_k and fed_sum_with_k and reg_spend_amount:
-            percent_rest_of_unspended_contract = (float(contracts_summ) / float(reg_sum_with_k + fed_spend_amount)) * 100
+        if reg_sum_with_k and fed_sum_with_k:
+            percent_rest_of_unspended_contract = (float(contracts_summ) / float(reg_sum_with_k + fed_sum_with_k)) * 100
         percent_rest_of_unspended_contract = round(percent_rest_of_unspended_contract, 2)
         sheet.write(row, col, u"%s " % percent_rest_of_unspended_contract)
         col += 1
