@@ -121,7 +121,8 @@ def get_monitoring_info(request, pk=None):
     from_dt = datetime(user_year, 01, 01)
     to_dt = datetime(user_year, 12, 31)
     agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
-    payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt, })
+    payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt,
+                           'payment_state': 1})
     object_kwargs = {'start_year__lt': request.user.customuser.get_user_date(),
                      'finish_year__gt': request.user.customuser.get_user_date()}
     query = mo.departamentagreement_set.filter(**agreement_kwargs)

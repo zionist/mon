@@ -704,6 +704,10 @@ def xls_work_table(request):
         "align: vertical center, horizontal center, wrap True;"
     )
 
+    fmt = '0.00'
+    float_style = xlwt.XFStyle()
+    float_style.num_format_str = fmt
+
     ## make header
     header_height = 8
     now = datetime.now()
@@ -790,10 +794,10 @@ def xls_work_table(request):
     agreement_kwargs = {}
     if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
         user_year = request.user.customuser.get_user_date().year
-        from_dt = datetime(user_year, 01, 01)
-        to_dt = datetime(user_year, 12, 31)
+        from_dt = datetime(user_year - 1, 12, 31)
+        to_dt = datetime(user_year + 1, 1, 1)
         agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
-        payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
+        payment_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt, 'payment_state': 1})
         object_kwargs = {'start_year__lt': request.user.customuser.get_user_date(),
                          'finish_year__gt': request.user.customuser.get_user_date()}
     payment_kwargs.update({} )
@@ -808,7 +812,7 @@ def xls_work_table(request):
             sorted_objects.append(obj)
     for mo in sorted_objects:
         col = 0
-        sheet.write(row, col, u"%s" % num)
+        sheet.write(row, col, num)
         col += 1
 
         sheet.write(row, col, mo.name)
@@ -849,24 +853,26 @@ def xls_work_table(request):
         #for arg in query.exclude(agreement_type=0):
         #    if arg.subvention.amount:
         #        reg_sum_with_k += arg.subvention.amount
-        sheet.write(row, col, u"%s " % reg_sum_with_k)
+        sheet.write(row, col, reg_sum_with_k, float_style)
         col += 1
 
         # Краевой бюджет сумма без учета коэф администрирования
-        sheet.write(row, col, u"%s " % reg_sum_without_k)
+        sheet.write(row, col, reg_sum_without_k, float_style)
         col += 1
 
         # Профинансировано министерством
         reg_minis_sum = sum([agr.subvention.reg_budget.minis_sum or 0 for agr in query.all() if agr.subvention and agr.subvention.reg_budget])
         reg_minis_sum = round(reg_minis_sum / 1000, 2)
-        sheet.write(row, col, reg_minis_sum)
+        sheet.write(row, col, reg_minis_sum, float_style)
         col += 1
 
         # Краевой бюджет кассовый расход
         reg_spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(payment_budget_state=2,
             **payment_kwargs).filter(contract__mo=mo).values("amount")])
+        print payment_kwargs
+
         reg_spend_amount = round(reg_spend_amount / 1000, 2)
-        sheet.write(row, col, u"%s " % reg_spend_amount)
+        sheet.write(row, col,  reg_spend_amount, float_style)
         col += 1
 
         # % исполнения по кассовому расходу
@@ -874,12 +880,12 @@ def xls_work_table(request):
         if reg_sum_with_k and reg_spend_amount:
             percent_reg_rest_of_unspended = (float(reg_spend_amount) / float(reg_sum_with_k)) * 100
         percent_reg_rest_of_unspended = round(percent_reg_rest_of_unspended, 2)
-        sheet.write(row, col, u"%s " % percent_reg_rest_of_unspended)
+        sheet.write(row, col,  percent_reg_rest_of_unspended, float_style)
         col += 1
 
         # Остаток неосвоенных средств
         reg_rest_of_unspended = reg_sum_with_k - reg_spend_amount
-        sheet.write(row, col, u"%s " % reg_rest_of_unspended)
+        sheet.write(row, col,  reg_rest_of_unspended, float_style)
         col += 1
 
         ## Федеральный бюджет
@@ -901,24 +907,24 @@ def xls_work_table(request):
                     fed_sum_without_k -= arg.subvention.fed_budget.adm_coef
         fed_sum_with_k = round(fed_sum_with_k / 1000, 2)
         fed_sum_without_k = round(fed_sum_without_k / 1000, 2)
-        sheet.write(row, col, u"%s " % fed_sum_with_k)
+        sheet.write(row, col,  fed_sum_with_k, float_style)
         col += 1
 
         # Федеральный бюджет сумма без учета коэф администрирования
-        sheet.write(row, col, u"%s " % fed_sum_without_k)
+        sheet.write(row, col,  fed_sum_without_k, float_style)
         col += 1
 
         # Профинансировано министерством ?
         fed_minis_sum = sum([agr.subvention.fed_budget.minis_sum or 0 for agr in query.all() if agr.subvention and agr.subvention.fed_budget])
         fed_minis_sum = round(fed_minis_sum / 1000, 2)
-        sheet.write(row, col, fed_minis_sum)
+        sheet.write(row, col, fed_minis_sum, float_style)
         col += 1
 
         # Федеральный бюджет кассовый расход
         fed_spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(payment_budget_state=1,
             **payment_kwargs).filter(contract__mo=mo).values("amount")])
         fed_spend_amount = round(fed_spend_amount / 1000, 2)
-        sheet.write(row, col, u"%s " % fed_spend_amount)
+        sheet.write(row, col,  fed_spend_amount, float_style)
         col += 1
 
         # % исполнения по кассовому расходу
@@ -926,29 +932,29 @@ def xls_work_table(request):
         if fed_sum_with_k and fed_spend_amount:
             percent_fed_rest_of_unspended = (float(fed_spend_amount) / float(fed_sum_with_k)) * 100
         percent_fed_rest_of_unspended = round(percent_fed_rest_of_unspended, 2)
-        sheet.write(row, col, u"%s " % percent_fed_rest_of_unspended)
+        sheet.write(row, col,  percent_fed_rest_of_unspended)
         col += 1
 
         # Остаток неосвоенных средств
         fed_rest_of_unspended = fed_sum_with_k - fed_spend_amount
-        sheet.write(row, col, u"%s " % fed_rest_of_unspended)
+        sheet.write(row, col,  fed_rest_of_unspended, float_style)
         col += 1
 
         ## sums
         # Количество жилых помещений
         sum_flats_amount = reg_subvention_performance + fed_subvention_performance
-        sheet.write(row, col, sum_flats_amount)
+        sheet.write(row, col, sum_flats_amount, float_style)
         col += 1
 
         # Сумма с учетом коэффицента администрирования
         sum_sum_with_k = reg_sum_with_k + fed_sum_with_k
-        sheet.write(row, col, u"%s " % sum_sum_with_k)
+        sheet.write(row, col,  sum_sum_with_k, float_style)
         col += 1
 
 
         # Кассовый расход
         sum_spend_amount = reg_spend_amount + fed_spend_amount
-        sheet.write(row, col, u"%s " % sum_spend_amount)
+        sheet.write(row, col,  sum_spend_amount, float_style)
         col += 1
 
         ## contracts
@@ -979,25 +985,25 @@ def xls_work_table(request):
 
         # Сумма по заключенным контрактам (без учета средств МО)
         contracts_summ_without_mo_money = round(contracts_summ_without_mo_money / 1000, 2)
-        sheet.write(row, col, contracts_summ_without_mo_money)
+        sheet.write(row, col, contracts_summ_without_mo_money, float_style)
         col += 1
 
         # Сумма муниципальных средств, включенных в сумму контракта
         contracts_summ_mo_money = round(contracts_summ_mo_money / 1000, 2)
-        sheet.write(row, col, contracts_summ_mo_money)
+        sheet.write(row, col, contracts_summ_mo_money, float_style)
         col += 1
 
         # Сумма по заключенным контрактам ИТОГО
         contracts_summ = round(contracts_summ / 1000, 2)
-        sheet.write(row, col, contracts_summ)
+        sheet.write(row, col, contracts_summ, float_style)
         col += 1
 
         # % исполнения от суммы предусмотренной субвенции (сумма субвенций)
         percent_rest_of_unspended_contract = 0
-        if reg_sum_with_k and fed_sum_with_k:
+        if reg_sum_with_k or fed_sum_with_k:
             percent_rest_of_unspended_contract = (float(contracts_summ) / float(reg_sum_with_k + fed_sum_with_k)) * 100
         percent_rest_of_unspended_contract = round(percent_rest_of_unspended_contract, 2)
-        sheet.write(row, col, u"%s " % percent_rest_of_unspended_contract)
+        sheet.write(row, col,  percent_rest_of_unspended_contract, float_style)
         col += 1
 
         # Экономия по результатам заключенных контрактов
@@ -1005,7 +1011,8 @@ def xls_work_table(request):
         max_flat_price = round(max_flat_price.max_price / 1000, 2)
         contracts_economy = contracts_flats_amount * max_flat_price - contracts_summ
         contracts_economy = contracts_economy if contracts_economy > 0 else 0
-        sheet.write(row, col, contracts_economy)
+        contracts_economy = round(contracts_summ, 2)
+        sheet.write(row, col, contracts_economy, float_style)
         col += 1
 
         row += 1
