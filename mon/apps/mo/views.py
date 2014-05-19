@@ -1011,7 +1011,7 @@ def xls_work_table(request):
         max_flat_price = round(max_flat_price.max_price / 1000, 2)
         contracts_economy = contracts_flats_amount * max_flat_price - contracts_summ
         contracts_economy = contracts_economy if contracts_economy > 0 else 0
-        contracts_economy = round(contracts_summ, 2)
+        contracts_economy = round(contracts_economy, 2)
         sheet.write(row, col, contracts_economy, float_style)
         col += 1
 
