@@ -870,7 +870,6 @@ def xls_work_table(request):
         # Краевой бюджет кассовый расход
         reg_spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(payment_budget_state=2,
             **payment_kwargs).filter(contract__mo=mo).values("amount")])
-        print payment_kwargs
 
         reg_spend_amount = round(reg_spend_amount / 1000, 2)
         sheet.write(row, col,  reg_spend_amount, float_style)
@@ -964,20 +963,21 @@ def xls_work_table(request):
         contracts_summ = 0
         contracts_summ_without_mo_money = 0
         contracts_summ_mo_money = 0
-        query = mo.contract_set.filter(**object_kwargs).values("flats_amount", "summa",
-                                             "summ_without_mo_money", "summ_mo_money")
+        query = mo.contract_set.filter(**object_kwargs)
         for contract in query:
-            if contract["flats_amount"]:
-                contracts_flats_amount += contract["flats_amount"]
-            # Сумма по заключенным контрактам ИТОГО
-            if contract["summa"]:
-                contracts_summ += contract["summa"]
-            # Сумма по заключенным контрактам (без учета средств МО)
-            if contract["summ_without_mo_money"]:
-                contracts_summ_without_mo_money += contract["summ_without_mo_money"]
-            # Сумма муниципальных средств, включенных в сумму контракта
-            if contract["summ_mo_money"]:
-                contracts_summ_mo_money += contract["summ_mo_money"]
+            # do not count summ for contracts with all administrative payments
+            if not contract.payment_set.filter(payment_state=2).count() == contract.payment_set.all().count():
+                if contract.flats_amount:
+                    contracts_flats_amount += contract.flats_amount
+                # Сумма по заключенным контрактам ИТОГО
+                if contract.summa:
+                    contracts_summ += contract.summa
+                # Сумма по заключенным контрактам (без учета средств МО)
+                if contract.summ_without_mo_money:
+                    contracts_summ_without_mo_money += contract.summ_without_mo_money
+                # Сумма муниципальных средств, включенных в сумму контракта
+                if contract.summ_mo_money:
+                    contracts_summ_mo_money += contract.summ_mo_money
 
 
         # Количество жилых помещений
