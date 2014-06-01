@@ -607,6 +607,7 @@ def get_contract(request, pk, extra=None):
     remainder = contract.summa - payment_amount if contract.summa else 0
     context.update({
         'object': contract,
+        'payments_list': list(contract.payment_set.all()),
         'contract_payment_amount': payment_amount,
         'contract_remainder': remainder})
     return render(request, 'contract.html', context, context_instance=RequestContext(request))
