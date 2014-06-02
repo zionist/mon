@@ -69,14 +69,12 @@ def add_mo(request):
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
-def recount_mos(mos=[], kwargs=None):
+def recount_mos(mos=[], kwargs={}, agreement_kwargs={}):
     cur_year = datetime.today().replace(month=1, day=1)
-    kwargs = kwargs if kwargs else {'date__range': [cur_year, cur_year.replace(year=cur_year.year+1)]}
     for mo in mos:
         sum_flats_amount = sum([int(contract.flats_amount) for contract in mo.contract_set.filter(**kwargs) if contract.flats_amount])
         mo.flats_amount = sum_flats_amount
-        agreements = mo.departamentagreement_set.filter(**kwargs)
-
+        agreements = mo.departamentagreement_set.filter(**agreement_kwargs)
         amount_sum = 0.0
         reg_amount_sum = 0.0
         fed_amount_sum = 0.0
@@ -111,14 +109,19 @@ def recount_mos(mos=[], kwargs=None):
 def get_recount_mo(request, pk=None):
     agreement_kwargs = {}
     if MO.objects.all().exists():
+        user_year = datetime.today().year
+        kwargs = {}
+        agreement_kwargs = {}
         if hasattr(request.user, 'customuser') and request.user.customuser.get_user_date():
-            from_dt = request.user.customuser.get_user_date()
-            to_dt = datetime(from_dt.year + 1, 1, 1)
+            user_year = request.user.customuser.get_user_date().year
+            from_dt = datetime(user_year - 1, 12, 31)
+            to_dt = datetime(user_year + 1, 1, 1)
+            kwargs = {'start_year__lt': request.user.customuser.get_user_date(), 'finish_year__gt': request.user.customuser.get_user_date()}
             agreement_kwargs.update({'date__gt': from_dt, 'date__lt': to_dt})
         if pk:
-            recount_mos(MO.objects.filter(pk=pk), kwargs=agreement_kwargs)
+            recount_mos(MO.objects.filter(pk=pk), kwargs=kwargs, agreement_kwargs=agreement_kwargs)
         else:
-            recount_mos(MO.objects.all(), kwargs=agreement_kwargs)
+            recount_mos(MO.objects.all(), kwargs=kwargs, agreement_kwargs=agreement_kwargs)
     return get_mos(request, pk=pk)
 
 
@@ -1009,7 +1012,13 @@ def xls_work_table(request):
         # Экономия по результатам заключенных контрактов
         max_flat_price = MaxFlatPrice.objects.get(year=user_year)
         max_flat_price = round(max_flat_price.max_price / 1000, 2)
-        contracts_economy = contracts_flats_amount * max_flat_price - contracts_summ
+        if mo.id == 5:
+            print "#"
+            print max_flat_price
+            print contracts_flats_amount
+            print contracts_summ_without_mo_money
+        
+        contracts_economy = contracts_flats_amount * max_flat_price - contracts_summ_without_mo_money
         contracts_economy = contracts_economy if contracts_economy > 0 else 0
         contracts_economy = round(contracts_economy, 2)
         sheet.write(row, col, contracts_economy, float_style)
