@@ -86,11 +86,11 @@ class BuildingForm(GroundForm):
         self.ownership = None
         if build_state and int(build_state) == 2:
             self.ownership = True
-            for name in ['ownership_year', 'cad_num', 'cad_sum',  'floor',
+            for name in ['ownership_year', 'ownership_num', 'cad_num', 'cad_sum',  'floor',
                          'mo_fond_doc_date',  'mo_fond_doc_num', ]:
                 self.fields[name].required = True
         if not self.ownership:
-            for name in ['ownership_year', 'build_year', 'cad_num', 'cad_sum',  'floor',
+            for name in ['ownership_year', 'ownership_num', 'build_year', 'cad_num', 'cad_sum',  'floor',
                 'mo_fond_doc_date',  'mo_fond_doc_num', ]:
                 self.fields.pop(name)
         self.fields['build_state'].widget = forms.HiddenInput()
@@ -128,6 +128,7 @@ class BuildingForm(GroundForm):
 
             'build_state', # Статус объекта
             'ownership_year', # Дата перехода права собственности
+            'ownership_num', # Номер документа перехода права собственности
             'build_year', # Год постройки
             'cad_num', # Кадастровый номер
             'cad_sum', # Кадастровая стоимость, руб.
@@ -167,11 +168,11 @@ class BuildingUpdateForm(GroundForm):
         self.ownership = None
         if self.instance:
             if self.instance.build_state and int(self.instance.build_state) == 2:
-                for name in ['ownership_year', 'cad_num', 'cad_sum',  'floor',
+                for name in ['ownership_year', 'ownership_num', 'cad_num', 'cad_sum',  'floor',
                              'mo_fond_doc_date',  'mo_fond_doc_num', ]:
                     self.fields[name].required = True
             else:
-                for name in ['ownership_year', 'build_year', 'cad_num', 'cad_sum',  'floor',
+                for name in ['ownership_year', 'ownership_num', 'build_year', 'cad_num', 'cad_sum',  'floor',
                              'mo_fond_doc_date',  'mo_fond_doc_num', ]:
                     self.fields.pop(name)
 
@@ -210,6 +211,7 @@ class BuildingUpdateForm(GroundForm):
 
             'build_state', # Статус объекта
             'ownership_year', # Дата перехода права собственности
+            'ownership_num', # Номер документа перехода права собственности
             'build_year', # Год постройки
             'cad_num', # Кадастровый номер
             'cad_sum', # Кадастровая стоимость, руб.
@@ -245,8 +247,6 @@ class BuildingUpdateStateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
         def _validate_status(value):
-            print self.instance.readiness
-            print value
             if self.instance.readiness is None:
                 raise ValidationError(u'Степень готовновсти должна быть "Сдан в эксплуатацию"')
             else:

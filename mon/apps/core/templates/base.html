@@ -167,13 +167,15 @@
                             {% endif %}
                             <li><a href="{% url 'create-monitoring' %}">{% trans 'Добавить объект мониторинга' %}</a></li>
                             <li><a href="{% url 'manage-developer' dev.id dev.state %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
-                            {% if user.is_staff %}
+                            {% if user.is_superuser %}
                             <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
+                            {% endif %}
+                            {% if user.is_staff %}
                             <li><a href="{% url 'create-auction' %}">{% trans 'Добавить аукцион' %}</a></li>
                             <!--
-                            <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li> -->
-                            <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат выезда' %}</a></li>
-                            <li><a href="{% url 'manage-person' %}">{% trans 'Добавить участника выезда' %}</a></li>
+                            <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li> 
+                            <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат выезда' %}</a></li> 
+                            <li><a href="{% url 'manage-person' %}">{% trans 'Добавить участника выезда' %}</a></li> -->
                             {% endif %}
                         </ul>
                     </li>
