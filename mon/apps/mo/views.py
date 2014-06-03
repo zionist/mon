@@ -18,6 +18,9 @@ from django.http import HttpResponseRedirect
 from django.forms.models import inlineformset_factory, formset_factory, modelformset_factory
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required, user_passes_test
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+import matplotlib.pyplot as plt 
+from matplotlib import rc 
 
 from .models import MO, DepartamentAgreement, PeopleAmount, Subvention, FederalBudget, RegionalBudget, MaxFlatPrice
 from .forms import MOForm, DepartamentAgreementForm, PeopleAmountForm, SubventionForm, FederalBudgetForm, \
@@ -1051,7 +1054,8 @@ def add_max_flat_price(request):
 
 
 @login_required
-def xls_contract_grapth(request):
+def xls_contract_grapth(request, render="xls"):
+    print render
 
     # create
     book = xlwt.Workbook(encoding='utf8')
@@ -1105,20 +1109,21 @@ def xls_contract_grapth(request):
     sheet.write_merge(0, header_height, 3, 3, u'Кассовый расход по освоению субвенций, руб.', style_bold)
     sheet.write_merge(0, header_height, 4, 4, u'%', style_bold)
 
-    months = [
-        {1: u'Январь'},
-        {2: u'Февраль'},
-        {3: u'Март'},
-        {4: u'Апрель'},
-        {5: u'Май'},
-        {6: u'Июнь'},
-        {7: u'Июль'},
-        {8: u'Август'},
-        {9: u'Сентябрь'},
-        {10: u'Октябрь'},
-        {11: u'Ноябрь'},
-        {12: u'Декабрь'},
-    ]
+    months = {
+        1: u'Январь',
+        2: u'Февраль',
+        3: u'Март',
+        4: u'Апрель',
+        5: u'Май',
+        6: u'Июнь',
+        7: u'Июль',
+        8: u'Август',
+        9: u'Сентябрь',
+        10: u'Октябрь',
+        11: u'Ноябрь',
+        12: u'Декабрь',
+    }
+    
 
     agreement_kwargs = {}
     payment_kwargs = {}
@@ -1155,34 +1160,80 @@ def xls_contract_grapth(request):
                     sum_with_k += arg.subvention.fed_budget.sub_sum
                 if arg.subvention.fed_budget.adm_coef:
                     sum_with_k += arg.subvention.fed_budget.adm_coef
+    sum_with_k = round(sum_with_k / 1000, 2)
 
     # fill table
-    for month in months:
+    contracts_num_list = []
+    percent_of_contracts_flats_amount_and_subvention_perfomance_list = []    
+    spend_amount_list = []    
+    percent_of_sum_with_k_and_spend_amount_list = []
+    for month in months.keys():
         # Наименование месяца
-        sheet.write(row, col, month.values()[0])
+        sheet.write(row, col, months[month])
         # Количество контрактов
-        contracts_num = Contract.objects.filter(**object_kwargs).filter(date__month=month.keys()[0]).count()
+        contracts_num = Contract.objects.filter(**object_kwargs).filter(date__month=month).count()
+        contracts_num_list.append(contracts_num)
         sheet.write(row, col + 1, contracts_num)
         # Отношение количества жилых помещений в контрактах к показателю результативности субвенции (%)
-        flats_amount = sum([amount.values()[0] or 0 for amount in Contract.objects.filter(**object_kwargs).filter(date__month=month.keys()[0]).values('flats_amount')])
+        flats_amount = sum([amount.values()[0] or 0 for amount in Contract.objects.filter(**object_kwargs).filter(date__month=month).values('flats_amount')])
         percent_of_contracts_flats_amount_and_subvention_perfomance = float(flats_amount) / float(subvention_performance) * 100
+        percent_of_contracts_flats_amount_and_subvention_perfomance_list.append(percent_of_contracts_flats_amount_and_subvention_perfomance)
         sheet.write(row, col + 2, percent_of_contracts_flats_amount_and_subvention_perfomance)
         # Кассовый расход по освоению субвенций
-        spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(**payment_kwargs).filter(date__month=month.keys()[0]).values("amount")])
+        spend_amount = sum([p.get("amount") or 0 for p in Payment.objects.filter(**payment_kwargs).filter(date__month=month).values("amount")])
+        spend_amount = round(spend_amount / 1000, 2)
+        spend_amount_list.append(spend_amount)
         sheet.write(row, col + 3, spend_amount)
         # Отношение сумм субвенций к кассовому расходу (%)
         if not spend_amount:
             percent_of_sum_with_k_and_spend_amount = 0
         else:
             percent_of_sum_with_k_and_spend_amount = spend_amount / sum_with_k * 100
+        percent_of_sum_with_k_and_spend_amount_list.append(percent_of_sum_with_k_and_spend_amount)
         sheet.write(row, col + 4, percent_of_sum_with_k_and_spend_amount)
         row += 1
-
-    response = HttpResponse(mimetype='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=list.xls'
-    book.save(response)
-    return response
-
+    rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']}) 
+    rc('text', usetex=True) 
+    rc('text.latex',unicode=True) 
+    rc('text.latex',preamble='\usepackage[utf8]{inputenc}') 
+    rc('text.latex',preamble='\usepackage[russian]{babel}') 
+    if render == "xls":
+        response = HttpResponse(mimetype='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=list.xls'
+        book.save(response)
+        return response
+    if render == "contracts_nums":
+        plt.plot(months.keys(), contracts_num_list, 'g')
+        plt.xlabel(u'Месяц')
+        plt.ylabel(u'Количество контрактов')
+        response=HttpResponse(content_type='image/png')
+        plt.savefig(response)
+        plt.close()
+        return response
+    if render == "percent_of_contracts_flats_amount_and_subvention_perfomance":
+        plt.plot(months.keys(), percent_of_contracts_flats_amount_and_subvention_perfomance_list, 'b')
+        plt.xlabel(u'Месяц')
+        plt.ylabel(u'Отношение количества жилых помещений \n в контрактах к показателю \n результативности субвенции (\%)')
+        response=HttpResponse(content_type='image/png')
+        plt.savefig(response)
+        plt.close()
+        return response
+    if render == "spend_amount":
+        plt.plot(months.keys(), spend_amount_list, 'r')
+        plt.xlabel(u'Месяц')
+        plt.ylabel(u'Кассовый расход по освоению субвенций (тыс. руб.)')
+        response=HttpResponse(content_type='image/png')
+        plt.savefig(response)
+        plt.close()
+        return response
+    if render == "percent_of_sum_with_k_and_spend_amount":
+        plt.plot(months.keys(),  percent_of_sum_with_k_and_spend_amount_list, 'm')
+        plt.xlabel(u'Месяц')
+        plt.ylabel(u'Отношение сумм субвенций \n к кассовому расходу (\%)')
+        response=HttpResponse(content_type='image/png')
+        plt.savefig(response)
+        plt.close()
+        return response
 
 @login_required
 def update_max_flat_price(request, pk):

@@ -28,7 +28,11 @@
                             <li><a href="{% url 'mos' %}">{% trans 'Муниципальные образования' %}</a></li>
                             <li class="divider"></li>
                             <li><a href="{% url 'xls_work_table' %}">{% trans 'Рабочая таблица' %}</a></li>
-                            <li><a href="{% url 'xls_contract_grapth' %}">{% trans 'График количества заключенных контрактов' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth' %}">{% trans 'Таблица количества заключенных контрактов' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-contracts_nums' %}">{% trans 'График количества заключенных контрактов' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-percent_of_contracts_flats_amount_and_subvention_perfomance' %}">{% trans 'График отношения количества жилых помещений в контрактах к показателю результативности субвенции' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-spend_amount' %}">{% trans 'График кассового расхода по освоению субвенций' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-percent_of_sum_with_k_and_spend_amount' %}">{% trans 'График отношения сумм субвенции к кассовому расходу' %}</a></li>
                         </ul>
                     </li>
                 {% else %}
