@@ -15,6 +15,7 @@
                 {% if not show_edit_agreement %}
                     <div class="span2">
                         <li id="agreements" class="dropdown" style="list-style-type:none; display: inline;">
+                            {% if user.is_superuser %}
                             <a href="#" role="button" class="dropdown-toggle btn" data-toggle="dropdown">{% trans 'Соглашения ' %}<b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" >
                                 <li><a href="{% url 'add-agreement-mo' object.id 0 %}">
@@ -24,6 +25,7 @@
                                 <!-- <li><a href="{% url 'add-agreement-mo' object.id 2 %}">
                                     {% trans 'Добавить доп. соглашение о вычете средств' %}</a></li> -->
                             </ul>
+                            {% endif %}
                         </li>
                     </div>
                 {% else %}
