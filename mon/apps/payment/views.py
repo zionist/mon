@@ -96,8 +96,8 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
             fed_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1, payment_budget_state=1) if payment.amount])
             reg_adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2, payment_budget_state=2) if payment.amount])
             fed_adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2, payment_budget_state=1) if payment.amount])
-            spent = reg_spent + fed_spent
             adm_spent = reg_adm_spent + fed_adm_spent
+            spent = reg_spent + fed_spent + adm_spent
             percent = round((float(spent/amount) * 100), 3) if amount else 0
 
 
