@@ -85,6 +85,8 @@ class CopyContract(BaseContract):
     address = models.TextField(help_text=u"Адрес", verbose_name=u"Адрес", null=True, blank=False)
     flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений"), null=True, verbose_name=_(u"Количество жилых помещений"), blank=True, )
     area = models.FloatField(help_text=_(u"Общая площадь (кв. м)"), null=True, verbose_name=_(u"Общая площадь (кв. м)"), blank=False, )
+    check_result_info = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Информация по результатам проверки"),
+                                         verbose_name=_(u"Информация по результатам проверки"), )
 
     class Meta:
         app_label = "build"
@@ -149,6 +151,7 @@ class CopyBuilding(BaseBuilding, BaseCompareData, BaseFile):
     contract = models.ForeignKey(Contract, blank=False, null=True, help_text=_(u"Данные заключенного контракта"), verbose_name=_(u"Данные заключенного контракта"), )
 
     flat_num = models.IntegerField(null=True, blank=True, help_text=u"Номер жилого помещения", verbose_name=u"Номер жилого помещения")
+    driveway_num = models.IntegerField(null=True, blank=True, help_text=u"Подъезд", verbose_name=u"Подъезд")
 
     class Meta:
         app_label = "build"

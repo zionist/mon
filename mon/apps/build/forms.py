@@ -75,10 +75,11 @@ class BuildingForm(GroundForm):
             if not build_state:
                 raise ValidationError(u'Степень готовности должа быть "Сдан в эксплуатацию"')
             else:
-                if int(value) != 5:
+                if int(value) != 5 and int(build_state) == 2:
                     raise ValidationError(u'Степень готовности должна быть "Сдан в эксплуатацию"')
 
         super(BuildingForm, self).__init__(*args, **kwargs)
+
         self.fields['readiness'] = forms.ChoiceField(choices=READINESS_CHOICES,
                                                      validators=[_validate_readiness, ],
                                                      label=u'Степень готовности')
@@ -248,7 +249,7 @@ class BuildingUpdateStateForm(forms.ModelForm):
 
         def _validate_status(value):
             if self.instance.readiness is None:
-                raise ValidationError(u'Степень готовновсти должна быть "Сдан в эксплуатацию"')
+                raise ValidationError(u'Степень готовности должна быть "Сдан в эксплуатацию"')
             else:
                 print int(self.instance.readiness) != 5
                 if int(self.instance.readiness) != 5 and int(value) == 2:

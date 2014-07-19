@@ -126,7 +126,8 @@ def add_building(request, dev_pk=None, state=None, contract=0, build_state=1):
             form = GroundForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(request.POST, request.FILES, prefix=prefix, initial={'build_state': build_state})
+            form = BuildingForm(request.POST, request.FILES, prefix=prefix,
+                                initial={'build_state': build_state})
             state_int = int(select)
         if not request.user.is_staff:
             form.fields.pop('approve_status')
@@ -338,12 +339,14 @@ def update_building_copy(request, pk):
         copy = CopyBuilding.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    form = CopyBuildingForm(prefix='build', instance=copy)
+    form = CopyBuildingForm(prefix='build', instance=copy,
+                            initial={'build_state': copy.build_state})
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
     form, text_area_form = split_form(form)
     context = {'title': _(u'Добавление рынка жилья')}
     context.update({'state': copy.state, 'dev': copy.developer.pk})
+
     context.update({'object': copy, 'form': form,
                     'text_area_fields': text_area_form, 'prefix': prefix,
                     'formsets': [room_f, hallway_f, wc_f, kitchen_f],
