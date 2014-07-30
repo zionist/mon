@@ -784,7 +784,13 @@ def update_result(request, pk, extra=None):
                                        BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
             return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
     else:
-        form = ResultForm(instance=result, prefix=prefix)
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
+            from_dt = request.user.customuser.get_user_date()
+            initial_kw.update({'start_year': date(from_dt.year, 1, 1),
+                               'finish_year': date(from_dt.year, 12, 31)})
+        form = ResultForm(instance=result, prefix=prefix, initial=initial_kw)
         form, text_area_form = split_form(form)
         cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, result=True)

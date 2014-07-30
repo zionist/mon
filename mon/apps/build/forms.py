@@ -33,6 +33,8 @@ class GroundForm(forms.ModelForm):
 
         mo = kwargs.get('initial').get('mo') if 'initial' in kwargs else None
         if mo:
+            self.fields['contract'] = forms.ModelChoiceField(queryset=Contract.objects.filter(mo=mo),
+                                                             label=_(u"Контракт"), help_text=_(u"Контракт"), required=True)
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'), required=True,
                                                        queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'

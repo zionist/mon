@@ -10,7 +10,7 @@ import autocomplete_light
 
 
 from .models import CompareData, Result, Auction, Person
-from apps.build.models import Contract, ContractDocuments
+from apps.build.models import Contract, ContractDocuments, Building
 from apps.core.models import WATER_SETTLEMENT_CHOICES, HOT_WATER_SUPPLY_CHOICES, WATER_REMOVAL_CHOICES, \
     HEATING_CHOICES, ELECTRIC_SUPPLY_CHOICES
 from apps.core.forms import CSIMultipleChoiceField, CSICheckboxSelectMultiple, cmp_single, cmp_multi
@@ -148,6 +148,10 @@ class ResultForm(forms.ModelForm):
             self.fields['mo'] = forms.ModelChoiceField(label=_(u'Муниципальное образование'),
                 required=True, queryset=MO.objects.filter(pk=mo.pk), initial=mo.pk)
             self.fields['mo'].widget.attrs['readonly'] = 'readonly'
+            self.fields['contract'] = forms.ModelChoiceField(queryset=Contract.objects.filter(mo=mo),
+                         label=_(u"Контракт"), help_text=_(u"Контракт"), required=True)
+            self.fields['building'] = forms.ModelChoiceField(queryset=Building.objects.filter(mo=mo),
+                         label=_(u"Объект"), help_text=_(u"Объект"), required=True)
 
 
 class ContractDocumentsForm(forms.ModelForm):

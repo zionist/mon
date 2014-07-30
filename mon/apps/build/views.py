@@ -339,8 +339,15 @@ def update_building_copy(request, pk):
         copy = CopyBuilding.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    form = CopyBuildingForm(prefix='build', instance=copy,
-                            initial={'build_state': copy.build_state})
+    if hasattr(request.user, 'customuser'):
+        mo = request.user.customuser.mo
+        form = CopyBuildingForm(prefix='build', instance=copy,
+                                initial={'build_state': copy.build_state,
+                                         'mo': mo})
+    else:
+        form = CopyBuildingForm(prefix='build', instance=copy,
+                                initial={'build_state': copy.build_state})
+
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
     form, text_area_form = split_form(form)
