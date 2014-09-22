@@ -24,12 +24,16 @@ PAYMENT_PERSPECTIVE_CHOICES = ((0, _(u'Перспективы освоения �
 PAYMENT_STATE_CHOICES = (((1, _(u'Платеж')), (2, _(u'Административный платеж')), ))
 PAYMENT_BUDGET_STATE_CHOICES = (((1, _(u'Федеральный')), (2, _(u'Краевой')), ))
 APPROVE_CHOICES = ((0, _(u'Не проверено')), (1, _(u'Требуется проверка')), (2, _(u'Проверено')), )
-STOVE_CHOICES = ((0, _(u'Не указано')), (1, _(u'Газовая кухонная плита')), (2, _(u'Электрическая кухонная плита')), (3, _(u'Кухонная плита')), )
+STOVE_CHOICES = ((0, _(u'Не указано')), (1, _(u'Газовая кухонная плита')), (2, _(u'Электрическая кухонная плита')), (3, _(u'Кухонная плита')),
+                 (4, _(u'Кухонная плита без духового шкафа')), (5, _(u'Отсутствует')), )
 HEATING_CHOICES = ((0, _(u'Не указано')), (1, _(u'Центральное')),  (2, _(u'Индивидуальное поквартирное')),  (3, _(u'Автономное')))
-SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Раковина')), (2, _(u'Раковина со смесителем')), )
-BATH_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ванна')), (2, _(u'Ванна со смесителем')), )
+SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Мойка')), (2, _(u'Мойка со смесителем')), (3, _(u'Отсутствует')), )
+WC_SINK_CHOICES = ((0, _(u'Не указано')), (1, _(u'Умывальник')), (2, _(u'Умывальник со смесителем')), (3, _(u'Отсутствует')), )
+BATH_CHOICES = ((0, _(u'Не указано')), (1, _(u'Ванна')), (2, _(u'Ванна со смесителем')), (3, _(u'Отсутствует')), )
 AREA_CMP_CHOICES = ((0, _(u'Не менее')), (1, _(u'Равно')), )
 BUDGET_CHOICES = ((1, _(u'Федеральный')),  (2, _(u'Краевой')), )
+
+BUILD_STATE_CHOICES = ((1, _(u'Не оформлен в муниципальную собственность')),  (2, _(u'Оформлен в муниципальную собственность')), )
 
 YES_NO_CHOICES = (("0", u"Нет"), ("1", u"Да"), ("", u"----"))
 
@@ -79,11 +83,11 @@ class BaseBudget(models.Model):
     class Meta:
         abstract = True
 
-    sub_sum = models.FloatField(help_text=_(u"Размер предоставляемой в текущем году субвенции"), null=True, verbose_name=_(u"Размер предоставляемой в текущем году субвенции"), blank=True, )
+    sub_sum = models.FloatField(help_text=_(u"Размер предоставляемой в текущем году субвенции"), default=0, null=True, verbose_name=_(u"Размер предоставляемой в текущем году субвенции"), blank=True, )
     sub_orph_home = models.FloatField(help_text=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
                                         verbose_name=_(u"Размер субвенции, выделенной на предоставление жилых помещений детям сиротам"),
-                                        blank=True, null=True, )
-    adm_coef = models.FloatField(help_text=_(u"Размер коэффициента на администрирование расходов"), null=True, verbose_name=_(u"Размер коэффициента на администрирование расходов"), blank=True, )
+                                        blank=True, null=True, default=0)
+    adm_coef = models.FloatField(help_text=_(u"Размер коэффициента на администрирование расходов"), default=0, null=True, verbose_name=_(u"Размер коэффициента на администрирование расходов"), blank=True, )
     subvention_performance = models.IntegerField(help_text=_(u"Показатель результативности предоставления субвенции "
                                                              u"(количество детей-сирот, подлежащих обеспечению жилыми "
                                                              u"помещениями в текущем году)"), default=0,
@@ -98,7 +102,7 @@ class BaseSubvention(models.Model):
         abstract = True
 
     date = models.DateField(auto_now=True)
-    amount = models.FloatField(help_text=_(u"Общая сумма предоставляемой в текущем году субвенции"), null=True,
+    amount = models.FloatField(help_text=_(u"Общая сумма предоставляемой в текущем году субвенции"), default=0, null=True,
                                  verbose_name=_(u"Общая сумма предоставляемой в текущем году субвенции"), blank=True, )
 
 
@@ -125,27 +129,6 @@ class BaseOrphan(models.Model):
     is_privilege = models.NullBooleanField(blank=True, )
 
 
-class BaseBuilding(models.Model):
-
-    class Meta:
-        abstract = True
-
-    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
-    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
-
-    approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
-    state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
-    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
-    complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
-    comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
-    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
-    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
-
-    offer = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Коммерческое предложение"), verbose_name=_(u"Коммерческое предложение"))
-    permission = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Разрешение на строительство"), verbose_name=_(u"Разрешение на строительство"))
-    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
-
-
 class BaseContract(BaseName):
 
     class Meta:
@@ -158,7 +141,7 @@ class BaseContract(BaseName):
     has_trouble_docs = models.NullBooleanField(help_text=_(u"Замечания по документации"), verbose_name=_(u"Замечания по документации"), blank=True, null=True, )
 
 
-class BaseResult(models.Model):
+class BaseAuction(BaseName):
 
     class Meta:
         abstract = True
@@ -166,10 +149,7 @@ class BaseResult(models.Model):
     start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
     finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
 
-    check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
-    doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
-    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
-    recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
+    num = models.CharField(help_text=_(u"Номер"), max_length=2048, verbose_name=_(u"Номер"), )
 
 
 class BaseDeveloper(BaseName, ):
@@ -324,7 +304,7 @@ class BaseDevices(models.Model):
     lamp = models.NullBooleanField(help_text=_(u"Электропатрон"), verbose_name=_(u"Электропатрон"), blank=True, )
     ceiling_hook = models.NullBooleanField(help_text=_(u"Потолочный крюк"), verbose_name=_(u"Потолочный крюк"), blank=True, )
     heaters = models.NullBooleanField(help_text=_(u"Отопительные приборы"), verbose_name=_(u"Отопительные приборы"), blank=True, )
-    smoke_filter = models.NullBooleanField(help_text=_(u"Дымоулавливатель"), verbose_name=_(u"Дымоулавливатель"), blank=True, )
+    smoke_filter = models.NullBooleanField(help_text=_(u"Элементы пожарной безопасности"), verbose_name=_(u"Элементы пожарной безопасности"), blank=True, )
 
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
@@ -336,7 +316,7 @@ class BaseDevices(models.Model):
 
 
 # common classes
-class BaseRoom(BaseDevices):
+class BaseRoom(models.Model):
 
     class Meta:
         app_label = "core"
@@ -354,8 +334,8 @@ class BaseRoom(BaseDevices):
         return d
 
 
-class BaseKitchen(BaseDevices):
-    sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
+class BaseKitchen(models.Model):
+    sink_with_mixer = models.IntegerField(help_text=_(u"Мойка"), default=0, blank=True, null=True, verbose_name=_(u"Мойка"), choices=SINK_CHOICES)
 
     class Meta:
         app_label = "core"
@@ -373,12 +353,12 @@ class BaseKitchen(BaseDevices):
         return d
 
 
-class BaseWC(BaseDevices, ):
+class BaseWC(models.Model):
     is_tower_dryer = models.NullBooleanField(help_text=_(u"Полотенцесушитель"), verbose_name=_(u"Полотенцесушитель"), blank=True, )
     is_toilet = models.NullBooleanField(help_text=_(u"Унитаз"), verbose_name=_(u"Унитаз"), blank=True, )
     bath_with_mixer = models.IntegerField(help_text=_(u"Ванна"), default=0, blank=True, null=True, verbose_name=_(u"Ванна"), choices=BATH_CHOICES)
-    sink_with_mixer = models.IntegerField(help_text=_(u"Раковина"), default=0, blank=True, null=True, verbose_name=_(u"Раковина"), choices=SINK_CHOICES)
-    wc_switches = models.NullBooleanField(help_text=_(u"Выключатели в туалете"), verbose_name=_(u"Выключатели в туалете"), blank=True, )
+    sink_with_mixer = models.IntegerField(help_text=_(u"Умывальник"), default=0, blank=True, null=True, verbose_name=_(u"Умывальник"), choices=WC_SINK_CHOICES)
+    # wc_switches = models.NullBooleanField(help_text=_(u"Выключатели в туалете"), verbose_name=_(u"Выключатели в туалете"), blank=True, )
 
     class Meta:
         app_label = "core"
@@ -396,7 +376,7 @@ class BaseWC(BaseDevices, ):
         return d
 
 
-class BaseHallway(BaseDevices, ):
+class BaseHallway(models.Model):
 
     class Meta:
         app_label = "core"
@@ -473,6 +453,91 @@ class Hallway(BaseMaterials, BaseHallway, ):
         return d
 
 
+class ResultRoom(BaseDevices, Room):
+    class Meta:
+        verbose_name = u"Комната"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultRoom, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class ResultKitchen(BaseDevices, Kitchen):
+
+    class Meta:
+        verbose_name = u"Кухня"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultKitchen, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class ResultWC(BaseDevices, WC, ):
+    class Meta:
+        verbose_name = u"Ванная комната"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultWC, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class ResultHallway(BaseDevices, Hallway, ):
+    class Meta:
+        verbose_name = u"Прихожая"
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(ResultHallway, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class BaseBuilding(models.Model):
+
+    class Meta:
+        abstract = True
+
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
+
+    approve_status = models.IntegerField(default=2, choices=APPROVE_CHOICES, verbose_name=_(u"Статус проверки объекта"), help_text=_(u"Статус проверки документа"))
+    state = models.IntegerField(default=1, help_text=_(u"Состояние"), verbose_name=_(u"Состояние"), choices=STATE_CHOICES , )
+    address = models.TextField(help_text=_(u"Адрес"), null=True, verbose_name=_(u"Адрес"), blank=False, )
+    complete_date = models.DateField(help_text=_(u"Срок сдачи в эксплуатацию"), null=True, verbose_name=_(u"Срок сдачи в эксплуатацию"), blank=True, )
+    comment = models.TextField(help_text=_(u"Комментарий"), null=True, verbose_name=_(u"Комментарий"), blank=True, )
+    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
+    payment_perspective = models.IntegerField(help_text=_(u"Перспектива освоения"), null=True, blank=True, verbose_name=_(u"Перспектива освоения"), choices=PAYMENT_PERSPECTIVE_CHOICES , )
+
+    build_state = models.IntegerField(help_text=_(u"Статус объекта"), null=True, blank=False, verbose_name=_(u"Статус объекта"), choices=BUILD_STATE_CHOICES, )
+    build_year = models.DateField(help_text=_(u"Год постройки"), verbose_name=_(u"Год постройки"), null=True, blank=True)
+    ownership_year = models.DateField(help_text=_(u"Дата перехода права собственности"), verbose_name=_(u"Дата перехода права собственности"), null=True, blank=True)
+    ownership_num = models.CharField(help_text=_(u"Номер документа перехода права собственности"), max_length=2048, verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
+    ownership_doc_num = models.CharField(max_length=512, help_text=_(u"Номер документа перехода права собственности"), verbose_name=_(u"Номер документа перехода права собственности"), null=True, blank=True)
+    mo_fond_doc_date = models.DateField(help_text=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Дата документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+    mo_fond_doc_num = models.CharField(max_length=512, help_text=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), verbose_name=_(u"Номер документа МО о передаче жилого помещения в спец. фонд"), null=True, blank=True)
+
+    cad_passport = models.FileField(null=True, blank=True, upload_to='img_files', help_text=_(u"Выписка из кадастрового паспорта"), verbose_name=_(u"Выписка из кадастрового паспорта"))
+
+    room = models.ForeignKey(Room, null=True, blank=True, )
+    wc = models.ForeignKey(WC, null=True, blank=True, )
+    hallway = models.ForeignKey(Hallway, null=True, blank=True, )
+    kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )
+
+
 class Developer(BaseDeveloper, ):
 
     class Meta:
@@ -489,20 +554,44 @@ class BaseCompareData(BaseCommonChars, ):
     class Meta:
         abstract = True
 
+    planing_floor = models.IntegerField(help_text=_(u"Этаж (планируемый)"), null=True, verbose_name=_(u"Этаж (планируемый)"), blank=True, )
+    floor = models.IntegerField(help_text=_(u"Этаж сданного в эксплуатацию объекта"), null=True, verbose_name=_(u"Этаж сданного в эксплуатацию объекта"), blank=True, )
     floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
     driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
     flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений"), null=True, verbose_name=_(u"Количество жилых помещений"), blank=True, )
     area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
     area = models.FloatField(help_text=_(u"Общая площадь (кв. м)"), null=True, verbose_name=_(u"Общая площадь (кв. м)"), blank=False, )
 
-    room = models.ForeignKey(Room, null=True, blank=True, )
-    wc = models.ForeignKey(WC, null=True, blank=True, )
-    hallway = models.ForeignKey(Hallway, null=True, blank=True, )
-    kitchen = models.ForeignKey(Kitchen, null=True, blank=True, )
-
     def to_dict(self):
         attrs = deepcopy(self.__dict__)
         d = super(BaseCompareData, self).to_dict() or {}
+        for k in attrs:
+            if not '__' in k and getattr(self, k):
+                d.update({k: getattr(self, k)})
+        return d
+
+
+class BaseResult(models.Model):
+
+    class Meta:
+        abstract = True
+
+    start_year = models.DateField(help_text=_(u"Срок начала учета в системе"), verbose_name=_(u"Срок начала учета в системе"), blank=False, default=START_YEAR_DEFAULT)
+    finish_year = models.DateField(help_text=_(u"Срок окончания учета в системе"), verbose_name=_(u"Срок окончания учета в системе"), blank=False, default=STOP_YEAR_DEFAULT)
+
+    check_date = models.DateField(help_text=_(u"Дата следующей проверки"), null=True, verbose_name=_(u"Дата следующей проверки"), blank=True, )
+    doc_list = models.CharField(help_text=_(u"Перечень предоставленных документов"), null=True, max_length=2048, verbose_name=_(u"Перечень предоставленных документов"), blank=True, )
+    readiness = models.IntegerField(help_text=_(u"Степень готовности"), null=True, blank=True, verbose_name=_(u"Степень готовности"), choices=READINESS_CHOICES , )
+    recommend = models.CharField(help_text=_(u"Рекомендации"), null=True, max_length=2048, verbose_name=_(u"Рекомендации"), blank=True, )
+
+    room = models.ForeignKey(ResultRoom, null=True, blank=True, )
+    wc = models.ForeignKey(ResultWC, null=True, blank=True, )
+    hallway = models.ForeignKey(ResultHallway, null=True, blank=True, )
+    kitchen = models.ForeignKey(ResultKitchen, null=True, blank=True, )
+
+    def to_dict(self):
+        attrs = deepcopy(self.__dict__)
+        d = super(BaseResult, self).to_dict() or {}
         for k in attrs:
             if not '__' in k and getattr(self, k):
                 d.update({k: getattr(self, k)})
@@ -594,20 +683,19 @@ class AuctionHallway(BaseMultiMaterials, BaseHallway):
         return d
 
 
-class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImprovement, ):
+class BaseAuctionData(BaseMultiWaterSupply):
 
     class Meta:
         abstract = True
 
-    flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений по номеру заказа"), null=True, verbose_name=_(u"Количество жилых помещений по номеру заказа"), blank=False, )
-    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"), default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
-    area = models.FloatField(help_text=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), null=True, verbose_name=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), blank=False, )
-    floors = models.IntegerField(help_text=_(u"Этажность"), null=True, verbose_name=_(u"Этажность"), blank=True, )
-    driveways = models.IntegerField(help_text=_(u"Подъездность"), null=True, verbose_name=_(u"Подъездность"), blank=True, )
-
+    flats_amount = models.IntegerField(help_text=_(u"Количество жилых помещений по номеру заказа"), null=True,
+                                       verbose_name=_(u"Количество жилых помещений по номеру заказа"), blank=False, )
+    area_cmp = models.IntegerField(help_text=_(u"Общая площадь не менее/равна"), verbose_name=_(u"Общая площадь не менее/равна"),
+                                   default=1, blank=False, null=True, choices=AREA_CMP_CHOICES)
+    area = models.FloatField(help_text=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), null=True,
+                             verbose_name=_(u"Площадь жилых помещений по номеру заказа (кв. м)"), blank=False, )
     is_water_boiler = models.NullBooleanField(help_text=_(u"Водонагревательный прибор (бойлер)"), verbose_name=_(u"Водонагревательный прибор (бойлер)"), blank=True, )
     is_heat_boiler = models.NullBooleanField(help_text=_(u"Отопительный котел"), verbose_name=_(u"Отопительный котел"), blank=True, )
-    is_intercom = models.NullBooleanField(help_text=_(u"Домофон"), verbose_name=_(u"Домофон"), blank=True, )
     is_loggia = models.NullBooleanField(help_text=_(u"Наличие лоджии"), verbose_name=_(u"Наличие лоджии"), blank=True, )
     is_balcony = models.NullBooleanField(help_text=_(u"Наличие балкона"), verbose_name=_(u"Наличие балкона"), blank=True, )
     internal_doors = models.CommaSeparatedIntegerField(max_length=256, help_text=_(u"Материал межкомнатных дверей"),
@@ -619,7 +707,8 @@ class BaseAuctionData(BaseSocialObjects, BaseMultiWaterSupply, BaseTerritoryImpr
 
     stage = models.IntegerField(help_text=_(u"Этап размещения заказа"), null=True, blank=False, verbose_name=_(u"Этап размещения заказа"), choices=STAGE_CHOICES , )
     start_price = models.FloatField(help_text=_(u"Начальная (максимальная) цена руб."), null=True, verbose_name=_(u"Начальная (максимальная) цена руб."), blank=False, )
-    date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"),  null=True, verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа) дд.мм.гггг"),  blank=False, )
+    date = models.DateField(help_text=_(u"Дата размещения извещения о торгах (Дата опубликования заказа)"),  null=True,
+                            verbose_name=_(u"Дата размещения извещения о торгах (Дата опубликования заказа)"),  blank=False, )
     open_date = models.DateTimeField(help_text=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"),  null=True, verbose_name=_(u"Дата и время проведения открытого аукциона (последнего события при размещении заказа, при отмене размещения, либо завершении аукциона)"),  blank=False, )
     proposal_count = models.IntegerField(help_text=_(u"Количество поданных заявок"), verbose_name=_(u"Количество поданных заявок"), blank=True, default=0)
 

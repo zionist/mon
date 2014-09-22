@@ -28,6 +28,11 @@
                             <li><a href="{% url 'mos' %}">{% trans 'Муниципальные образования' %}</a></li>
                             <li class="divider"></li>
                             <li><a href="{% url 'xls_work_table' %}">{% trans 'Рабочая таблица' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth' %}">{% trans 'Таблица количества заключенных контрактов' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-contracts_nums' %}">{% trans 'График количества заключенных контрактов' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-percent_of_contracts_flats_amount_and_subvention_perfomance' %}">{% trans 'График отношения количества жилых помещений в контрактах к показателю результативности субвенции' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-spend_amount' %}">{% trans 'График кассового расхода по освоению субвенций' %}</a></li>
+                            <li><a href="{% url 'xls_contract_grapth-percent_of_sum_with_k_and_spend_amount' %}">{% trans 'График отношения сумм субвенции к кассовому расходу' %}</a></li>
                         </ul>
                     </li>
                 {% else %}
@@ -54,6 +59,8 @@
                                 <li><a href="{% url 'buildings' %}">{% trans 'Объекты' %}</a></li>
                                 <li><a href="{% url 'buildings-xls' %}">{% trans 'Выгрузка объектов' %}</a></li>
                                 <li><a href="{% url 'contracts-xls' %}">{% trans 'Выгрузка контрактов' %}</a></li>
+                                <li><a href="{% url 'auctions-xls' %}">{% trans 'Выгрузка аукционов' %}</a></li>
+                                <li><a href="{% url 'payments-xls' %}">{% trans 'Выгрузка платежей' %}</a></li>
                                 <li><a href="{% url 'building_copies' %}">{% trans 'Копии объектов' %}</a></li>
                             {% endif %}
                             {% if user.is_staff %}
@@ -61,6 +68,8 @@
                                 <li><a href="{% url 'buildings-all' %}">{% trans 'Все объекты' %}</a></li>
                                 <li><a href="{% url 'buildings-all-xls' %}">{% trans 'Выгрузка всех объектов' %}</a></li>
                                 <li><a href="{% url 'contracts-all-xls' %}">{% trans 'Выгрузка всех контрактов' %}</a></li>
+                                <li><a href="{% url 'auctions-all-xls' %}">{% trans 'Выгрузка всех аукционов' %}</a></li>
+                                <li><a href="{% url 'payments-all-xls' %}">{% trans 'Выгрузка всех платежей' %}</a></li>
                                 <li><a href="{% url 'building_copies-all' %}">{% trans 'Все копии объектов' %}</a></li>
                             {% endif %}
                         </ul>
@@ -158,13 +167,15 @@
                             {% endif %}
                             <li><a href="{% url 'create-monitoring' %}">{% trans 'Добавить объект мониторинга' %}</a></li>
                             <li><a href="{% url 'manage-developer' dev.id dev.state %}">{% trans 'Добавить застройщика(владельца) объекта' %}</a></li>
-                            {% if user.is_staff %}
+                            {% if user.is_superuser %}
                             <li><a href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a></li>
+                            {% endif %}
+                            {% if user.is_staff %}
                             <li><a href="{% url 'create-auction' %}">{% trans 'Добавить аукцион' %}</a></li>
                             <!--
-                            <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li> -->
-                            <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат выезда' %}</a></li>
-                            <li><a href="{% url 'manage-person' %}">{% trans 'Добавить участника выезда' %}</a></li>
+                            <li><a href="{% url 'create-contract' %}">{% trans 'Добавить контракт' %}</a></li> 
+                            <li><a href="{% url 'create-result' %}">{% trans 'Добавить результат выезда' %}</a></li> 
+                            <li><a href="{% url 'manage-person' %}">{% trans 'Добавить участника выезда' %}</a></li> -->
                             {% endif %}
                         </ul>
                     </li>
@@ -204,6 +215,7 @@
                                 <li><a href="{% url 'create-user' %}">{% trans 'Создать пользователя' %}</a></li>
                                 <li><a href="{% url 'users' %}">{% trans 'Список пользователей' %}</a></li>
                                 <li><a href="{% url 'choices' %}">{% trans 'Список материалов' %}</a></li>
+                                <li><a href="{% url 'max_flat_prices' %}">{% trans 'Максимальная стоимость квартиры' %}</a></li>
                                 {% endif %}
                                 <li id="control-logout"><a href="{% url 'logout' %}">{% trans 'Выйти' %}</a></li>
                             </ul>

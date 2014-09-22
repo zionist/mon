@@ -1,0 +1,29 @@
+{% load extras %}
+
+<table width=100%>
+    <tbody>
+    <th> Название </th> <th> Значение</th>
+    {% for field in form %}
+        {% if forloop.counter0|check_divison:"2" == "0" %}
+        <tr>
+        {% endif %}
+        <td>
+            {% if field.is_hidden %}
+            {{ field }}
+            {% else %}
+            {{ field.label_tag }}
+            <span class="text-error">{{ field.errors }} </span>
+            {{ field|add_date_mask_class}}
+            {% endif %}
+        </td>
+        {% if forloop.counter0|check_divison:"4" == "2" %}
+        </tr>
+        {% endif %}
+        {% if forloop.last and forloop.counter0|check_divison:"4" != "2" %}
+        {% if forloop.counter0|check_divison:"2" %}
+        </tr>
+        {% endif %}
+        {% endif %}
+    {% endfor %}
+</tbody>
+</table>

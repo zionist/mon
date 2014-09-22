@@ -9,6 +9,7 @@ AGREEMENT_TYPE_CHOICES = ((0, _(u'Соглашение с министерств
 
 
 class RegionalBudget(BaseBudget, ):
+    minis_sum = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Профинансировано Министерством краевых средств"), verbose_name=_(u"Профинансировано Министерством краевых средств"))
 
     class Meta:
         app_label = "mo"
@@ -19,6 +20,7 @@ class RegionalBudget(BaseBudget, ):
 
 
 class FederalBudget(BaseBudget, ):
+    minis_sum = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Профинансировано Министерством федеральных средств"), verbose_name=_(u"Профинансировано Министерством федеральных средств"))
 
     class Meta:
         app_label = "mo"
@@ -43,6 +45,7 @@ class Subvention(BaseSubvention, ):
         string = '%s' + _(u' по соглашению №') + '%s'
         return string % (self.amount, self.get_dep())
 
+    minis_sum = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Профинансировано Министерством, всего"), verbose_name=_(u"Профинансировано Министерством, всего"))
     fed_budget = models.ForeignKey(FederalBudget, help_text=_(u"Федеральный бюджет"), verbose_name=_(u"Федеральный бюджет"), blank=True, null=True, )
     reg_budget = models.ForeignKey(RegionalBudget, help_text=_(u"Краевой бюджет"), verbose_name=_(u"Краевой бюджет"), blank=True, null=True, )
 
@@ -61,11 +64,16 @@ class MO(models.Model):
                                         verbose_name=_(u"Форма создания специализированного жилого фонда для детей-сирот"),
                                         blank=True, null=True, )
     has_trouble = models.NullBooleanField(blank=True, null=True, help_text=_(u"Есть замечания"), verbose_name=_(u"Есть замечания"))
+    planing_home_orphans = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"), verbose_name=_(u"Численность детей-сирот в возрасте от 18 лет и старше, включенных в список"))
     home_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения"))
+    home_reg_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от краевого бюджета"))
+    home_fed_orphans = models.IntegerField(blank=True, default=0, help_text=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"), verbose_name=_(u"Количество сирот, которым предоставлены жилые помещения от федерального бюджета"))
     common_economy = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая эканомия по субвенциям"), verbose_name=_(u"Общая эканомия по субвенциям"))
     common_percentage = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общий процент освоения субвенции"), verbose_name=_(u"Общий процент освоения субвенции"))
     common_spent = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая сумма потраченной субвенции"), verbose_name=_(u"Общая сумма потраченной субвенции"))
     common_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Общая сумма субвенции"), verbose_name=_(u"Общая сумма субвенции"))
+    common_reg_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Сумма субвенции от краевого бюджета"), verbose_name=_(u"Сумма субвенции от краевого бюджета"))
+    common_fed_amount = models.FloatField(blank=True, null=True, default=0, help_text=_(u"Сумма субвенции от федерального бюджета"), verbose_name=_(u"Сумма субвенции от федерального бюджета"))
     flats_amount = models.IntegerField(blank=True, null=True, default=0, help_text=_(u"Количество жилых помещений по заключенным контрактам"), verbose_name=_(u"Количество жилых помещений по заключенным контрактам"))
 
 
@@ -127,3 +135,9 @@ class PeopleAmount(models.Model):
         help_text=_(u"Взыскателей по исполнительным производствам (количество человек)"))
 
     mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование муниципального образования"), verbose_name=_(u"Наименование муниципального образования"), )
+
+
+class MaxFlatPrice(models.Model):
+    # mo = models.ForeignKey(MO, blank=True, null=True, help_text=_(u"Наименование МО"), verbose_name=_(u"Наименование МО"), )
+    year = models.IntegerField(unique=True, help_text=_(u'Год'), verbose_name=_(u'Год'))
+    max_price = models.FloatField(help_text=_(u'Максимальная стоимость квартиры руб.'), verbose_name=_(u'Максимальная стоимость квартиры руб.'))

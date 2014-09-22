@@ -37,7 +37,7 @@ from apps.build.models import Building, Ground, CopyBuilding
 from apps.build.forms import BuildingForm, BuildingShowForm, GroundForm, \
     GroundShowForm, BuildingSelectForm, BuildingMonitoringForm, CopyBuildingForm, \
     GroundMonitoringForm, BuildingSelectMonitoringForm, BuildingUpdateForm, GroundUpdateForm, \
-    CopyForm
+    CopyForm, BuildingUpdateStateForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, split_form, copy_object, to_xls
 from apps.core.models import WC, Room, Hallway, Kitchen, BaseWC, BaseRoom, BaseHallway, BaseKitchen, Developer
 from apps.core.forms import DeveloperForm, WCForm, RoomForm, HallwayForm, KitchenForm
@@ -72,25 +72,44 @@ def select_building_state(request, contract=None):
     context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix = 'select_build'
     if request.method == "POST":
-        print request.POST
         select_form = BuildingSelectForm(request.POST, prefix=prefix)
         if select_form.is_valid():
             cd = select_form.cleaned_data
             if not cd.get('developer'):
-                return redirect('add-building-developer', state=int(cd.get('state')), contract=cd.get('contract') or 0)
+                return redirect('add-building-developer', state=int(cd.get('state')),
+                                 contract=cd.get('contract') or 0)
             dev_pk = cd.get('developer').pk
-            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk, contract=cd.get('contract') or 0)
+            return redirect('add-building', state=cd.get('state'), dev_pk=dev_pk, build_state=cd.get('build_state'),
+                             contract=cd.get('contract') or 0)
     else:
         initial = {}
         if contract:
             initial.update({"contract": contract})
-        form = BuildingSelectForm(prefix=prefix, initial=initial)
-    context.update({'select_form': form})
+        select_form = BuildingSelectForm(prefix=prefix, initial=initial)
+    context.update({'select_form': select_form})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
 
 @login_required
-def add_building(request, dev_pk=None, state=None, contract=0):
+def update_building_state(request, pk, build_state=None):
+    template = 'build_updating.html'
+    build = Building.objects.get(pk=pk)
+    build_state = int(build_state) if build_state else 1
+    context = {'title': _(u'Изменение статуса объекта рынка жилья'), 'object': build}
+    prefix = 'update_build'
+    if request.method == "POST":
+        state_form = BuildingUpdateStateForm(request.POST, prefix=prefix, instance=build)
+        if state_form.is_valid():
+            state_form.save()
+            return redirect('get-building', pk=pk)
+    else:
+        state_form = BuildingUpdateStateForm(prefix=prefix, instance=build)
+    context.update({'state_form': state_form})
+    return render_to_response(template, context, context_instance=RequestContext(request))
+
+
+@login_required
+def add_building(request, dev_pk=None, state=None, contract=0, build_state=1):
     template = 'build_creation.html'
     context = {'title': _(u'Добавление объекта рынка жилья')}
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
@@ -101,12 +120,14 @@ def add_building(request, dev_pk=None, state=None, contract=0):
     dev = Developer.objects.get(pk=dev_pk)
     context.update({'state': select, 'dev': dev_pk})
     if request.method == "POST" and 'build' in request.POST:
+        build_state = request.POST.get('%s-build_state' % prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
         if select and int(select) == 2:
             form = GroundForm(request.POST, request.FILES, prefix=prefix)
             state_int = int(select)
         elif select and int(select) in [0, 1]:
-            form = BuildingForm(request.POST, request.FILES, prefix=prefix)
+            form = BuildingForm(request.POST, request.FILES, prefix=prefix,
+                                initial={'build_state': build_state})
             state_int = int(select)
         if not request.user.is_staff:
             form.fields.pop('approve_status')
@@ -137,11 +158,12 @@ def add_building(request, dev_pk=None, state=None, contract=0):
         from_dt = datetime.now()
         if request.user.is_staff:
             from_dt = request.user.customuser.get_user_date()
-        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+        initial_kw.update({'start_year': date(from_dt.year, 1, 1),
             'finish_year': date(from_dt.year, 12, 31)})
         if select and int(select) == 2:
             form = GroundForm(prefix=prefix, initial=initial_kw)
         elif select and int(select) in [0, 1]:
+            initial_kw.update({'build_state': build_state})
             form = BuildingForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
         form, text_area_form = split_form(form)
@@ -317,12 +339,21 @@ def update_building_copy(request, pk):
         copy = CopyBuilding.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    form = CopyBuildingForm(prefix='build', instance=copy)
+    if hasattr(request.user, 'customuser'):
+        mo = request.user.customuser.mo
+        form = CopyBuildingForm(prefix='build', instance=copy,
+                                initial={'build_state': copy.build_state,
+                                         'mo': mo})
+    else:
+        form = CopyBuildingForm(prefix='build', instance=copy,
+                                initial={'build_state': copy.build_state})
+
     prefix, dev_prefix, select_prefix = 'build', 'dev', 'select_build'
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
     form, text_area_form = split_form(form)
     context = {'title': _(u'Добавление рынка жилья')}
     context.update({'state': copy.state, 'dev': copy.developer.pk})
+
     context.update({'object': copy, 'form': form,
                     'text_area_fields': text_area_form, 'prefix': prefix,
                     'formsets': [room_f, hallway_f, wc_f, kitchen_f],
@@ -427,13 +458,18 @@ def get_building_copies(request, mo=None, all=False):
 @login_required
 def get_building(request, pk, state=None, extra=None):
 
+    def _remove_common_fields(form, res_form):
+        for field in form.fields:
+            if field in res_form.fields:
+                res_form.fields.pop(field)
+
     context = {'title': _(u'Параметры объекта')}
     if state and int(state) == 2:
         build = Ground.objects.get(pk=pk)
         form = GroundForm(instance=build)
     else:
         build = Building.objects.get(pk=pk)
-        form = BuildingForm(instance=build)
+        form = BuildingForm(instance=build, initial={'build_state': build.build_state})
     if not request.user.is_staff:
         if build.mo != request.user.customuser.mo:
             return HttpResponseForbidden("Forbidden")
@@ -441,8 +477,21 @@ def get_building(request, pk, state=None, extra=None):
         form.fields.pop('approve_status')
         form.fields.pop('mo')
     room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=build)
-    context.update({'object': build, 'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+    context.update({'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+    if build.result_set.all().exists():
+        context.update({'result_list': build.result_set.all()})
+        parent = build.result_set.latest('id')
+        res_room_f, res_hallway_f, res_wc_f, res_kitchen_f = get_fk_show_forms(parent=parent, result=True)
+        # remove common fields from result fk objects
+        _remove_common_fields(room_f, res_room_f)
+        _remove_common_fields(hallway_f, res_hallway_f)
+        _remove_common_fields(wc_f, res_wc_f)
+        _remove_common_fields(kitchen_f, res_kitchen_f)
+        context.update({'result': True, 'formsets': [(room_f, res_room_f), (hallway_f, res_hallway_f),
+                                     (wc_f, res_wc_f), (kitchen_f, res_kitchen_f)]})
+    else:
+        context.update({'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+    context.update({'object': build, 'form': form, 'copyform': CopyForm(), })
     return render(request, 'build.html', context, context_instance=RequestContext(request))
 
 
@@ -507,24 +556,21 @@ def update_building(request, pk, state=None, extra=None):
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build, request=request)
         if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             new_build = form.save()
-            new_build.room = room_f.save()
             if not request.user.is_staff:
                 new_build.approve_status = build.approve_status
                 new_build.mo = build.mo
-                new_build.save()
-            for obj in [room_f, hallway_f, wc_f, kitchen_f]:
-                obj.save()
+            room = room_f.save()
+            new_build.room = room
+            new_build.hallway = hallway_f.save()
+            new_build.wc = wc_f.save()
+            new_build.kitchen = kitchen_f.save()
+            new_build.save()
             return redirect('buildings')
         else:
             form, text_area_form = split_form(form)
             context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                            'titles': [
-                                BaseRoom._meta.verbose_name,
-                                BaseHallway._meta.verbose_name,
-                                BaseWC._meta.verbose_name,
-                                BaseKitchen._meta.verbose_name,
-                                ]})
+                            'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
             return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
     else:
         initial_kw = {'mo': build.mo}
@@ -532,19 +578,16 @@ def update_building(request, pk, state=None, extra=None):
             form = GroundUpdateForm(prefix=prefix, instance=build, initial=initial_kw)
         else:
             form = BuildingUpdateForm(prefix=prefix, instance=build, initial=initial_kw)
+
         # remove approve_status field from view if not admin
         if not request.user.is_staff:
             form.fields.pop('approve_status')
             form.fields.pop('mo')
-        form, text_area_form = split_form(form)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=build)
-        context.update({'object': build, 'form': form,  'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+        form, text_area_form = split_form(form)
+        context.update({'object': build, 'form': form,  'text_area_fields': text_area_form,
+                        'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                        'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name, BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
         return render(request, 'build_updating.html', context, context_instance=RequestContext(request))
 
 
@@ -577,19 +620,7 @@ def update_monitoring(request, pk, state=None, extra=None):
             # "move" to objects
             if form.cleaned_data.get('contract'):
                 new_build.contract = form.cleaned_data['contract']
-                new_build.room = Room()
-                new_build.room.save()
-                new_build.room_id = new_build.room.pk
-                new_build.hallway = Hallway()
-                new_build.hallway.save()
-                new_build.hallway_id = new_build.hallway.pk
-                new_build.wc = WC()
-                new_build.wc.save()
-                new_build.wc_id = new_build.wc.pk
-                new_build.kitchen = Kitchen()
-                new_build.kitchen.save()
-                new_build.kitchen_id = new_build.kitchen.pk
-                new_build.save(update_fields=['room', 'kitchen', 'wc', 'hallway', 'contract'])
+                new_build.save(update_fields=['contract'])
             if not request.user.is_staff:
                 new_build.approve_status = build.approve_status
                 new_build.mo = build.mo

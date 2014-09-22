@@ -1,0 +1,28 @@
+body {
+ background-color: white;
+}
+
+table {
+    border-spacing: 0px;
+    border: 1px solid black;
+}
+
+.td-left {
+  border-top: 1px solid black;
+  /*
+  border-left: 1px solid black;
+  border-right: 1px solid black;*/
+}
+
+.td-right {
+    border-top: 1px solid black;
+    border-left: 1px solid black;
+}
+
+.grey {
+    color: #888888;
+}
+
+p {
+    text-align: left;
+}

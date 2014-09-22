@@ -5,7 +5,7 @@
     <h4>{{title}}</h4>
     {% if user.is_superuser %}
         <a class="btn btn-small" href="{% url 'create-mo' %}">{% trans 'Добавить муниципальное образование' %}</a><br><br>
-    {% elif show_recount and user.is_staff %}
+    {% elif show_recount and user.is_staff and future %}
         <a class="btn btn-small" href="{% url 'recount-mo' user.customuser.mo.id %}">{% trans 'Рассчитать данные муниципального образования' %}
             {{user.customuser.mo.name}} {% trans 'за выбранный год' %}</a><br><br>
     {% endif %}
@@ -19,20 +19,24 @@
         {% if mo_list and not formset %}
             <div class="auction-table">
             <table class="table table-condensed table-striped table-hover">
-                <tr><th> {% trans 'Наименование' %} / {% trans 'Форма создания спец. жил. фонда' %}</th>
+                <tr>
                     <th> {% trans 'Показатель результативности предоставления субвенции' %}</th>
-                    <th> {% trans 'Общая сумма выделенной субвенции' %}</th>
+                    <th> {% trans 'в т.ч. за счет краевых средств' %}</th>
+                    <th> {% trans 'в т.ч. за счет федеральных средств' %}</th>
+                    <th> {% trans 'Общая сумма выделенной субвенции, всего' %}</th>
+                    <th> {% trans 'в т.ч. за счет краевых средств' %}</th>
+                    <th> {% trans 'в т.ч. за счет федеральных средств' %}</th>
                     <th> {% trans 'Количество жилых помещений по заключенным контрактам' %}</th>
                 </tr>
                 {% for obj in mo_list %}
                     {% if obj.id %}
                         <tr>
-                            <td><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a>
+                            <td colspan="7"><p><a href="{% url 'change-mo' obj.id %}">{{obj.name}}</a>{% trans ', форма создания спец. жил. фонда - ' %}
                                 {% with creation_form=obj.creation_form %}
-                                {% if '0' in creation_form %}/ П {% endif %}
-                                {% if '1' in creation_form %}/ ДС {% endif %}
-                                {% if '2' in creation_form %}/ С {% endif %}
-                                {% endwith %}
+                                    {% if '0' in creation_form %} Приобретение; {% endif %}
+                                    {% if '1' in creation_form %} Долевое строительство; {% endif %}
+                                    {% if '2' in creation_form %} Строительство; {% endif %}
+                                {% endwith %}</p>
                             {% if mo_contracts %}
                                 <br><br><strong>{% trans 'Контракты: ' %} </strong>
                                 {% for contract in obj.contract_set.all %}
@@ -42,8 +46,13 @@
                                 {% endfor %}
                             {% endif %}
                             </td>
+                        </tr><tr>
                             <td>{{obj.home_orphans}}</td>
+                            <td>{{obj.home_reg_orphans}}</td>
+                            <td>{{obj.home_fed_orphans}}</td>
                             <td>{{obj.common_amount}}</td>
+                            <td>{{obj.common_reg_amount}}</td>
+                            <td>{{obj.common_fed_amount}}</td>
                             <td>{{obj.flats_amount}}</td>
                         </tr>
                     {% endif %}

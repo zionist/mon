@@ -7,9 +7,9 @@ from django.utils.translation import ugettext as _
 
 from apps.mo.models import MO
 
-DATE_CHOICES = ((0, ''), (1, '2012'), (2, '2013'), (3, '2014'),
-                (4, '2015'), (5, '2016'), (6, '2017'),
-                (7, '2018'), (8, '2019'), (9, '2020'))
+DATE_CHOICES = ((0, ''), (1, 2012), (2, 2013), (3, 2014),
+                (4, 2015), (5, 2016), (6, 2017),
+                (7, 2018), (8, 2019), (9, 2020))
 DICT_DATE_CHOICES = dict(DATE_CHOICES)
 
 

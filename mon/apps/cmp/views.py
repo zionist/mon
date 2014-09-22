@@ -20,13 +20,13 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import permission_required, login_required
 
-from .models import Result, AuctionDocuments, Auction, Person, CompareData, CopyAuction
+from .models import Result, Auction, Person, CompareData, CopyAuction
 from .forms import ContractForm, ResultForm, AuctionForm, CompareDataForm, PersonForm, AuctionShowForm, ContractShowForm, \
-    ResultShowForm, CompareDataShowForm, AuctionDocumentsForm, ContractDocumentsForm, FilterAuctionForm
+    ResultShowForm, CompareDataShowForm, ContractDocumentsForm, FilterAuctionForm
 from apps.core.views import get_fk_forms, get_fk_show_forms, get_fk_cmp_forms
 from apps.core.views import split_form, set_fields_equal, copy_object, to_xls
 from apps.core.models import BaseWC, BaseRoom, BaseHallway, BaseKitchen, WC, Room, Hallway, Kitchen
-from apps.build.models import Contract, ContractDocuments, CopyContract
+from apps.build.models import Contract, ContractDocuments, CopyContract, Building
 from apps.build.forms import BuildingShowForm, GroundShowForm, CopyForm
 from apps.imgfile.models import Image
 from apps.mo.models import MO
@@ -38,35 +38,38 @@ def add_auction(request):
     context = {'title': _(u'Добавление аукциона')}
     prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
-        image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
         form = AuctionForm(request.POST, request.FILES, prefix=prefix)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=True)
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             auction = form.save()
-            auction.docs = image_form.save()
             auction.room = room_f.save()
             auction.hallway = hallway_f.save()
             auction.wc = wc_f.save()
             auction.kitchen = kitchen_f.save()
-            auction.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
+            auction.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             return redirect('auctions')
         else:
-            context.update({'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+                            'titles': [
+                                BaseRoom._meta.verbose_name,
+                                BaseHallway._meta.verbose_name,
+                                BaseWC._meta.verbose_name,
+                                BaseKitchen._meta.verbose_name,
+                            ]})
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
-        image_form = AuctionDocumentsForm(prefix=images_prefix)
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
         from_dt = datetime.now()
         if request.user.is_staff:
             from_dt = request.user.customuser.get_user_date()
-        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+        initial_kw.update({'start_year': date(from_dt.year, 1, 1),
                            'finish_year': date(from_dt.year, 12, 31)})
         form = AuctionForm(prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True)
         # move text_area fields to another form
-        context.update({'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [
                             BaseRoom._meta.verbose_name,
                             BaseHallway._meta.verbose_name,
@@ -105,14 +108,13 @@ def update_auction_copy(request, pk):
     template = 'auction_creation.html'
     context = {'title': _(u'Добавление аукциона')}
     prefix, images_prefix = 'auction', 'auction_images'
-    image_form = AuctionDocumentsForm(prefix=images_prefix, instance=copy)
     initial_kw = {}
     if hasattr(request.user, 'customuser'):
         initial_kw.update({'mo': request.user.customuser.mo})
     form = AuctionForm(prefix=prefix, initial=initial_kw, instance=copy)
     room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(multi=True, parent=copy)
     # move text_area fields to another form
-    context.update({'form': form, 'images': image_form, 'prefix': prefix,
+    context.update({'form': form, 'prefix': prefix,
                     'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                     'titles': [
                         BaseRoom._meta.verbose_name,
@@ -141,7 +143,7 @@ def copy_auction(request, pk):
     auction_dict = forms.model_to_dict(auction)
 
     for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id',
-              'docs', 'contract']:
+              'contract']:
         auction_dict.pop(n)
 
     for copy in xrange(amount):
@@ -217,32 +219,31 @@ def get_auctions(request, pk=None):
 
 
 @login_required
-def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auctions.html'):
+def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auctions.html', xls=False):
     context = {'title': _(u'Аукционы')}
     kwargs = {}
     mo_obj = None
     from_dt = None
-    if pk:
-        mo_obj = MO.objects.get(pk=pk)
-        context = {'title': _(u'Аукционы %s' % mo_obj.name)}
-    elif hasattr(request.user, 'customuser'):
-        mo_obj = request.user.customuser.mo
-        context = {'title': _(u'Аукционы %s' % mo_obj.name)}
+    if hasattr(request.user, 'customuser'):
         from_dt = request.user.customuser.get_user_date()
-    if from_dt:
         kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
-    if all:
+    if pk or not all:
+        if pk:
+            mo_obj = MO.objects.get(pk=pk)
+        elif not all and hasattr(request.user, 'customuser'):
+            mo_obj = request.user.customuser.mo
+        if mo_obj:
+            if copies:
+                context = {'title': _(u'Копии аукционов %s' % (mo_obj))}
+            else:
+                context = {'title': _(u'Аукционы %s' % (mo_obj))}
+            context.update({'object': mo_obj})
+            kwargs.update({'mo': mo_obj})
+    if all or not mo_obj:
         if copies:
             context = {'title': _(u'Все копии аукционов')}
         else:
             context = {'title': _(u'Все аукционы')}
-    elif mo_obj:
-        if copies:
-            context = {'title': _(u'Копии аукционов %s' % (mo_obj))}
-        else:
-            context = {'title': _(u'Аукционы %s' % (mo_obj))}
-        context.update({'object': mo_obj})
-        kwargs.update({'mo': mo_obj})
     objects = []
     if copies:
         objects = CopyAuction.objects.filter(**kwargs).order_by('num')
@@ -258,6 +259,8 @@ def get_mo_auctions(request, pk=None, copies=False, all=False, template='mo_auct
     else:
         filter_form = FilterAuctionForm(prefix=f_pref)
     objects = list(objects)
+    if xls:
+        return to_xls(request,  objects={AuctionForm: objects}, multi=True)
     for obj in objects:
         setattr(obj, "index_number", objects.index(obj) + 1)
     page = request.GET.get('page', '1')
@@ -282,9 +285,8 @@ def get_auction(request, pk, extra=None):
         context.update({'form': form})
     else:
         form = AuctionShowForm(prefix=prefix, instance=auction)
-        image_form = AuctionDocumentsForm(prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=auction, multi=True)
-        context.update({'form': form, 'images': image_form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
                                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name,]})
     context.update({'object': auction})
@@ -298,17 +300,15 @@ def update_auction(request, pk, extra=None):
     prefix, images_prefix = 'auction', 'auction_images'
     if request.method == "POST":
         form = AuctionForm(request.POST, request.FILES, prefix=prefix, instance=auction)
-        image_form = AuctionDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=auction.docs)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, request=request, multi=True)
         context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
-            image_form.save()
             for obj in [room_f, hallway_f, wc_f, kitchen_f]:
                 obj.save()
             return redirect('auctions')
         else:
-            context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix,
+            context.update({'object': auction, 'form': form, 'prefix': prefix,
                             'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                             'titles': [
                                 BaseRoom._meta.verbose_name,
@@ -318,13 +318,12 @@ def update_auction(request, pk, extra=None):
                                 ]})
             return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
     else:
-        image_form = AuctionDocumentsForm(instance=auction.docs, prefix=images_prefix)
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
         form = AuctionForm(instance=auction, prefix=prefix, initial=initial_kw)
         room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=auction, multi=True)
-        context.update({'object': auction, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
+        context.update({'object': auction, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
                                    BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
     return render(request, 'auction_updating.html', context, context_instance=RequestContext(request))
@@ -368,8 +367,7 @@ def add_contract(request, auction_for_update=0):
     if request.method == "POST":
         form = ContractForm(request.POST, request.FILES, prefix=prefix)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        if form.is_valid() and image_form.is_valid():
             cd = form.cleaned_data
             auction = None
             if cd.get('auction_for_update'):
@@ -378,12 +376,8 @@ def add_contract(request, auction_for_update=0):
                 except ObjectDoesNotExist:
                     return HttpResponseNotFound("Aucton not found")
             contract = form.save()
-            contract.room = room_f.save()
-            contract.hallway = hallway_f.save()
-            contract.wc = wc_f.save()
-            contract.kitchen = kitchen_f.save()
             contract.docs = image_form.save()
-            contract.save(update_fields=['room', 'hallway', 'wc', 'kitchen', 'docs'])
+            contract.save(update_fields=['docs'])
             if auction:
                 if auction.contract:
                     return HttpResponse(u"Вы не можете привязать созданный контракт к аукциону %s. "
@@ -397,7 +391,7 @@ def add_contract(request, auction_for_update=0):
             # update Auction after contract save. Set contract field to this Contract object
             return redirect('contracts')
         else:
-            context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
+            context.update({'form': form, 'prefix': prefix, 'images': image_form, })
             return render_to_response(template, context, context_instance=RequestContext(request))
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix)
@@ -409,17 +403,13 @@ def add_contract(request, auction_for_update=0):
         from_dt = datetime.now()
         if request.user.is_staff:
             from_dt = request.user.customuser.get_user_date()
-        initial_kw.update({'start_year': date(from_dt.year, 01, 01),
+        initial_kw.update({'start_year': date(from_dt.year, 1, 1),
                            'finish_year': date(from_dt.year, 12, 31)})
         form = ContractForm(prefix=prefix, initial=initial_kw)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
-        context.update({'form': form, 'prefix': prefix, 'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+        form, text_area_form = split_form(form)
+        context.update({'form': form, 'text_area_fields': text_area_form, 'prefix': prefix,
+                        'images': image_form,
+                        })
         return render_to_response(template, context, context_instance=RequestContext(request))
 
 
@@ -439,29 +429,13 @@ def copy_contract(request, pk):
 
     contract_dict = forms.model_to_dict(contract)
 
-    for n in ['wc', 'kitchen', 'hallway', 'room', 'mo', 'id', 'developer',
-              'docs']:
+    for n in ['mo', 'id', 'developer', 'docs']:
         contract_dict.pop(n)
 
     for copy in xrange(amount):
-        # fks
         copy = CopyContract(**contract_dict)
         copy.mo = contract.mo
         copy.developer = contract.developer
-
-        # create new fk related objects
-        copy.room = copy_object(contract.room)
-        copy.room.save()
-        copy.room_id = copy.room.id
-        copy.hallway = copy_object(contract.hallway)
-        copy.hallway.save()
-        copy.hallway_id = copy.hallway.id
-        copy.wc = copy_object(contract.wc)
-        copy.wc.save()
-        copy.wc_id = copy.wc.id
-        copy.kitchen = copy_object(contract.kitchen)
-        copy.kitchen.save()
-        copy.kitchen_id = copy.kitchen.id
         copy.save()
     return get_contract_copies(request)
 
@@ -557,7 +531,7 @@ def get_contracts(request, mo=None, all=False, template='contracts.html',
         if Contract.objects.filter(**kwargs).exists():
             objects = Contract.objects.filter(**kwargs).order_by('num')
     if xls:
-        return to_xls(request,  objects={ContractForm: objects})
+        return to_xls(request,  objects={ContractForm: objects}, fk_forms=False)
     objects = list(objects)
     for obj in objects:
         setattr(obj, "index_number", objects.index(obj) + 1)
@@ -588,14 +562,6 @@ def delete_contract_copy(request, pk):
         copy = CopyContract.objects.get(pk=pk)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("Not found")
-    if copy.room:
-        copy.room.delete()
-    if copy.hallway:
-        copy.hallway.delete()
-    if copy.wc:
-        copy.wc.delete()
-    if copy.kitchen:
-        copy.kitchen.delete()
     copy.delete()
     return redirect("contract_copies")
 
@@ -613,15 +579,9 @@ def update_contract_copy(request, pk):
     prefix, images_prefix = 'contract', 'contract_images'
     form = ContractForm(prefix=prefix, instance=copy)
     image_form = ContractDocumentsForm(prefix=images_prefix)
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=copy)
     context.update({'object': copy, 'form': form, 'prefix': prefix,
-                    'images': image_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                    'titles': [
-                        BaseRoom._meta.verbose_name,
-                        BaseHallway._meta.verbose_name,
-                        BaseWC._meta.verbose_name,
-                        BaseKitchen._meta.verbose_name,
-                        ]})
+                    'images': image_form,
+                    })
     delete_contract_copy(request, copy.pk)
     return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -638,20 +598,16 @@ def get_contract(request, pk, extra=None):
     else:
         image_form = ContractDocumentsForm(prefix=images_prefix, instance=contract.docs)
         form = ContractShowForm(instance=contract)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=contract)
+        form.fields.pop("auction_for_update")
         objects = list(contract.building_set.all()) + list(contract.ground_set.all())
-        context.update({'form': form, 'copyform': CopyForm(), 'formsets': [room_f, hallway_f, wc_f, kitchen_f], 'images': image_form,
+        context.update({'form': form, 'copyform': CopyForm(), 'images': image_form,
                         'building_list': objects,
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+                        })
     payment_amount = sum(payment.amount for payment in contract.payment_set.all())
     remainder = contract.summa - payment_amount if contract.summa else 0
     context.update({
         'object': contract,
+        'payments_list': list(contract.payment_set.all()),
         'contract_payment_amount': payment_amount,
         'contract_remainder': remainder})
     return render(request, 'contract.html', context, context_instance=RequestContext(request))
@@ -665,35 +621,22 @@ def update_contract(request, pk, extra=None):
     if request.method == "POST":
         form = ContractForm(request.POST, request.FILES, prefix=prefix, instance=contract)
         image_form = ContractDocumentsForm(request.POST, request.FILES, prefix=images_prefix, instance=contract.docs)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract, request=request)
-        context.update({'object': contract, 'form': form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
-        if form.is_valid() and image_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
+        context.update({'object': contract, 'form': form, 'prefix': prefix, })
+        if form.is_valid() and image_form.is_valid():
             image_form.save()
             form.save()
-            for obj in [room_f, hallway_f, wc_f, kitchen_f]:
-                obj.save()
             return redirect('contracts')
         else:
             context.update({'object': contract, 'form': form, 'prefix': prefix, 'images': image_form,
-                            'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                            'titles': [
-                                BaseRoom._meta.verbose_name,
-                                BaseHallway._meta.verbose_name,
-                                BaseWC._meta.verbose_name,
-                                BaseKitchen._meta.verbose_name,
-                                ]})
+                            })
             return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
     else:
         image_form = ContractDocumentsForm(instance=contract.docs, prefix=images_prefix)
         form = ContractForm(instance=contract, prefix=prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=contract)
-        context.update({'object': contract, 'form': form, 'images': image_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
-                        'titles': [
-                            BaseRoom._meta.verbose_name,
-                            BaseHallway._meta.verbose_name,
-                            BaseWC._meta.verbose_name,
-                            BaseKitchen._meta.verbose_name,
-                            ]})
+        form, text_area_form = split_form(form)
+        context.update({'object': contract, 'form': form, 'text_area_fields': text_area_form, 'images': image_form,
+                        'prefix': prefix,
+                        })
     return render(request, 'contract_updating.html', context, context_instance=RequestContext(request))
 
 
@@ -710,14 +653,6 @@ def delete_contract(request, pk):
     context = {'title': _(u'Удаление контракта')}
     contract = Contract.objects.get(pk=pk)
     if contract and 'delete' in request.POST:
-        if contract.room:
-            contract.room.delete()
-        if contract.hallway:
-            contract.hallway.delete()
-        if contract.wc:
-            contract.wc.delete()
-        if contract.kitchen:
-            contract.kitchen.delete()
         contract.delete()
         return redirect('contracts')
     elif 'cancel' in request.POST:
@@ -728,22 +663,22 @@ def delete_contract(request, pk):
 
 
 @login_required
-def add_result(request):
+def add_result(request, object=None):
     template = 'result_creation.html'
     context = {'title': _(u'Добавление результатов выезда в МО')}
     prefix, cmp_prefix = 'result', 'cmp_result'
     if request.method == "POST":
         form = ResultForm(request.POST, request.FILES, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, result=True)
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             result = form.save()
             result.cmp_data = cmp_form.save()
-            result.cmp_data.room = room_f.save()
-            result.cmp_data.hallway = hallway_f.save()
-            result.cmp_data.wc = wc_f.save()
-            result.cmp_data.kitchen = kitchen_f.save()
-            result.cmp_data.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
+            result.room = room_f.save()
+            result.hallway = hallway_f.save()
+            result.wc = wc_f.save()
+            result.kitchen = kitchen_f.save()
+            result.save(update_fields=['room', 'hallway', 'wc', 'kitchen'])
             result.save(update_fields=['cmp_data'])
             return redirect('results')
         else:
@@ -754,9 +689,17 @@ def add_result(request):
         initial_kw = {}
         if hasattr(request.user, 'customuser'):
             initial_kw.update({'mo': request.user.customuser.mo})
+            from_dt = request.user.customuser.get_user_date()
+            initial_kw.update({'start_year': date(from_dt.year, 1, 1),
+                               'finish_year': date(from_dt.year, 12, 31)})
+        if object:
+            object = Building.objects.get(pk=object)
+            initial_kw.update({'building': object})
         form = ResultForm(prefix=prefix, initial=initial_kw)
+        for field in form:
+            print field.name
         cmp_form = CompareDataForm(prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms()
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(result=True)
         form, text_area_form = split_form(form)
         context.update({'form': form, 'cmp_form': cmp_form, 'text_area_fields': text_area_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
@@ -768,7 +711,7 @@ def add_result(request):
 def get_results(request, mo=None, all=False):
     template = 'results.html'
     kwargs = {}
-
+    context = {}
     mo_obj = None
     if mo:
         mo_obj = MO.objects.get(pk=mo)
@@ -780,9 +723,9 @@ def get_results(request, mo=None, all=False):
         kwargs.update({'start_year__lt': from_dt, 'finish_year__gt': from_dt})
 
     if all:
-        context = {'title': _(u'Все выезды')}
+        context.update({'title': _(u'Все выезды')})
     elif mo_obj:
-        context = {'title': _(u'Выезды в %s' % (mo_obj))}
+        context.update({'title': _(u'Выезды в %s' % (mo_obj))})
         kwargs.update({'mo': mo_obj})
 
     if Result.objects.filter(**kwargs).exists():
@@ -811,7 +754,7 @@ def get_result(request, pk, extra=None):
     else:
         form = ResultShowForm(instance=result, prefix=prefix)
         cmp_form = CompareDataShowForm(instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result.cmp_data)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result)
         context.update({'form': form, 'cmp_form': cmp_form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
     context.update({'object': result})
     return render(request, 'result.html', context, context_instance=RequestContext(request))
@@ -825,7 +768,7 @@ def update_result(request, pk, extra=None):
     if request.method == "POST":
         form = ResultForm(request.POST, request.FILES, instance=result, prefix=prefix)
         cmp_form = CompareDataForm(request.POST, instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data, request=request)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, request=request, result=True)
         context.update({'object': result, 'form': form, 'cmp_form': cmp_form, 'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
         if form.is_valid() and cmp_form.is_valid() and room_f.is_valid() and hallway_f.is_valid() and wc_f.is_valid() and kitchen_f.is_valid():
             form.save()
@@ -841,10 +784,16 @@ def update_result(request, pk, extra=None):
                                        BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
             return render(request, 'result_updating.html', context, context_instance=RequestContext(request))
     else:
-        form = ResultForm(instance=result, prefix=prefix)
+        initial_kw = {}
+        if hasattr(request.user, 'customuser'):
+            initial_kw.update({'mo': request.user.customuser.mo})
+            from_dt = request.user.customuser.get_user_date()
+            initial_kw.update({'start_year': date(from_dt.year, 1, 1),
+                               'finish_year': date(from_dt.year, 12, 31)})
+        form = ResultForm(instance=result, prefix=prefix, initial=initial_kw)
         form, text_area_form = split_form(form)
         cmp_form = CompareDataForm(instance=result.cmp_data, prefix=cmp_prefix)
-        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result.cmp_data)
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=result, result=True)
         context.update({'object': result, 'form': form, 'text_area_fields': text_area_form, 'cmp_form': cmp_form,
                         'prefix': prefix, 'formsets': [room_f, hallway_f, wc_f, kitchen_f],
                         'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
@@ -866,10 +815,10 @@ def delete_result(request, pk):
     result = Result.objects.get(pk=pk)
     if result and 'delete' in request.POST:
         result.cmp_data.delete()
-        result.cmp_data.room.delete()
-        result.cmp_data.hallway.delete()
-        result.cmp_data.wc.delete()
-        result.cmp_data.kitchen.delete()
+        result.room.delete()
+        result.hallway.delete()
+        result.wc.delete()
+        result.kitchen.delete()
         result.delete()
         return redirect('results')
     elif 'cancel' in request.POST:
@@ -998,13 +947,58 @@ def cmp_contract_auction(request, pk):
 
 
 @login_required
+def cmp_building_auction(request, pk):
+    building = Building.objects.get(pk=pk)
+    context = {'title': _(u'Сравнение параметров'),
+               'object_title': _(u'Объект %s' % building.address)}
+
+    contract_form = BuildingShowForm(instance=building)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=building)
+
+    if building.contract and building.contract.auction_set.all().exists():
+        cmp_obj = building.contract.auction_set.all()[0]
+        auction_form = AuctionShowForm(instance=cmp_obj, cmp_initial=building)
+    else:
+        context.update({'errorlist': _('No one matched object')})
+        return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+    context.update({'cmp_object_title': _(u'Аукцион %s' % cmp_obj.num)})
+
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=building, multi=True)
+    auction_form, contract_form = set_fields_equal(auction_form, contract_form)
+    room_cf, room_f = set_fields_equal(room_cf, room_f)
+    hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)
+    wc_cf, wc_f = set_fields_equal(wc_cf, wc_f)
+    kitchen_cf, kitchen_f = set_fields_equal(kitchen_cf, kitchen_f)
+
+    object_update_url = reverse('update-building', args=[building.id, 1])
+    object_pre_delete_url = reverse('pre-delete-building', args=[building.id, 1])
+    cmp_obj_update_url = reverse('update-auction', args=[cmp_obj.id, ])
+    cmp_obj_pre_delete_url = reverse('pre-delete-auction', args=[cmp_obj.id, ])
+    context.update({'cmp_obj_update_url': cmp_obj_update_url,
+                    'cmp_obj_pre_delete_url': cmp_obj_pre_delete_url})
+    context.update({'object_update_url': object_update_url,
+                    'object_pre_delete_url': object_pre_delete_url})
+
+    context.update({'cmp_form': auction_form, 'room_cf': room_cf, 'hallway_cf': hallway_cf,
+                    'wc_cf': wc_cf, 'kitchen_cf': kitchen_cf, })
+    context.update({'form': contract_form, 'room_f': room_f, 'hallway_f': hallway_f,
+                    'wc_f': wc_f, 'kitchen_f': kitchen_f, })
+
+    context.update({'object': building, 'cmp_object': cmp_obj,
+                    'titles': [BaseRoom._meta.verbose_name, BaseHallway._meta.verbose_name,
+                               BaseWC._meta.verbose_name, BaseKitchen._meta.verbose_name]})
+    return render(request, 'cmp.html', context, context_instance=RequestContext(request))
+
+
+@login_required
 def cmp_result_building(request, pk):
     res = Result.objects.get(pk=pk)
     context = {'title': _(u'Сравнение параметров'), 'object_title': _(u'Результат')}
     result = res.cmp_data
 
     form = CompareDataShowForm(instance=result)
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=result)
+    room_f, hallway_f, wc_f, kitchen_f = get_fk_show_forms(parent=res)
     context.update({'form': form, 'formsets': [room_f, hallway_f, wc_f, kitchen_f]})
 
     if res.building:
@@ -1029,7 +1023,7 @@ def cmp_result_building(request, pk):
                     'object_pre_delete_url': object_pre_delete_url})
 
 
-    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=result)
+    room_cf, hallway_cf, wc_cf, kitchen_cf = get_fk_cmp_forms(parent=cmp_obj, cmp=res)
     cmp_form, form = set_fields_equal(cmp_form, form)
     room_cf, room_f = set_fields_equal(room_cf, room_f)
     hallway_cf, hallway_f = set_fields_equal(hallway_cf, hallway_f)

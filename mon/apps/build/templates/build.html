@@ -21,18 +21,53 @@
         {% if object %}
             <div class="row">
                 <div class="span6"><a class="btn btn-info" href="{% url 'update-building' object.id object.state %}">
-                    {% trans 'Редактировать' %}</a></div>
+                    {% trans 'Редактировать' %}</a>
+                    <a class="btn btn-small" href="{% url 'cmp-building-auction' object.id %}">
+                        {% trans 'Сравнить с аукционом' %}</a>
+                </div>
 
                  <form method="POST" enctype="multipart/form-data" action="{% url 'copy-building' object.id %}"> {% csrf_token %}
                     <div class="span2"> {{ copyform.amount.label }}  </div>
                     <div class="span1"> {{ copyform.amount }} </div>
                     <div class="span1"><button class="btn" type="submit" >
                          {% trans 'Скопировать' %} </button></div>
-
                 <div class="span2 text-right"><a class="btn btn-danger" href="{% url 'pre-delete-building' object.id object.state %}">
                     {% trans 'Удалить' %}</a></div>
                  </form>
             </div><br />
+{% if result_list %}
+    <div class="auction-table">
+        <table class="table table-condensed">
+            <tr><th> {% trans 'Дата выезда' %}</th><th> {% trans 'Наименование МО' %}</th>
+                <th> {% trans 'Замечания по результатам' %}</th></tr>
+            {% for obj in result_list %}
+            {% if obj.id %}
+            <tr>
+                <td><a href="{% url 'change-result' obj.id %}">{{obj.cmp_data.cmp_date}}</a></td>
+                <td>{{obj.mo.name}}</td>
+                <td>
+                    {% with obj.recommend as recommend %}
+                    {% if recommend and recommend != ' ' and recommend != 'Нет' and recommend != 'нет' %}
+                    {% trans 'Да' %}
+                    {% else %}
+                    {% trans 'Нет' %}
+                    {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}
+
+            <div class="row">
+                <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
+                <div class="right">
+                    <a class="btn" href="{% url 'update-building-state' object.id %}"> {% trans 'Редактировать статус'%} </a>
+                    <a class="btn" href="{% url 'create-result' object.id %}"> {% trans 'Добавить связанный выезд' %} </a>
+                </div>
+            </div>
         {% endif %}
     {% endif %}
     {% if form or formsets %}
@@ -41,14 +76,19 @@
             {% include "view_table.html" %}
         {% endif %}
 
-        {% if formsets %}
-            {% for form in formsets %}
+        {% if formsets and result %}
+            {% for formset in formsets %}
                <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
+                {% for form in formset %}
+                    {% include "view_table.html" %}
+                {% endfor %}
+            {% endfor %}
+        {% elif formsets and not result %}
+            {% for form in formsets %}
+                <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
                 {% include "view_table.html" %}
             {% endfor %}
         {% endif %}
+
     {% endif %}
-
-
-
 {% endblock %}

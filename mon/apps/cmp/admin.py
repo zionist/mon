@@ -1,14 +1,8 @@
 from django.contrib import admin
 from django import forms
-from .models import CompareData, Result, Person, Auction, AuctionDocuments
+from .models import CompareData, Result, Person, Auction
 from apps.build.models import Contract, ContractDocuments
 from apps.imgfile.models import File, Image
-
-
-class AuctionDocumentsAdmin(admin.ModelAdmin):
-    pass
-
-admin.site.register(AuctionDocuments, AuctionDocumentsAdmin)
 
 
 class AuctionAdmin(admin.ModelAdmin):

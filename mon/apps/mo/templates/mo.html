@@ -12,19 +12,26 @@
         {% if form and object %}
         <div class="row">
             {% if user.is_staff %}
-            <div class="span2">
-                <li id="agreements" class="dropdown" style="list-style-type:none; display: inline;">
-                    <a href="#" role="button" class="dropdown-toggle btn" data-toggle="dropdown">{% trans 'Соглашения ' %}<b class="caret"></b></a>
-                    <ul class="dropdown-menu" role="menu" >
-                        <li><a href="{% url 'add-agreement-mo' object.id %}">
-                            {% trans 'Добавить соглашение' %}</a></li>
-                        <li><a href="{% url 'add-dop-agreement-mo' object.id 1 %}">
-                            {% trans 'Добавить доп. соглашение' %}</a></li>
-                        <li><a href="{% url 'add-dop-agreement-mo' object.id 2 %}">
-                            {% trans 'Добавить письмо о вычете средств' %}</a></li>
-                    </ul>
-                </li>
-            </div>
+                {% if not show_edit_agreement %}
+                    <div class="span2">
+                        <li id="agreements" class="dropdown" style="list-style-type:none; display: inline;">
+                            {% if user.is_superuser %}
+                            <a href="#" role="button" class="dropdown-toggle btn" data-toggle="dropdown">{% trans 'Соглашения ' %}<b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" >
+                                <li><a href="{% url 'add-agreement-mo' object.id 0 %}">
+                                    {% trans 'Добавить соглашение' %}</a></li>
+                                <li><a href="{% url 'add-agreement-mo' object.id 1 %}">
+                                    {% trans 'Добавить доп. соглашение' %}</a></li>
+                                <!-- <li><a href="{% url 'add-agreement-mo' object.id 2 %}">
+                                    {% trans 'Добавить доп. соглашение о вычете средств' %}</a></li> -->
+                            </ul>
+                            {% endif %}
+                        </li>
+                    </div>
+                {% else %}
+                    <div class="span2"> </div>
+                {% endif %}
+
             {% endif %}
             <div class="span10 text-right">
                 <a class="btn" href="{% url 'monitorings' object.id %}">

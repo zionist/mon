@@ -16,13 +16,19 @@
                 {% with form=text_area_fields %}
                 {% include "2_col_form.html" %}
                 {% endwith %}
-                {% endif %}
                 {% for form in formsets %}
                 <br />
                 <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
                 {% include "4_col_form.html" %}
                 {% endfor %}
-                {% if form %}
+                <br />
+                <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
+            </form>
+        {% elif state_form %}
+            <form method="POST" enctype="multipart/form-data" action="{% url 'update-building-state' object.id %}"> {% csrf_token %}
+                {% with form=state_form %}
+                {% include "4_col_form.html" %}
+                {% endwith %}
                 <br />
                 <button class="btn-info" type="submit" name="build"> {% trans ' Сохранить ' %} </button>
             </form>

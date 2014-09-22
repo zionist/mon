@@ -20,11 +20,36 @@
                 {% trans 'Удалить' %}</a></div>
             </form>
         </div><br />
-        {% if building_list %}
-            <div class="row">
-                <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
-                <div class="right"> <a class="btn" href="{% url 'create-building' object.id %}"> Добавить связанный объект </a> </div>
+        <div class="row">
+            <div class="right">
+                <a class="btn" href="{% url 'create-building' object.id %}"> Добавить связанный объект </a>
+                <a class="btn" href="{% url 'create-payment' object.id %}"> Добавить связанный платеж </a>
             </div>
+        </div>
+        <div class="row">
+            <div class="span6"> <h4>{% trans 'Связанные платежи' %}</h4> </div>
+        </div>
+
+        {% if payments_list %}
+        <table class="table table-condensed table-hover">
+            <tr><th> {% trans 'Номер документа' %}</th>
+                <th> {% trans 'Дата' %}</th>
+                <th>{% trans 'Сумма платежа (руб.)' %}</th>
+                <th>{% trans 'Тип платежа' %}</th></tr>
+            {% for payment in payments_list %}
+            <tr onclick="location.href = '{% url 'change-payment' payment.id %}'">
+                <td> <a href="{% url 'change-payment' payment.id  %}"> {{ payment.num }} </a> </td>
+                <td> {{ payment.date }} </td>
+                <td> {{ payment.amount }} </td>
+                <td> {% if payment.payment_state == 1 %} Платеж {% endif %} {% if payment.payment_state == 2 %} Административный платеж {% endif %} </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        <div class="row">
+            <div class="span6"> <h4>{% trans 'Связанные объекты' %}</h4> </div>
+        </div>
+        {% if building_list %}
             <table class="table table-condensed table-hover">
                 {% regroup building_list by state as objects_list %}
                 <tr><th> {% trans 'Адрес' %}</th><th> </th>
@@ -50,11 +75,8 @@
                 {% endfor %}
                 {% endfor %}
             </table>
-        {% else %}
-            <div class="row">
-                <div class="right"> <a class="btn" href="{% url 'create-building' object.id %}"> Добавить объект </a> </div>
-            </div>
         {% endif %}
+
         <h4 class="blue">{% trans 'Контракт' %} № {{object.num}}</h4>
         <div>
             <p class="blue">
@@ -62,15 +84,9 @@
             {% trans 'Остаток неоплаченных средств по контракту ' %} <strong>{{contract_remainder}}</strong> {% trans ' руб.' %}
             </p>
         </div>
-        {% if form or formsets %}
+        {% if form %}
             {% if form %}
                 {% include "view_table.html" %}
-            {% endif %}
-            {% if formsets %}
-                {% for form in formsets %}
-                    <p class="blue">{% cycle titles.0 titles.1 titles.2 titles.3 %}</p>
-                    {% include "view_table.html" %}
-                {% endfor %}
             {% endif %}
         {% endif %}
 

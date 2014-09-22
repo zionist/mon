@@ -20,7 +20,7 @@ def divide(value, arg):
 
 @register.filter
 def get_choice_or_value(form, field_name):
-    if form.initial:
+    if hasattr(form, 'initial') and form.initial:
         if hasattr(form.fields[field_name], "choices"):
             if form.initial.get(field_name) is not None:
                 # get multichoice from form
@@ -50,6 +50,14 @@ def get_choice_or_value(form, field_name):
                 return choices.get(form.data[field_name])
         else:
             return form.data.get(field_name)
+
+
+@register.filter
+def hide_not_set(value):
+    if value == u"Не указано":
+        return u""
+    else:
+        return value
 
 
 @register.filter

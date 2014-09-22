@@ -26,7 +26,9 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.core.servers.basehttp import FileWrapper
 from apps.core.templatetags.extras import get_choice_or_value
 
-from .forms import RoomForm, HallwayForm, WCForm, KitchenForm, \
+from .forms import RoomForm, HallwayForm, WCForm, KitchenForm,\
+    ResultRoomForm, ResultHallwayForm, ResultWCForm, ResultKitchenForm, \
+    ResultRoomShowForm, ResultHallwayShowForm, ResultWCShowForm, ResultKitchenShowForm, \
     RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm, \
     AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm, \
     AuctionRoomShowForm, AuctionHallwayShowForm, AuctionWCShowForm, AuctionKitchenShowForm
@@ -46,9 +48,11 @@ def generate_fonts_css(request):
                               context_instance=RequestContext(request))
 
 
-def get_fk_forms(parent=None, request=None, multi=None):
+def get_fk_forms(parent=None, request=None, multi=None, result=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     forms = [RoomForm, HallwayForm, WCForm, KitchenForm] if not multi else [AuctionRoomForm, AuctionHallwayForm, AuctionWCForm, AuctionKitchenForm]
+    if result:
+        forms = [ResultRoomForm, ResultHallwayForm, ResultWCForm, ResultKitchenForm]
     if not parent:
         if request and request.method == "POST":
             room_f = forms[0](request.POST, request.FILES, prefix=room_p)
@@ -74,10 +78,12 @@ def get_fk_forms(parent=None, request=None, multi=None):
     return [room_f, hallway_f, wc_f, kitchen_f]
 
 
-def get_fk_show_forms(parent=None, multi=None):
+def get_fk_show_forms(parent=None, multi=None, result=None):
     room_p, hallway_p, wc_p, kitchen_p = 'room_build', 'hallway_build', 'wc_build', 'kitchen_build'
     forms = [RoomShowForm, HallwayShowForm, WCShowForm, KitchenShowForm] if not multi \
         else [AuctionRoomShowForm, AuctionHallwayShowForm, AuctionWCShowForm, AuctionKitchenShowForm]
+    if result:
+        forms = [ResultRoomShowForm, ResultHallwayShowForm, ResultWCShowForm, ResultKitchenShowForm]
     room_f = forms[0](prefix=room_p, instance=parent.room)
     hallway_f = forms[1](prefix=hallway_p, instance=parent.hallway)
     wc_f = forms[2](prefix=wc_p, instance=parent.wc)
@@ -174,7 +180,7 @@ def copy_object(obj):
     return new_obj
 
 # object instance: form for display
-def to_xls(request, objects={}):
+def to_xls(request, objects={}, fk_forms=True, multi=False):
     # create
     book = xlwt.Workbook(encoding='utf8')
     sheet = book.add_sheet('untitled')
@@ -196,9 +202,12 @@ def to_xls(request, objects={}):
     # object fields should be same as form fields
     # get all types of objects
 
-    room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request)
-    fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
-                u'Кухня': kitchen_f, u'Комната': room_f}
+    if fk_forms:
+        room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(request=request, multi=multi)
+        fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
+                    u'Кухня': kitchen_f, u'Комната': room_f}
+    else:
+        fk_forms = {}
     row = 0
     for form, objs in objects.iteritems():
         if not objs:
@@ -213,8 +222,7 @@ def to_xls(request, objects={}):
         for fk_name, fk_form in fk_forms.iteritems():
             for field in fk_form:
                 sheet.write(row, col, u"%s %s" % (fk_name, field.label)
-                if field.label else u"%s %s" % (fk_name, field.name),
-                            style_bold)
+                if field.label else u"%s %s" % (fk_name, field.name), style_bold)
                 col += 1
             # write values
         row += 1
@@ -235,9 +243,10 @@ def to_xls(request, objects={}):
                 col += 1
 
             # write fk forms values
-            room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=obj)
-            fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
-                        u'Кухня': kitchen_f, u'Комната': room_f}
+            if fk_forms:
+                room_f, hallway_f, wc_f, kitchen_f = get_fk_forms(parent=obj, multi=multi)
+                fk_forms = {u'Санузел': wc_f, u'Прихожая': hallway_f,
+                            u'Кухня': kitchen_f, u'Комната': room_f}
             for fk_name, fk_form in fk_forms.iteritems():
                 for field in fk_form:
                     value = fk_form.initial.get(field.name)
@@ -258,3 +267,5 @@ def to_xls(request, objects={}):
     response['Content-Disposition'] = 'attachment; filename=list.xls'
     book.save(response)
     return response
+
+

@@ -19,12 +19,14 @@ from django.contrib.auth.decorators import permission_required, login_required
 
 from .models import Payment
 from .forms import PaymentForm, PaymentShowForm, DateForm
-from apps.mo.models import MO
+from apps.mo.models import MO, MaxFlatPrice
 from apps.user.models import CustomUser
+from apps.core.views import to_xls
+from apps.build.models import Contract
 
 
 @login_required
-def add_payment(request):
+def add_payment(request, contract=None):
     template = 'payment_creation.html'
     context = {'title': _(u'Добавление платежа')}
     prefix = 'pay'
@@ -34,7 +36,11 @@ def add_payment(request):
             form.save()
             return redirect('payments')
     else:
-        form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo})
+        if contract:
+            contract = Contract.objects.get(pk=contract)
+            form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo, 'contract': contract})
+        else:
+            form = PaymentForm(prefix=prefix, initial={'user_mo': request.user.customuser.mo})
     context.update({'form': form, 'prefix': prefix})
     return render_to_response(template, context, context_instance=RequestContext(request))
 
@@ -90,10 +96,32 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
             fed_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=1, payment_budget_state=1) if payment.amount])
             reg_adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2, payment_budget_state=2) if payment.amount])
             fed_adm_spent = sum([float(payment.amount) for payment in objects.filter(payment_state=2, payment_budget_state=1) if payment.amount])
-            spent = reg_spent + fed_spent
             adm_spent = reg_adm_spent + fed_adm_spent
+            spent = reg_spent + fed_spent + adm_spent
             percent = round((float(spent/amount) * 100), 3) if amount else 0
-            economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+
+
+            object_kwargs = {'start_year__lt': user.customuser.get_user_date(),
+                             'finish_year__gt': user.customuser.get_user_date()}
+            max_flat_price = MaxFlatPrice.objects.get(year=from_dt.year)
+            query = mo.contract_set.filter(**object_kwargs).values("flats_amount", "summa",
+                                                               "summ_without_mo_money", "summ_mo_money")
+            # Количество жилых помещений
+            contracts_flats_amount = 0
+            contracts_summ = 0
+            query = mo.contract_set.filter(**object_kwargs).values("flats_amount", "summa",
+                                                                   "summ_without_mo_money", "summ_mo_money")
+            for contract in query:
+                if contract["flats_amount"]:
+                    contracts_flats_amount += contract["flats_amount"]
+                    # Сумма по заключенным контрактам ИТОГО
+                if contract["summa"]:
+                    contracts_summ += contract["summa"]
+            contracts_economy = contracts_flats_amount * max_flat_price.max_price - contracts_summ
+            contracts_economy = contracts_economy if contracts_economy > 0 else 0
+
+            # economy = sum([float(auction.start_price) for auction in mo.auction_set.all() if auction.start_price]) - spent
+            economy = contracts_economy
             accounting.update({'mo': mo, 'spent': spent, 'saved': amount - spent, 'percent': percent,
                                'sub_amount': amount, 'economy': economy, 'home_amount': home_amount,
                                'adm_amount': adm_amount, 'adm_spent': adm_spent,
@@ -129,7 +157,7 @@ def recount_accounting(mo, user=None, context=None, accounting=None, update=None
 
 
 @login_required
-def get_payments(request, mo=None, all=False):
+def get_payments(request, mo=None, all=False, xls=False):
     context = {'title': _(u'Платежи')}
     template = 'payments.html'
     prefix = 'acc_date'
@@ -150,7 +178,8 @@ def get_payments(request, mo=None, all=False):
             mo = request.user.customuser.mo if request.user.customuser.mo else MO.objects.get(pk=mo)
             context = {'title': _(u'Платежи %s') % mo.name}
             objects = recount_accounting(mo, user=request.user, context=context)
-
+        if xls:
+            return to_xls(request,  objects={PaymentForm: objects}, fk_forms = False)
         form = DateForm(prefix=prefix)
         context.update({'date_form': form})
         page = request.GET.get('page', '1')

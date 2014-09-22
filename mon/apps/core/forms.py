@@ -10,8 +10,8 @@ from django.forms.models import inlineformset_factory, formset_factory, \
 from django.forms import MultipleChoiceField
 from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 
-from .models import Room, WC, Hallway, Kitchen, AuctionRoom, AuctionWC, AuctionHallway, \
-    AuctionKitchen, Developer, Choices
+from .models import Room, WC, Hallway, Kitchen, ResultRoom, ResultWC, ResultHallway, ResultKitchen, \
+    AuctionRoom, AuctionWC, AuctionHallway, AuctionKitchen, Developer, Choices
 from apps.core.models import STOVE_CHOICES, SEPARATE_CHOICES
 
 
@@ -156,6 +156,30 @@ class KitchenForm(forms.ModelForm):
         self.fields['ceiling'] = forms.ChoiceField(label=u"Материал отделки потолка", choices=choices, )
 
 
+class ResultRoomForm(RoomForm):
+
+    class Meta:
+        model = ResultRoom
+
+
+class ResultKitchenForm(KitchenForm):
+
+    class Meta:
+        model = ResultKitchen
+
+
+class ResultWCForm(WCForm):
+
+    class Meta:
+        model = ResultWC
+
+
+class ResultHallwayForm(HallwayForm):
+
+    class Meta:
+        model = ResultHallway
+
+
 class RoomShowForm(RoomForm):
 
     class Meta:
@@ -225,6 +249,34 @@ class KitchenShowForm(KitchenForm):
             for field in self.fields:
                 if getattr(self.instance, field) != getattr(cmp_initial, field):
                     self.fields[field].widget.attrs['style'] = 'background-color: red;'
+
+
+class ResultRoomShowForm(RoomShowForm):
+
+    class Meta:
+        model = ResultRoom
+        exclude = ('floor', 'wall', 'ceiling', )
+
+
+class ResultKitchenShowForm(KitchenShowForm):
+
+    class Meta:
+        model = ResultKitchen
+        exclude = ('floor', 'wall', 'ceiling', )
+
+
+class ResultWCShowForm(WCShowForm):
+
+    class Meta:
+        model = ResultWC
+        exclude = ('floor', 'wall', 'ceiling', )
+
+
+class ResultHallwayShowForm(HallwayShowForm):
+
+    class Meta:
+        model = ResultHallway
+        exclude = ('floor', 'wall', 'ceiling', )
 
 
 class BaseAuctionRoomForm(forms.ModelForm):
